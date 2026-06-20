@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, BookOpen } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function Auth({ onLoginSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,7 +20,7 @@ export default function Auth({ onLoginSuccess }) {
 
     try {
       // Connect to the backend
-      const response = await fetch(`http://localhost:5000${url}`, {
+      const response = await fetch(`${API_URL}${url}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -35,7 +36,7 @@ export default function Auth({ onLoginSuccess }) {
         onLoginSuccess(data.user);
       } else {
         // Automatically login after successful signup
-        const loginRes = await fetch('http://localhost:5000/api/auth/login', {
+        const loginRes = await fetch(`${API_URL}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -61,7 +62,7 @@ export default function Auth({ onLoginSuccess }) {
 
     // Simulate Google Login
     // Prompt for a gmail or generate one
-    const mockGmail = prompt("Enter your Gmail address:", "student.backbenchers@gmail.com");
+    const mockGmail = prompt("Enter your Gmail address:", "shaansingh101206@gmail.com");
     if (!mockGmail) {
       setLoading(false);
       return;
@@ -76,7 +77,7 @@ export default function Auth({ onLoginSuccess }) {
     const mockName = mockGmail.split('@')[0].split('.').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

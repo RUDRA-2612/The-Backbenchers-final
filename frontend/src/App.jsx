@@ -8,6 +8,7 @@ import Downloads from './components/Downloads';
 import AdminPanel from './components/AdminPanel';
 import MockPdfViewer from './components/MockPdfViewer';
 import Footer from './components/Footer';
+import { API_URL } from './config';
 
 export default function App() {
   // Authentication State
@@ -35,7 +36,7 @@ export default function App() {
   // Fetch materials from API
   const fetchMaterials = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/materials');
+      const response = await fetch(`${API_URL}/api/materials`);
       if (response.ok) {
         const data = await response.json();
         setMaterials(data);
@@ -92,7 +93,7 @@ export default function App() {
     try {
       // 1. Log to server
       if (user) {
-        await fetch('http://localhost:5000/api/downloads', {
+        await fetch(`${API_URL}/api/downloads`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -107,7 +108,7 @@ export default function App() {
 
       // 2. Trigger browser file download (blob fetch or custom file download)
       // Since these are PDF/text guides, we trigger a browser download from the server path
-      const fileUrl = `http://localhost:5000${file.filepath}`;
+      const fileUrl = file.filepath.startsWith('http') ? file.filepath : `${API_URL}${file.filepath}`;
       
       const link = document.createElement('a');
       link.href = fileUrl;

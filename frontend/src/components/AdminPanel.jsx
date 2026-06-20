@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { API_URL } from '../config';
 
 const subjectsList = [
   { code: 'CS1139', name: 'Programming 1 (Python)' },
@@ -28,15 +29,15 @@ export default function AdminPanel({ onMaterialUploaded }) {
   // Fetch admin logs
   const fetchLogs = async () => {
     try {
-      const loginRes = await fetch('http://localhost:5000/api/admin/logins');
+      const loginRes = await fetch(`${API_URL}/api/admin/logins`);
       const loginData = await loginRes.json();
       setLogins(loginData);
 
-      const downloadRes = await fetch('http://localhost:5000/api/admin/downloads');
+      const downloadRes = await fetch(`${API_URL}/api/admin/downloads`);
       const downloadData = await downloadRes.json();
       setDownloads(downloadData);
 
-      const studentRes = await fetch('http://localhost:5000/api/admin/users');
+      const studentRes = await fetch(`${API_URL}/api/admin/users`);
       const studentData = await studentRes.json();
       setStudents(studentData);
     } catch (err) {
@@ -72,7 +73,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
     formData.append('file', file);
 
     try {
-      const res = await fetch('http://localhost:5000/api/materials/upload', {
+      const res = await fetch(`${API_URL}/api/materials/upload`, {
         method: 'POST',
         body: formData
       });
