@@ -10,7 +10,8 @@
     "frontend": "npm run dev --prefix frontend",
     "dev": "concurrently \"npm run server\" \"npm run frontend\"",
     "build": "npm run build --prefix frontend",
-    "install-all": "npm install && npm install --prefix frontend"
+    "install-all": "npm install && npm install --prefix frontend",
+    "postinstall": "npm install --prefix frontend"
   },
   "dependencies": {
     "cors": "^2.8.5",
