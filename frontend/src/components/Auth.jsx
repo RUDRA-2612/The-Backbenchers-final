@@ -45,7 +45,7 @@ export default function Auth({ onLoginSuccess }) {
         if (loginRes.ok) {
           onLoginSuccess(loginData.user);
         } else {
-          setError('Account created, please log in manually.');
+          setError('Account created, please sign in manually.');
           setIsLogin(true);
         }
       }
