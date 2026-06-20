@@ -193,7 +193,12 @@ export default function App() {
           isCollapsed={sidebarCollapsed}
         />
         
-        <main className="content-container">
+        <main 
+          className="content-container"
+          onClick={() => {
+            if (!sidebarCollapsed) setSidebarCollapsed(true);
+          }}
+        >
           <div style={{ flex: 1 }}>
             {renderMainContent()}
           </div>
