@@ -1,0 +1,84 @@
+{
+  "users": [],
+  "loginLogs": [],
+  "downloadLogs": [],
+  "materials": [
+    {
+      "id": "def-py-1",
+      "title": "Python Basics Cheat Sheet",
+      "subjectCode": "CS1139",
+      "category": "notes",
+      "subcategory": null,
+      "filename": "python_basics.pdf",
+      "filepath": "/uploads/defaults/python_basics.pdf",
+      "isDefault": true,
+      "uploadedAt": "2026-06-20T13:19:28.195Z"
+    },
+    {
+      "id": "def-py-2",
+      "title": "PYQ End Term 2025",
+      "subjectCode": "CS1139",
+      "category": "papers",
+      "subcategory": "end-term",
+      "filename": "py_endterm_2025.pdf",
+      "filepath": "/uploads/defaults/py_endterm_2025.pdf",
+      "isDefault": true,
+      "uploadedAt": "2026-06-20T13:19:28.196Z"
+    },
+    {
+      "id": "def-eee-1",
+      "title": "EEE Mid Term 1 Solved Paper",
+      "subjectCode": "EE1118",
+      "category": "papers",
+      "subcategory": "mid-term-1",
+      "filename": "eee_mid1_2025.pdf",
+      "filepath": "/uploads/defaults/eee_mid1_2025.pdf",
+      "isDefault": true,
+      "uploadedAt": "2026-06-20T13:19:28.196Z"
+    },
+    {
+      "id": "def-calc-1",
+      "title": "Calculus Complete Formula Sheet",
+      "subjectCode": "AS1109",
+      "category": "formulas",
+      "subcategory": null,
+      "filename": "calculus_formulas.pdf",
+      "filepath": "/uploads/defaults/calculus_formulas.pdf",
+      "isDefault": true,
+      "uploadedAt": "2026-06-20T13:19:28.196Z"
+    },
+    {
+      "id": "def-phys-1",
+      "title": "Applied Physics Wave Optics Notes",
+      "subjectCode": "AS1108",
+      "category": "notes",
+      "subcategory": null,
+      "filename": "physics_optics.pdf",
+      "filepath": "/uploads/defaults/physics_optics.pdf",
+      "isDefault": true,
+      "uploadedAt": "2026-06-20T13:19:28.196Z"
+    },
+    {
+      "id": "def-evs-1",
+      "title": "Environmental Science Important Topics",
+      "subjectCode": "ES1115",
+      "category": "topics",
+      "subcategory": null,
+      "filename": "evs_imp_topics.pdf",
+      "filepath": "/uploads/defaults/evs_imp_topics.pdf",
+      "isDefault": true,
+      "uploadedAt": "2026-06-20T13:19:28.196Z"
+    },
+    {
+      "id": "def-fc-1",
+      "title": "Fundamentals of Comm. Mid Term 2 Solved",
+      "subjectCode": "CC1101",
+      "category": "papers",
+      "subcategory": "mid-term-2",
+      "filename": "fc_mid2_solved.pdf",
+      "filepath": "/uploads/defaults/fc_mid2_solved.pdf",
+      "isDefault": true,
+      "uploadedAt": "2026-06-20T13:19:28.196Z"
+    }
+  ]
+}
