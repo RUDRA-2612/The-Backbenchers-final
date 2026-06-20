@@ -14,7 +14,10 @@ export default function SubjectGrid({ onSelectSubject }) {
   return (
     <div>
       <div className="hero-section">
-        <h1 className="hero-title">Welcome to <span>Backbenchers</span></h1>
+        <h1 className="hero-title" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)' }}>Welcome to</span>
+          <span style={{ fontSize: '1.2em' }}>Backbenchers</span>
+        </h1>
         <p className="hero-subtitle">Your ultimate portal for 1st-semester notes, PYQs, solutions, formula sheets, and important exam topics.</p>
       </div>
 
