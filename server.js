@@ -1,11 +1,10 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
 const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('cloudinary').v2;
+const { createClient } = require('@supabase/supabase-js');
 const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,62 +12,15 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// --- MONGODB CONNECTION ---
-if (!process.env.MONGODB_URI) {
-  console.warn("WARNING: MONGODB_URI is missing in .env");
+// --- SUPABASE INITIALIZATION ---
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+  console.warn("WARNING: Supabase URL or Anon Key is missing in .env");
 }
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/backbenchers')
-  .then(() => {
-    console.log('Connected to MongoDB');
-    seedDatabase();
-  })
-  .catch(err => console.error('MongoDB connection error:', err));
-
-// --- MONGODB SCHEMAS & MODELS ---
-const userSchema = new mongoose.Schema({
-  id: String,
-  name: String,
-  email: { type: String, unique: true },
-  password: { type: String, required: false },
-  isGoogle: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now }
-});
-const User = mongoose.model('User', userSchema);
-
-const loginLogSchema = new mongoose.Schema({
-  id: String,
-  userId: String,
-  name: String,
-  email: String,
-  method: String,
-  timestamp: { type: Date, default: Date.now }
-});
-const LoginLog = mongoose.model('LoginLog', loginLogSchema);
-
-const downloadLogSchema = new mongoose.Schema({
-  id: String,
-  name: String,
-  email: String,
-  subjectCode: String,
-  title: String,
-  filename: String,
-  timestamp: { type: Date, default: Date.now }
-});
-const DownloadLog = mongoose.model('DownloadLog', downloadLogSchema);
-
-const materialSchema = new mongoose.Schema({
-  id: String,
-  title: String,
-  subjectCode: String,
-  category: String,
-  subcategory: String,
-  filename: String,
-  filepath: String, // This will now be the Cloudinary URL
-  isDefault: { type: Boolean, default: false },
-  uploadedAt: { type: Date, default: Date.now }
-});
-const Material = mongoose.model('Material', materialSchema);
+const supabase = createClient(
+  process.env.SUPABASE_URL || 'https://xyzcompany.supabase.co',
+  process.env.SUPABASE_ANON_KEY || 'public-anon-key'
+);
 
 // --- SEED DEFAULTS ---
 const defaultFiles = [
@@ -83,67 +35,61 @@ const defaultFiles = [
 
 const seedDatabase = async () => {
   try {
-    const userCount = await User.countDocuments();
-    if (userCount === 0) {
+    const { count: userCount, error: userError } = await supabase.from('users').select('*', { count: 'exact', head: true });
+    if (!userError && userCount === 0) {
       console.log('Seeding default user...');
-      const defaultUser = new User({
+      await supabase.from('users').insert({
         id: uuidv4(),
         name: 'Shaan Singh',
         email: 'shaansingh101206@gmail.com',
         password: 'rudra2612',
         isGoogle: false
       });
-      await defaultUser.save();
       console.log('Default user seeded.');
     }
 
-    const count = await Material.countDocuments();
-    if (count === 0) {
+    const { count: materialCount, error: materialError } = await supabase.from('materials').select('*', { count: 'exact', head: true });
+    if (!materialError && materialCount === 0) {
       console.log('Seeding default materials...');
       const dummyUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
-      for (const file of defaultFiles) {
-        await new Material({
-          id: file.id,
-          title: file.title,
-          subjectCode: file.subjectCode,
-          category: file.category,
-          subcategory: file.subcategory || null,
-          filename: file.filename,
-          filepath: dummyUrl,
-          isDefault: true
-        }).save();
-      }
+      const materialsToInsert = defaultFiles.map(file => ({
+        id: file.id,
+        title: file.title,
+        subjectCode: file.subjectCode,
+        category: file.category,
+        subcategory: file.subcategory || null,
+        filename: file.filename,
+        filepath: dummyUrl,
+        isDefault: true
+      }));
+      await supabase.from('materials').insert(materialsToInsert);
       console.log('Database seeded with defaults.');
     }
   } catch (err) {
-    console.error('Seed error:', err);
+    console.error('Seed error:', err.message);
   }
 };
 
-// --- CLOUDINARY CONFIG ---
-if (process.env.CLOUDINARY_CLOUD_NAME) {
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-  });
-}
+// Seed db on startup
+seedDatabase();
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'backbenchers/materials',
-    allowed_formats: ['pdf'],
-    resource_type: 'raw' // Required for PDFs
+// --- MULTER CONFIG (MEMORY STORAGE) ---
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  fileFilter: function (req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ext !== '.pdf') {
+      return cb(new Error('Only PDF uploads are allowed!'));
+    }
+    cb(null, true);
   }
 });
 
-const upload = multer({ storage: storage });
-
 // --- API ROUTES ---
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });
+app.get('/api/health', async (req, res) => {
+  const { error } = await supabase.from('users').select('id').limit(1);
+  res.json({ status: 'ok', db: error ? 'error' : 'connected' });
 });
 
 app.post('/api/auth/register', async (req, res) => {
@@ -151,16 +97,20 @@ app.post('/api/auth/register', async (req, res) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) return res.status(400).json({ error: 'All fields are required' });
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const emailLower = email.toLowerCase();
+    const { data: existingUser } = await supabase.from('users').select('*').eq('email', emailLower).single();
     if (existingUser) return res.status(400).json({ error: 'Email already registered' });
 
-    const newUser = new User({
+    const newUser = {
       id: uuidv4(),
       name,
-      email: email.toLowerCase(),
-      password
-    });
-    await newUser.save();
+      email: emailLower,
+      password,
+      isGoogle: false
+    };
+    
+    const { error } = await supabase.from('users').insert(newUser);
+    if (error) throw error;
 
     res.status(201).json({ message: 'Registration successful', user: { id: newUser.id, name: newUser.name, email: newUser.email } });
   } catch (err) {
@@ -173,18 +123,20 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password, isGoogleLogin, name } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
-    let user = await User.findOne({ email: email.toLowerCase() });
+    const emailLower = email.toLowerCase();
+    let { data: user, error: findError } = await supabase.from('users').select('*').eq('email', emailLower).single();
 
     if (isGoogleLogin) {
       if (!user) {
-        user = new User({
+        user = {
           id: uuidv4(),
           name: name || email.split('@')[0],
-          email: email.toLowerCase(),
+          email: emailLower,
           password: 'OAuthMockPassword123',
           isGoogle: true
-        });
-        await user.save();
+        };
+        const { error: insertError } = await supabase.from('users').insert(user);
+        if (insertError) throw insertError;
       }
     } else {
       if (!user || user.password !== password) {
@@ -192,14 +144,14 @@ app.post('/api/auth/login', async (req, res) => {
       }
     }
 
-    const loginLog = new LoginLog({
+    // Log login
+    await supabase.from('login_logs').insert({
       id: uuidv4(),
       userId: user.id,
       name: user.name,
       email: user.email,
       method: isGoogleLogin ? 'Google OAuth' : 'Email/Password'
     });
-    await loginLog.save();
 
     res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email } });
   } catch (err) {
@@ -209,28 +161,32 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/admin/logins', async (req, res) => {
   try {
-    const logs = await LoginLog.find().sort({ timestamp: -1 });
+    const { data: logs, error } = await supabase.from('login_logs').select('*').order('timestamp', { ascending: false });
+    if (error) throw error;
     res.json(logs);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/admin/downloads', async (req, res) => {
   try {
-    const logs = await DownloadLog.find().sort({ timestamp: -1 });
+    const { data: logs, error } = await supabase.from('download_logs').select('*').order('timestamp', { ascending: false });
+    if (error) throw error;
     res.json(logs);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/admin/users', async (req, res) => {
   try {
-    const users = await User.find({}, '-password').sort({ createdAt: -1 });
+    const { data: users, error } = await supabase.from('users').select('id, name, email, isGoogle, createdAt').order('createdAt', { ascending: false });
+    if (error) throw error;
     res.json(users);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/materials', async (req, res) => {
   try {
-    const materials = await Material.find().sort({ uploadedAt: -1 });
+    const { data: materials, error } = await supabase.from('materials').select('*').order('uploadedAt', { ascending: false });
+    if (error) throw error;
     res.json(materials);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -241,21 +197,39 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'Please upload a PDF file' });
     if (!title || !subjectCode || !category) return res.status(400).json({ error: 'Title, subject code, and category are required' });
 
-    // With multer-storage-cloudinary, req.file.path contains the uploaded Cloudinary URL
-    const fileUrl = req.file.path;
-    const filename = req.file.filename || req.file.originalname;
+    // Generate unique filename
+    const ext = path.extname(req.file.originalname);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const filename = 'document-' + uniqueSuffix + (ext ? ext : '.pdf');
 
-    const newMaterial = new Material({
+    // Upload to Supabase Storage Bucket 'materials'
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('materials')
+      .upload(filename, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage.from('materials').getPublicUrl(filename);
+    const fileUrl = publicUrlData.publicUrl;
+
+    const newMaterial = {
       id: uuidv4(),
       title,
       subjectCode,
       category,
       subcategory: subcategory || null,
-      filename: filename,
-      filepath: fileUrl // Storing the Absolute Cloudinary URL
-    });
+      filename: req.file.originalname,
+      filepath: fileUrl,
+      isDefault: false
+    };
 
-    await newMaterial.save();
+    const { error: insertError } = await supabase.from('materials').insert(newMaterial);
+    if (insertError) throw insertError;
+
     res.status(201).json({ message: 'Material uploaded successfully', material: newMaterial });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -267,15 +241,17 @@ app.post('/api/downloads', async (req, res) => {
     const { name, email, subjectCode, title, filename } = req.body;
     if (!email || !filename) return res.status(400).json({ error: 'Email and filename are required' });
 
-    const log = new DownloadLog({
+    const log = {
       id: uuidv4(),
       name: name || 'Guest',
       email,
       subjectCode: subjectCode || 'N/A',
       title: title || filename,
       filename
-    });
-    await log.save();
+    };
+    
+    const { error } = await supabase.from('download_logs').insert(log);
+    if (error) throw error;
 
     res.status(201).json({ message: 'Download logged successfully', log });
   } catch (err) {
