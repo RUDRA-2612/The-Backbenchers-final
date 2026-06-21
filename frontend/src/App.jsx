@@ -62,6 +62,15 @@ export default function App() {
           setActiveView('home');
         } else {
           setActiveView('subject-detail');
+          setActivePdfFile(null); // Ensure PDF is closed if they back out
+        }
+      } else if (hash === 'pdf-viewer') {
+        // We only allow this hash if a pdf is actually open
+        if (!activePdfFile || !selectedSubject) {
+          window.location.replace('#home');
+          setActiveView('home');
+        } else {
+          // keep it open
         }
       } else if (hash === 'home' || hash === 'admin' || hash === 'downloads') {
         setActiveView(hash);
@@ -137,9 +146,7 @@ export default function App() {
 
   const handleViewFile = (file) => {
     setActivePdfFile(file);
-    // Open modal without changing hash so back button closes it, or we could just use state.
-    // Hash based modals can be tricky, so we just use React state for the PDF modal.
-    // If they press back, hashchange to the same view will just close the modal below in handleHashChange.
+    window.location.hash = 'pdf-viewer';
   };
 
   // Physically download file and log transaction in backend
@@ -270,7 +277,7 @@ export default function App() {
       {activePdfFile && (
         <MockPdfViewer 
           file={activePdfFile} 
-          onClose={() => setActivePdfFile(null)}
+          onClose={() => window.history.back()}
           onDownload={handleDownloadFile}
         />
       )}
