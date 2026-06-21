@@ -198,21 +198,21 @@ export default function App() {
       />
       
       <div className="main-wrapper">
+        <div 
+          className={`sidebar-overlay ${!sidebarCollapsed ? 'active' : ''}`} 
+          onClick={() => setSidebarCollapsed(true)}
+        ></div>
         <Sidebar 
           activeView={activeView} 
           setActiveView={(view) => {
             setActiveView(view);
             if (view === 'home') setSelectedSubject(null);
+            if (window.innerWidth < 768) setSidebarCollapsed(true);
           }}
           isCollapsed={sidebarCollapsed}
         />
         
-        <main 
-          className="content-container"
-          onClick={() => {
-            if (window.innerWidth < 768 && !sidebarCollapsed) setSidebarCollapsed(true);
-          }}
-        >
+        <main className="content-container">
           <div style={{ flex: 1 }}>
             {renderMainContent()}
           </div>

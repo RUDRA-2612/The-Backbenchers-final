@@ -362,6 +362,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* SIDEBAR */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 85;
+  transition: opacity var(--transition-speed) var(--transition-ease);
+  opacity: 0;
+  pointer-events: none;
+}
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .sidebar {
   width: 260px;
   background-color: var(--bg-primary);
@@ -716,6 +736,10 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1.5rem;
   overflow-x: auto;
   padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs-container::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
@@ -729,6 +753,7 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 3px solid transparent;
   transition: var(--transition);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tab-btn:hover {
@@ -757,6 +782,8 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-secondary);
   cursor: pointer;
   transition: var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .subtab-btn:hover {
@@ -899,6 +926,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .admin-table-container {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-table {
@@ -1245,15 +1273,19 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
   }
   .sidebar {
-    position: absolute;
-    top: 0;
+    position: fixed;
+    top: 70px;
     bottom: 0;
     left: 0;
     width: 240px;
     box-shadow: 10px 0 30px rgba(0,0,0,0.15);
+    z-index: 90;
+    transition: transform var(--transition-speed) var(--transition-ease);
+    transform: translateX(0);
   }
   .sidebar.collapsed {
-    width: 0;
+    width: 240px;
+    transform: translateX(-100%);
     border-right-width: 0;
     box-shadow: none;
   }
@@ -1272,8 +1304,44 @@ h1, h2, h3, h4, h5, h6 {
   .logo {
     font-size: 1.2rem;
   }
+  .navbar .logo span {
+    display: none;
+  }
   .nav-right {
-    gap: 0.75rem;
+    gap: 0.5rem;
+  }
+  .navbar {
+    padding: 0 1rem;
+  }
+
+  /* SubTabs Tweak */
+  .subtabs-container {
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .subtabs-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Admin Tweaks */
+  .admin-card {
+    padding: 1rem;
+  }
+
+  /* Grid Tweaks */
+  .subjects-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .resource-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .resource-actions {
+    width: 100%;
+    justify-content: flex-end;
   }
 
   /* Auth Page Tweaks */
@@ -1286,20 +1354,30 @@ h1, h2, h3, h4, h5, h6 {
 
   /* PDF Viewer Tweaks */
   .pdf-viewer-overlay {
-    padding: 0.5rem;
+    padding: 0;
   }
   .pdf-viewer-container {
-    height: 95vh;
+    height: 100vh;
+    border-radius: 0;
   }
   .pdf-body {
-    padding: 1rem;
+    padding: 0.5rem;
   }
   .pdf-page-sheet {
-    padding: 1.5rem 1rem;
+    padding: 1rem 0.75rem;
     min-height: auto;
   }
   .pdf-sheet-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+  }
+  .pdf-viewer-header {
+    padding: 0.5rem 0.75rem;
+  }
+  .pdf-title {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Footer Tweaks */
