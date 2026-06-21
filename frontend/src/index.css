@@ -1375,33 +1375,30 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1;
   font-weight: 700;
   color: var(--accent);
-  display: inline-block;
-  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: inline-flex;
   cursor: default;
-  position: relative;
 }
 
-.hero-brand-name:hover {
-  transform: scale(1.05) translateY(-2px);
-  text-shadow: 0 10px 25px var(--accent-glow);
-  letter-spacing: 0.02em;
+.dance-letter {
+  display: inline-block;
+  animation: letterDropIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-.hero-brand-name::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0;
-  height: 3px;
-  background-color: var(--accent);
-  border-radius: 2px;
-  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 0 10px var(--accent-glow);
+@keyframes letterDropIn {
+  0% { transform: translateY(15px) scale(0.8); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-.hero-brand-name:hover::after {
-  width: 100%;
+@media (hover: hover) and (pointer: fine) {
+  .hero-brand-name:hover .dance-letter {
+    animation: letterDanceHover 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+}
+
+@keyframes letterDanceHover {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  50% { transform: translateY(-8px) scale(1.1); opacity: 1; text-shadow: 0 10px 20px var(--accent-glow); color: var(--accent-hover); }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 /* RESPONSIVE DESIGN */
