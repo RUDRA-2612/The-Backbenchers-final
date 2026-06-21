@@ -65,13 +65,9 @@ export default function App() {
           setActivePdfFile(null); // Ensure PDF is closed if they back out
         }
       } else if (hash === 'pdf-viewer') {
-        // We only allow this hash if a pdf is actually open
-        if (!activePdfFile || !selectedSubject) {
-          window.location.replace('#home');
-          setActiveView('home');
-        } else {
-          // keep it open
-        }
+        // Do nothing on hashchange to pdf-viewer.
+        // The PDF modal is opened by handleViewFile setting activePdfFile synchronously.
+        // If we check activePdfFile here, it fails due to stale closures.
       } else if (hash === 'home' || hash === 'admin' || hash === 'downloads') {
         setActiveView(hash);
         setActivePdfFile(null);
