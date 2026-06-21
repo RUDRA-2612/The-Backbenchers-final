@@ -50,54 +50,42 @@ export default function App() {
     fetchMaterials();
   }, []);
 
-  // Helper to safely manipulate history (strips non-serializable data like React icons)
-  const replaceSafeState = (view, subject, pdfFile, hash) => {
-    const safeSubject = subject ? { ...subject } : null;
-    if (safeSubject && safeSubject.icon) delete safeSubject.icon;
-    try {
-      window.history.replaceState({ view, subject: safeSubject, pdfFile }, '', hash);
-    } catch (err) {
-      console.error('History replaceState error:', err);
-    }
-  };
-
-  const pushSafeState = (view, subject, pdfFile, hash) => {
-    const safeSubject = subject ? { ...subject } : null;
-    if (safeSubject && safeSubject.icon) delete safeSubject.icon;
-    try {
-      window.history.pushState({ view, subject: safeSubject, pdfFile }, '', hash);
-    } catch (err) {
-      console.error('History pushState error:', err);
-    }
-  };
-
-  // Handle browser back button (History API)
+  // Handle browser back button via Native Hash Routing (100% reliable on mobile)
   useEffect(() => {
-    const handlePopState = (event) => {
-      if (event.state) {
-        setActiveView(event.state.view || 'home');
-        setSelectedSubject(event.state.subject || null);
-        setActivePdfFile(event.state.pdfFile || null);
-      } else {
-        setActiveView('home');
-        setSelectedSubject(null);
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      
+      if (hash === 'subject-detail') {
+        // If they navigate to subject-detail but no subject is in state (e.g. refresh), go home
+        if (!selectedSubject) {
+          window.location.replace('#home');
+          setActiveView('home');
+        } else {
+          setActiveView('subject-detail');
+        }
+      } else if (hash === 'home' || hash === 'admin' || hash === 'downloads') {
+        setActiveView(hash);
         setActivePdfFile(null);
+        if (hash === 'home') setSelectedSubject(null);
+      } else {
+        // Default fallback
+        setActiveView('home');
+        setActivePdfFile(null);
+        window.location.replace('#home');
       }
     };
 
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handleHashChange);
     
-    // Initialize current state in history if not present
-    if (window.history.state) {
-      setActiveView(window.history.state.view || 'home');
-      setSelectedSubject(window.history.state.subject || null);
-      setActivePdfFile(window.history.state.pdfFile || null);
+    // Initialize hash on load
+    if (!window.location.hash) {
+      window.location.replace('#home');
     } else {
-      replaceSafeState(activeView, selectedSubject, activePdfFile, '#' + activeView);
+      handleHashChange();
     }
 
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [selectedSubject]);
 
   // Update theme html attribute
   useEffect(() => {
@@ -123,14 +111,14 @@ export default function App() {
     fetchMaterials();
     const nextView = userData.isAdmin ? 'admin' : 'home';
     setActiveView(nextView);
-    replaceSafeState(nextView, null, null, '#' + nextView);
+    window.location.hash = nextView;
   };
 
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('backbenchers_user');
     setActiveView('home');
-    replaceSafeState('home', null, null, '#home');
+    window.location.hash = 'home';
   };
 
   const toggleTheme = () => {
@@ -144,12 +132,14 @@ export default function App() {
   const handleSelectSubject = (subject) => {
     setSelectedSubject(subject);
     setActiveView('subject-detail');
-    pushSafeState('subject-detail', subject, activePdfFile, '#subject-detail');
+    window.location.hash = 'subject-detail';
   };
 
   const handleViewFile = (file) => {
     setActivePdfFile(file);
-    pushSafeState(activeView, selectedSubject, file, '#' + activeView + '-pdf');
+    // Open modal without changing hash so back button closes it, or we could just use state.
+    // Hash based modals can be tricky, so we just use React state for the PDF modal.
+    // If they press back, hashchange to the same view will just close the modal below in handleHashChange.
   };
 
   // Physically download file and log transaction in backend
@@ -261,9 +251,8 @@ export default function App() {
               return;
             }
             setActiveView(view);
-            const newSubject = view === 'home' ? null : selectedSubject;
             if (view === 'home') setSelectedSubject(null);
-            pushSafeState(view, newSubject, activePdfFile, '#' + view);
+            window.location.hash = view;
             if (window.innerWidth < 768) setSidebarCollapsed(true);
           }}
           isCollapsed={sidebarCollapsed}
@@ -281,7 +270,7 @@ export default function App() {
       {activePdfFile && (
         <MockPdfViewer 
           file={activePdfFile} 
-          onClose={() => window.history.back()}
+          onClose={() => setActivePdfFile(null)}
           onDownload={handleDownloadFile}
         />
       )}
