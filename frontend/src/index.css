@@ -1208,7 +1208,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .pdf-sheet-header {
-  border-bottom: 2px solid #ff6b00;
+  border-bottom: 2px solid #000000;
   padding-bottom: 1rem;
   margin-bottom: 2rem;
   display: flex;
@@ -1259,8 +1259,8 @@ h1, h2, h3, h4, h5, h6 {
 .pdf-section-heading {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #ff6b00;
-  border-bottom: 1px solid #e2e8f0;
+  color: #000000;
+  border-bottom: 1px solid #000000;
   padding-bottom: 0.3rem;
   margin-bottom: 0.75rem;
 }
@@ -1273,8 +1273,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .pdf-question-block {
-  background-color: #f8fafc;
-  border-left: 3px solid #ff6b00;
+  background-color: #ffffff;
+  border-left: 3px solid #000000;
   padding: 1rem;
   border-radius: 0 8px 8px 0;
   margin-bottom: 1.5rem;
@@ -1289,7 +1289,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .pdf-solution-title {
   font-weight: 600;
-  color: #10b981;
+  color: #000000;
   font-size: 0.85rem;
   margin-top: 0.5rem;
 }

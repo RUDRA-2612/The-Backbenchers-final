@@ -81,17 +81,17 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
             <div className="pdf-section-heading">Core Equations & Constant Tables</div>
             <p className="pdf-section-p">Below are the highly repeated formulas from previous year exams for quick revision:</p>
             
-            <div className="pdf-question-block" style={{ borderLeftColor: '#10b981' }}>
+            <div className="pdf-question-block" style={{ borderLeftColor: '#000000' }}>
               <div className="pdf-question-title">Equation 1: General Governing Relationship</div>
-              <p className="pdf-section-p" style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '1.05rem', color: 'var(--accent)' }}>
+              <p className="pdf-section-p" style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '1.05rem', color: '#000000' }}>
                 Y(x) = ∫ [ f(t) * e^(-iωt) ] dt  from -∞ to +∞
               </p>
               <p className="pdf-section-p">Where f(t) represents the input excitation and Y(x) represents the spectrum distribution coefficient.</p>
             </div>
 
-            <div className="pdf-question-block" style={{ borderLeftColor: '#10b981' }}>
+            <div className="pdf-question-block" style={{ borderLeftColor: '#000000' }}>
               <div className="pdf-question-title">Equation 2: System Boundary Constants</div>
-              <p className="pdf-section-p" style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '1.05rem', color: 'var(--accent)' }}>
+              <p className="pdf-section-p" style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '1.05rem', color: '#000000' }}>
                 ΔX * ΔP  ≥  ħ / 2
               </p>
               <p className="pdf-section-p">Fundamental limit of measurement certainty for wave propagation and state values.</p>
