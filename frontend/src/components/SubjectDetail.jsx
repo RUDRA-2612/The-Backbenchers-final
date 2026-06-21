@@ -32,12 +32,10 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
         <span>Back to Subjects</span>
       </button>
 
-      <div className="subject-header-section">
-        <div>
-          <h2 className="subject-header-title">{subject.name}</h2>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Access all syllabus resources in one place.</p>
-        </div>
-        <span className="subject-header-code">{subject.code}</span>
+      <div className="subject-header-section" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <h2 className="subject-header-title">{subject.name}</h2>
+        <span className="subject-header-code" style={{ alignSelf: 'flex-start', fontSize: '0.9rem', padding: '0.2rem 0.6rem' }}>{subject.code}</span>
+        <p style={{ color: 'var(--text-secondary)' }}>Access all syllabus resources in one place.</p>
       </div>
 
       {/* Tabs */}
@@ -119,7 +117,7 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
                   <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>View Online</span>
                 </button>
                 <button 
-                  className="btn btn-primary" 
+                  className="btn btn-secondary btn-accent-light" 
                   onClick={() => onDownloadFile(file)}
                   title="Download PDF"
                   style={{ padding: '0.5rem' }}
