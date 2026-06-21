@@ -15,7 +15,7 @@ export default function SubjectGrid({ onSelectSubject }) {
   return (
     <div>
       <div className="hero-section">
-        <h1 className="hero-title" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <h1 className="hero-title" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
           <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)', lineHeight: '1' }}>Welcome to</span>
           <span className="hero-brand-name">
             {"Backbenchers".split('').map((char, idx) => (
