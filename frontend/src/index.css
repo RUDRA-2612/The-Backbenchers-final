@@ -609,6 +609,26 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 3rem;
 }
 
+@media (max-width: 650px) {
+  .subjects-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .subject-card {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .subject-title {
+    font-size: 1.05rem;
+  }
+  
+  .subject-card-footer span {
+    font-size: 0.8rem;
+  }
+}
+
 .subject-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border);

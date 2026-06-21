@@ -50,6 +50,38 @@ export default function App() {
     fetchMaterials();
   }, []);
 
+  // Handle browser back button (History API)
+  useEffect(() => {
+    const handlePopState = (event) => {
+      if (event.state) {
+        setActiveView(event.state.view || 'home');
+        setSelectedSubject(event.state.subject || null);
+        setActivePdfFile(event.state.pdfFile || null);
+      } else {
+        setActiveView('home');
+        setSelectedSubject(null);
+        setActivePdfFile(null);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    
+    // Initialize current state in history if not present
+    if (window.history.state) {
+      setActiveView(window.history.state.view || 'home');
+      setSelectedSubject(window.history.state.subject || null);
+      setActivePdfFile(window.history.state.pdfFile || null);
+    } else {
+      window.history.replaceState({ 
+        view: activeView, 
+        subject: selectedSubject, 
+        pdfFile: activePdfFile 
+      }, '', '');
+    }
+
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // Update theme html attribute
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -74,13 +106,16 @@ export default function App() {
     localStorage.setItem('backbenchers_user', JSON.stringify(userData));
     // Fetch materials upon login to make sure we're sync'd
     fetchMaterials();
-    setActiveView(userData.isAdmin ? 'admin' : 'home');
+    const nextView = userData.isAdmin ? 'admin' : 'home';
+    setActiveView(nextView);
+    window.history.replaceState({ view: nextView, subject: null, pdfFile: null }, '', '');
   };
 
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('backbenchers_user');
     setActiveView('home');
+    window.history.replaceState({ view: 'home', subject: null, pdfFile: null }, '', '');
   };
 
   const toggleTheme = () => {
@@ -94,10 +129,12 @@ export default function App() {
   const handleSelectSubject = (subject) => {
     setSelectedSubject(subject);
     setActiveView('subject-detail');
+    window.history.pushState({ view: 'subject-detail', subject, pdfFile: activePdfFile }, '', '');
   };
 
   const handleViewFile = (file) => {
     setActivePdfFile(file);
+    window.history.pushState({ view: activeView, subject: selectedSubject, pdfFile: file }, '', '');
   };
 
   // Physically download file and log transaction in backend
@@ -161,7 +198,7 @@ export default function App() {
           <SubjectDetail 
             subject={selectedSubject} 
             materials={materials} 
-            onBack={() => setActiveView('home')}
+            onBack={() => window.history.back()}
             onViewFile={handleViewFile}
             onDownloadFile={handleDownloadFile}
           />
@@ -204,8 +241,14 @@ export default function App() {
         <Sidebar 
           activeView={activeView} 
           setActiveView={(view) => {
+            if (view === activeView) {
+              if (window.innerWidth < 768) setSidebarCollapsed(true);
+              return;
+            }
             setActiveView(view);
+            const newSubject = view === 'home' ? null : selectedSubject;
             if (view === 'home') setSelectedSubject(null);
+            window.history.pushState({ view, subject: newSubject, pdfFile: activePdfFile }, '', '');
             if (window.innerWidth < 768) setSidebarCollapsed(true);
           }}
           isCollapsed={sidebarCollapsed}
@@ -216,14 +259,14 @@ export default function App() {
           <div style={{ flex: 1 }}>
             {renderMainContent()}
           </div>
-          <Footer />
+          {activeView === 'home' && <Footer />}
         </main>
       </div>
 
       {activePdfFile && (
         <MockPdfViewer 
           file={activePdfFile} 
-          onClose={() => setActivePdfFile(null)}
+          onClose={() => window.history.back()}
           onDownload={handleDownloadFile}
         />
       )}
