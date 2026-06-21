@@ -724,6 +724,41 @@ h1, h2, h3, h4, h5, h6 {
   .content-container {
     padding: 1rem;
   }
+  
+  /* Navbar optimizations */
+  .navbar {
+    padding: 0 1rem;
+  }
+  .logo {
+    font-size: 1.3rem;
+  }
+  .nav-right {
+    gap: 1rem;
+  }
+
+  /* Auth page optimizations */
+  .auth-card {
+    padding: 1.5rem;
+  }
+  .auth-title {
+    font-size: 1.6rem;
+  }
+  
+  /* Hero section */
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  /* Subject Detail Header */
+  .subject-header-title {
+    font-size: 1.5rem;
+  }
+  
+  /* General Buttons */
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
 }
 
 /* SUBJECT DETAIL */
