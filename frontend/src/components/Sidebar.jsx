@@ -1,7 +1,7 @@
 import React from 'react';
 import { Home, Download, ShieldAlert } from 'lucide-react';
 
-export default function Sidebar({ activeView, setActiveView, isCollapsed }) {
+export default function Sidebar({ activeView, setActiveView, isCollapsed, isAdmin }) {
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <button 
@@ -20,13 +20,15 @@ export default function Sidebar({ activeView, setActiveView, isCollapsed }) {
         <span>My Downloads</span>
       </button>
 
-      <button 
-        className={`sidebar-link ${activeView === 'admin' ? 'active' : ''}`}
-        onClick={() => setActiveView('admin')}
-      >
-        <ShieldAlert size={20} />
-        <span>Admin Panel</span>
-      </button>
+      {isAdmin && (
+        <button 
+          className={`sidebar-link ${activeView === 'admin' ? 'active' : ''}`}
+          onClick={() => setActiveView('admin')}
+        >
+          <ShieldAlert size={20} />
+          <span>Admin Panel</span>
+        </button>
+      )}
     </aside>
   );
 }

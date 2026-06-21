@@ -124,6 +124,43 @@ app.post('/api/auth/login', async (req, res) => {
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
     const emailLower = email.toLowerCase();
+    const isAdminEmail = emailLower === 'rudrapal2612@gmail.com';
+
+    // 1. Intercept Admin Login
+    if (isAdminEmail && password === 'rudra@admin') {
+      let { data: adminUser } = await supabase.from('users').select('*').eq('email', emailLower).single();
+      
+      if (!adminUser) {
+        adminUser = {
+          id: uuidv4(),
+          name: 'Rudra Admin',
+          email: emailLower,
+          password: 'rudra@admin',
+          isGoogle: false
+        };
+        const { error: insertError } = await supabase.from('users').insert(adminUser);
+        if (insertError) throw insertError;
+      }
+      
+      await supabase.from('login_logs').insert({
+        id: uuidv4(),
+        userId: adminUser.id,
+        name: adminUser.name,
+        email: adminUser.email,
+        method: 'Admin Credentials'
+      });
+
+      return res.json({ 
+        message: 'Admin Login successful', 
+        user: { id: adminUser.id, name: adminUser.name, email: adminUser.email, isAdmin: true } 
+      });
+    }
+
+    // 2. Normal User Logic
+    if (isAdminEmail && isGoogleLogin) {
+      return res.status(403).json({ error: 'Admin account must use email and password to sign in.' });
+    }
+
     let { data: user, error: findError } = await supabase.from('users').select('*').eq('email', emailLower).single();
 
     if (isGoogleLogin) {
@@ -153,7 +190,7 @@ app.post('/api/auth/login', async (req, res) => {
       method: isGoogleLogin ? 'Google OAuth' : 'Email/Password'
     });
 
-    res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email } });
+    res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email, isAdmin: false } });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

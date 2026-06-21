@@ -69,13 +69,12 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Sync user state
   const handleLoginSuccess = (userData) => {
     setUser(userData);
     localStorage.setItem('backbenchers_user', JSON.stringify(userData));
     // Fetch materials upon login to make sure we're sync'd
     fetchMaterials();
-    setActiveView('home');
+    setActiveView(userData.isAdmin ? 'admin' : 'home');
   };
 
   const handleLogout = () => {
@@ -176,7 +175,7 @@ export default function App() {
           />
         );
       case 'admin':
-        return <AdminPanel onMaterialUploaded={fetchMaterials} />;
+        return user?.isAdmin ? <AdminPanel onMaterialUploaded={fetchMaterials} /> : <SubjectGrid onSelectSubject={handleSelectSubject} />;
       default:
         return <SubjectGrid onSelectSubject={handleSelectSubject} />;
     }
@@ -210,6 +209,7 @@ export default function App() {
             if (window.innerWidth < 768) setSidebarCollapsed(true);
           }}
           isCollapsed={sidebarCollapsed}
+          isAdmin={user?.isAdmin}
         />
         
         <main className="content-container">
