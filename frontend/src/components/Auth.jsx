@@ -106,7 +106,7 @@ export default function Auth({ onLoginSuccess }) {
       <div className="auth-card">
         <div className="auth-header">
           <div className="logo" style={{ justifyContent: 'center' }}>
-            <img src="/logo.png" alt="Logo" className="nav-logo-img" style={{ height: '60px' }} />
+            <img src="/logo.png" alt="Logo" className="nav-logo-img" style={{ height: '85px' }} />
           </div>
           <p className="auth-subtitle">
             {isLogin ? 'Sign in to access B.Tech notes & papers' : 'Create an account to start studying'}

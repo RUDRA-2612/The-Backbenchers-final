@@ -209,14 +209,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .nav-logo-img {
-  height: 32px;
+  height: 44px;
   width: auto;
   object-fit: contain;
   transition: var(--transition);
 }
 
 .pdf-logo-img {
-  height: 24px;
+  height: 30px;
   width: auto;
   object-fit: contain;
   vertical-align: middle;
