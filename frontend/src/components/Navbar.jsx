@@ -39,7 +39,10 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
           onClick={toggleTheme}
           title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
         >
-          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+          <span className="theme-text desktop-only">
+            {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+          </span>
         </button>
 
         {user && (

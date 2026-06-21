@@ -244,18 +244,44 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
   height: 40px;
-  border-radius: 50%;
+  min-width: 40px;
+  padding: 0;
+  border-radius: 20px;
   border: 1px solid var(--border);
-  transition: var(--transition);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+}
+
+.theme-toggle svg {
+  flex-shrink: 0;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .theme-toggle:hover {
   background-color: var(--accent-soft);
   color: var(--accent);
   border-color: var(--accent);
+  padding: 0 0.8rem;
+}
+
+.theme-toggle:hover svg {
   transform: rotate(15deg);
+}
+
+.theme-text {
+  max-width: 0;
+  opacity: 0;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.theme-toggle:hover .theme-text {
+  max-width: 100px;
+  opacity: 1;
+  margin-left: 0.4rem;
 }
 
 .profile-container {
