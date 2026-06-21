@@ -21,7 +21,7 @@ export default function App() {
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('backbenchers_theme') || 'light';
   });
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.innerWidth < 768);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [activeView, setActiveView] = useState('home'); // home, subject-detail, downloads, admin
   const [selectedSubject, setSelectedSubject] = useState(null);
 
@@ -91,9 +91,7 @@ export default function App() {
   // Handle window resize for sidebar
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setSidebarCollapsed(false);
-      } else {
+      if (window.innerWidth < 768) {
         setSidebarCollapsed(true);
       }
     };
