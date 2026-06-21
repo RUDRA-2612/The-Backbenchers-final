@@ -153,14 +153,14 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
             <span className="pdf-title">{file.title}</span>
           </div>
           <div className="pdf-viewer-controls">
-            <button className="pdf-control-btn" onClick={handleZoomOut} title="Zoom Out">
+            <button className="pdf-control-btn desktop-only" onClick={handleZoomOut} title="Zoom Out">
               <ZoomOut size={18} />
             </button>
-            <span className="pdf-page-indicator">{zoom}%</span>
-            <button className="pdf-control-btn" onClick={handleZoomIn} title="Zoom In">
+            <span className="pdf-page-indicator desktop-only">{zoom}%</span>
+            <button className="pdf-control-btn desktop-only" onClick={handleZoomIn} title="Zoom In">
               <ZoomIn size={18} />
             </button>
-            <div style={{ width: '1px', height: '20px', backgroundColor: '#475569', margin: '0 0.5rem' }}></div>
+            <div className="desktop-only" style={{ width: '1px', height: '20px', backgroundColor: '#475569', margin: '0 0.5rem' }}></div>
             <button className="pdf-control-btn" onClick={() => setPage(p => Math.max(p - 1, 1))} disabled={page === 1}>
               <ChevronLeft size={18} />
             </button>
@@ -168,7 +168,7 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
             <button className="pdf-control-btn" onClick={() => setPage(p => Math.min(p + 1, totalPages))} disabled={page === totalPages}>
               <ChevronRight size={18} />
             </button>
-            <div style={{ width: '1px', height: '20px', backgroundColor: '#475569', margin: '0 0.5rem' }}></div>
+            <div className="desktop-only" style={{ width: '1px', height: '20px', backgroundColor: '#475569', margin: '0 0.5rem' }}></div>
             <button className="pdf-control-btn" onClick={() => onDownload(file)} title="Download Document">
               <Download size={18} />
             </button>
