@@ -50,6 +50,27 @@ export default function App() {
     fetchMaterials();
   }, []);
 
+  // Helper to safely manipulate history (strips non-serializable data like React icons)
+  const replaceSafeState = (view, subject, pdfFile, hash) => {
+    const safeSubject = subject ? { ...subject } : null;
+    if (safeSubject && safeSubject.icon) delete safeSubject.icon;
+    try {
+      window.history.replaceState({ view, subject: safeSubject, pdfFile }, '', hash);
+    } catch (err) {
+      console.error('History replaceState error:', err);
+    }
+  };
+
+  const pushSafeState = (view, subject, pdfFile, hash) => {
+    const safeSubject = subject ? { ...subject } : null;
+    if (safeSubject && safeSubject.icon) delete safeSubject.icon;
+    try {
+      window.history.pushState({ view, subject: safeSubject, pdfFile }, '', hash);
+    } catch (err) {
+      console.error('History pushState error:', err);
+    }
+  };
+
   // Handle browser back button (History API)
   useEffect(() => {
     const handlePopState = (event) => {
@@ -72,11 +93,7 @@ export default function App() {
       setSelectedSubject(window.history.state.subject || null);
       setActivePdfFile(window.history.state.pdfFile || null);
     } else {
-      window.history.replaceState({ 
-        view: activeView, 
-        subject: selectedSubject, 
-        pdfFile: activePdfFile 
-      }, '', '#' + activeView);
+      replaceSafeState(activeView, selectedSubject, activePdfFile, '#' + activeView);
     }
 
     return () => window.removeEventListener('popstate', handlePopState);
@@ -106,14 +123,14 @@ export default function App() {
     fetchMaterials();
     const nextView = userData.isAdmin ? 'admin' : 'home';
     setActiveView(nextView);
-    window.history.replaceState({ view: nextView, subject: null, pdfFile: null }, '', '#' + nextView);
+    replaceSafeState(nextView, null, null, '#' + nextView);
   };
 
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('backbenchers_user');
     setActiveView('home');
-    window.history.replaceState({ view: 'home', subject: null, pdfFile: null }, '', '#home');
+    replaceSafeState('home', null, null, '#home');
   };
 
   const toggleTheme = () => {
@@ -127,12 +144,12 @@ export default function App() {
   const handleSelectSubject = (subject) => {
     setSelectedSubject(subject);
     setActiveView('subject-detail');
-    window.history.pushState({ view: 'subject-detail', subject, pdfFile: activePdfFile }, '', '#subject-detail');
+    pushSafeState('subject-detail', subject, activePdfFile, '#subject-detail');
   };
 
   const handleViewFile = (file) => {
     setActivePdfFile(file);
-    window.history.pushState({ view: activeView, subject: selectedSubject, pdfFile: file }, '', '#' + activeView + '-pdf');
+    pushSafeState(activeView, selectedSubject, file, '#' + activeView + '-pdf');
   };
 
   // Physically download file and log transaction in backend
@@ -246,7 +263,7 @@ export default function App() {
             setActiveView(view);
             const newSubject = view === 'home' ? null : selectedSubject;
             if (view === 'home') setSelectedSubject(null);
-            window.history.pushState({ view, subject: newSubject, pdfFile: activePdfFile }, '', '#' + view);
+            pushSafeState(view, newSubject, activePdfFile, '#' + view);
             if (window.innerWidth < 768) setSidebarCollapsed(true);
           }}
           isCollapsed={sidebarCollapsed}
