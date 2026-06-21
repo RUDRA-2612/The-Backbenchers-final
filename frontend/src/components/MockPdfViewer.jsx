@@ -19,7 +19,7 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
       return (
         <div className="pdf-page-sheet">
           <div className="pdf-sheet-header">
-            <span className="pdf-sheet-logo">Back<span>benchers</span> Exams</span>
+            <span className="pdf-sheet-logo"><span>Backbenchers</span> Exams</span>
             <span className="pdf-sheet-subcode">{code}</span>
           </div>
           <h2 className="pdf-sheet-title">{file.title}</h2>
@@ -68,7 +68,7 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
       return (
         <div className="pdf-page-sheet">
           <div className="pdf-sheet-header">
-            <span className="pdf-sheet-logo">Back<span>benchers</span> Quick Sheets</span>
+            <span className="pdf-sheet-logo"><span>Backbenchers</span> Quick Sheets</span>
             <span className="pdf-sheet-subcode">{code}</span>
           </div>
           <h2 className="pdf-sheet-title">{file.title}</h2>
@@ -109,7 +109,7 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
     return (
       <div className="pdf-page-sheet">
         <div className="pdf-sheet-header">
-          <span className="pdf-sheet-logo">Back<span>benchers</span> Notes</span>
+          <span className="pdf-sheet-logo"><span>Backbenchers</span> Notes</span>
           <span className="pdf-sheet-subcode">{code}</span>
         </div>
         <h2 className="pdf-sheet-title">{file.title}</h2>

@@ -107,7 +107,7 @@ export default function Auth({ onLoginSuccess }) {
         <div className="auth-header">
           <div className="logo" style={{ fontSize: '2.2rem', justifyContent: 'center' }}>
             <BookOpen size={32} color="var(--accent)" />
-            <span>Back<span>benchers</span></span>
+            <span>Backbenchers</span>
           </div>
           <p className="auth-subtitle">
             {isLogin ? 'Sign in to access B.Tech notes & papers' : 'Create an account to start studying'}
