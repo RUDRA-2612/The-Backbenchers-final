@@ -21,7 +21,7 @@ export default function App() {
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('backbenchers_theme') || 'light';
   });
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.innerWidth < 768);
   const [activeView, setActiveView] = useState('home'); // home, subject-detail, downloads, admin
   const [selectedSubject, setSelectedSubject] = useState(null);
 
@@ -55,6 +55,19 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('backbenchers_theme', theme);
   }, [theme]);
+
+  // Handle window resize for sidebar
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setSidebarCollapsed(false);
+      } else {
+        setSidebarCollapsed(true);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Sync user state
   const handleLoginSuccess = (userData) => {
@@ -197,7 +210,7 @@ export default function App() {
         <main 
           className="content-container"
           onClick={() => {
-            if (!sidebarCollapsed) setSidebarCollapsed(true);
+            if (window.innerWidth < 768 && !sidebarCollapsed) setSidebarCollapsed(true);
           }}
         >
           <div style={{ flex: 1 }}>

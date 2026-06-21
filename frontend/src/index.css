@@ -1267,4 +1267,48 @@ h1, h2, h3, h4, h5, h6 {
   .subject-header-title {
     font-size: 1.6rem;
   }
+  
+  /* Navbar Tweaks */
+  .logo {
+    font-size: 1.2rem;
+  }
+  .nav-right {
+    gap: 0.75rem;
+  }
+
+  /* Auth Page Tweaks */
+  .auth-card {
+    padding: 1.5rem;
+  }
+  .auth-title {
+    font-size: 1.5rem;
+  }
+
+  /* PDF Viewer Tweaks */
+  .pdf-viewer-overlay {
+    padding: 0.5rem;
+  }
+  .pdf-viewer-container {
+    height: 95vh;
+  }
+  .pdf-body {
+    padding: 1rem;
+  }
+  .pdf-page-sheet {
+    padding: 1.5rem 1rem;
+    min-height: auto;
+  }
+  .pdf-sheet-title {
+    font-size: 1.2rem;
+  }
+
+  /* Footer Tweaks */
+  .footer {
+    padding: 1.5rem 1rem;
+  }
+  .footer-admins-list {
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }

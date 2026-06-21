@@ -88,7 +88,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
       setFile(null);
       // Reset file input element
       document.getElementById('pdf-file-input').value = '';
-      
+
       // Trigger parent callback to refresh materials list
       onMaterialUploaded();
     } catch (err) {
@@ -107,28 +107,28 @@ export default function AdminPanel({ onMaterialUploaded }) {
 
       {/* Admin tabs */}
       <div className="tabs-container">
-        <button 
+        <button
           className={`tab-btn ${adminTab === 'upload' ? 'active' : ''}`}
           onClick={() => setAdminTab('upload')}
         >
           <UploadCloud size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Upload Study Material
         </button>
-        <button 
+        <button
           className={`tab-btn ${adminTab === 'logins' ? 'active' : ''}`}
           onClick={() => setAdminTab('logins')}
         >
           <History size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Student Login Audit
         </button>
-        <button 
+        <button
           className={`tab-btn ${adminTab === 'downloads' ? 'active' : ''}`}
           onClick={() => setAdminTab('downloads')}
         >
           <Download size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Downloads Audit
         </button>
-        <button 
+        <button
           className={`tab-btn ${adminTab === 'students' ? 'active' : ''}`}
           onClick={() => setAdminTab('students')}
         >
@@ -139,7 +139,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
 
       {/* Admin content */}
       <div className="admin-content" style={{ marginTop: '1.5rem' }}>
-        
+
         {/* TAB 1: UPLOAD FORM */}
         {adminTab === 'upload' && (
           <div className="admin-card" style={{ maxWidth: '600px' }}>
@@ -149,7 +149,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
             </h3>
 
             {uploadMessage.text && (
-              <div 
+              <div
                 className={uploadMessage.type === 'success' ? 'upload-success' : 'auth-error'}
                 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
               >
@@ -161,20 +161,20 @@ export default function AdminPanel({ onMaterialUploaded }) {
             <form onSubmit={handleUploadSubmit} className="admin-upload-form">
               <div className="form-group">
                 <label className="form-label" htmlFor="docTitle">Document Title</label>
-                <input 
+                <input
                   id="docTitle"
-                  type="text" 
-                  className="form-input" 
+                  type="text"
+                  className="form-input"
                   placeholder="e.g. Unit 3 - Electrostatics Lecture Notes"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  required 
+                  required
                 />
               </div>
 
               <div className="form-group">
                 <label className="form-label" htmlFor="docSubject">Subject</label>
-                <select 
+                <select
                   id="docSubject"
                   className="form-input"
                   value={subjectCode}
@@ -188,7 +188,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
 
               <div className="form-group">
                 <label className="form-label" htmlFor="docCategory">Resource Category</label>
-                <select 
+                <select
                   id="docCategory"
                   className="form-input"
                   value={category}
@@ -204,7 +204,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
               {category === 'papers' && (
                 <div className="form-group">
                   <label className="form-label" htmlFor="docSubcategory">Exam Subcategory</label>
-                  <select 
+                  <select
                     id="docSubcategory"
                     className="form-input"
                     value={subcategory}
@@ -219,20 +219,20 @@ export default function AdminPanel({ onMaterialUploaded }) {
 
               <div className="form-group">
                 <label className="form-label" htmlFor="pdf-file-input">PDF File Attachment</label>
-                <input 
+                <input
                   id="pdf-file-input"
-                  type="file" 
-                  className="form-input" 
+                  type="file"
+                  className="form-input"
                   accept=".pdf"
                   onChange={handleFileChange}
-                  required 
+                  required
                 />
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Only .pdf format files are supported.</span>
               </div>
 
-              <button 
-                type="submit" 
-                className="btn btn-primary" 
+              <button
+                type="submit"
+                className="btn btn-primary"
                 style={{ marginTop: '0.5rem' }}
                 disabled={loading}
               >
@@ -267,7 +267,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                         <td style={{ fontWeight: '600' }}>{log.name}</td>
                         <td>{log.email}</td>
                         <td>
-                          <span className="tag-method" style={{ 
+                          <span className="tag-method" style={{
                             backgroundColor: log.method.includes('Google') ? 'rgba(66, 133, 244, 0.1)' : 'var(--accent-soft)',
                             color: log.method.includes('Google') ? '#4285f4' : 'var(--accent)'
                           }}>
