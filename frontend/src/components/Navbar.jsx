@@ -27,8 +27,8 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
         <button className="menu-toggle" onClick={toggleSidebar} aria-label="Toggle Sidebar">
           <Menu size={22} />
         </button>
-        <div className="logo">
-          <BookOpen size={24} color="var(--accent)" />
+        <div className="logo" onClick={() => window.location.hash = 'home'}>
+          <img src="/logo.png" alt="Backbenchers Logo" className="nav-logo-img" />
           <span>Backbenchers</span>
         </div>
       </div>

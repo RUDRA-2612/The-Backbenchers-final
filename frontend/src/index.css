@@ -208,6 +208,17 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
 }
 
+.nav-logo-img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+  transition: var(--transition);
+}
+
+[data-theme='dark'] .nav-logo-img {
+  filter: invert(1) brightness(1.5);
+}
+
 .logo span {
   color: var(--accent);
 }
