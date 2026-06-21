@@ -609,25 +609,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 3rem;
 }
 
-@media (max-width: 650px) {
-  .subjects-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-  
-  .subject-card {
-    padding: 1rem;
-    gap: 1rem;
-  }
-  
-  .subject-title {
-    font-size: 1.05rem;
-  }
-  
-  .subject-card-footer span {
-    font-size: 0.8rem;
-  }
-}
 
 .subject-card {
   background-color: var(--bg-card);
@@ -704,6 +685,41 @@ h1, h2, h3, h4, h5, h6 {
 .subject-card:hover .subject-card-footer span svg {
   transform: translateX(4px);
   transition: transform 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .subjects-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem;
+  }
+  
+  .subject-card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+  
+  .subject-code {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .subject-title {
+    font-size: 0.95rem;
+  }
+  
+  .subject-card-footer {
+    font-size: 0.75rem;
+  }
+  
+  .subject-card-footer span svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  /* Make content-container padding smaller on mobile */
+  .content-container {
+    padding: 1rem;
+  }
 }
 
 /* SUBJECT DETAIL */
