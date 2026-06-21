@@ -215,6 +215,13 @@ h1, h2, h3, h4, h5, h6 {
   transition: var(--transition);
 }
 
+.pdf-logo-img {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
 [data-theme='dark'] .nav-logo-img {
   filter: invert(1) brightness(1.5);
 }

@@ -28,8 +28,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
           <Menu size={22} />
         </button>
         <div className="logo" onClick={() => window.location.hash = 'home'}>
-          <img src="/logo.png" alt="Backbenchers Logo" className="nav-logo-img" />
-          <span>Backbenchers</span>
+          <img src="/logo.png" alt="Logo" className="nav-logo-img" />
         </div>
       </div>
 

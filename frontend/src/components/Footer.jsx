@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="footer-logo">
-        <span>Backbenchers</span>
+        <img src="/logo.png" alt="Logo" className="nav-logo-img" style={{ height: '36px' }} />
       </div>
       <div className="footer-admins">
         <span className="footer-admins-title">Website Crafted with <Heart size={14} fill="var(--accent)" color="var(--accent)" style={{ display: 'inline', verticalAlign: 'middle' }} /> by:</span>

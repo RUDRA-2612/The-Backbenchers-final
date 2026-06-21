@@ -105,9 +105,8 @@ export default function Auth({ onLoginSuccess }) {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="logo" style={{ fontSize: '2.2rem', justifyContent: 'center' }}>
-            <BookOpen size={32} color="var(--accent)" />
-            <span>Backbenchers</span>
+          <div className="logo" style={{ justifyContent: 'center' }}>
+            <img src="/logo.png" alt="Logo" className="nav-logo-img" style={{ height: '60px' }} />
           </div>
           <p className="auth-subtitle">
             {isLogin ? 'Sign in to access B.Tech notes & papers' : 'Create an account to start studying'}
