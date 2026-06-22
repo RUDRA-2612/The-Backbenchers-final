@@ -133,31 +133,29 @@ app.post('/api/auth/login', async (req, res) => {
 
     // 1. Intercept Admin Login
     if (isAdminEmail && password === adminCredentials[emailLower].password) {
-      let { data: adminUser } = await supabase.from('users').select('*').eq('email', emailLower).single();
-      
-      if (!adminUser) {
-        adminUser = {
-          id: uuidv4(),
-          name: adminCredentials[emailLower].name,
-          email: emailLower,
-          password: adminCredentials[emailLower].password,
-          isGoogle: false
-        };
-        const { error: insertError } = await supabase.from('users').insert(adminUser);
-        if (insertError) throw insertError;
-      }
-      
-      await supabase.from('login_logs').insert({
+      const adminId = emailLower === 'rudrapal2612@gmail.com' 
+        ? 'cd29ea2c-bcf6-4d91-9a0f-d47cc61a6649' 
+        : '225949df-125e-43dc-a229-92570025ba18';
+
+      const mockAdminUser = {
+        id: adminId,
+        name: adminCredentials[emailLower].name,
+        email: emailLower,
+        isAdmin: true
+      };
+
+      // Fire-and-forget login logging (doesn't block login if it fails)
+      supabase.from('login_logs').insert({
         id: uuidv4(),
-        userId: adminUser.id,
-        name: adminUser.name,
-        email: adminUser.email,
+        userId: adminId,
+        name: mockAdminUser.name,
+        email: mockAdminUser.email,
         method: 'Admin Credentials'
-      });
+      }).then(() => {}).catch(e => console.error("Admin log error:", e));
 
       return res.json({ 
         message: 'Admin Login successful', 
-        user: { id: adminUser.id, name: adminUser.name, email: adminUser.email, isAdmin: true } 
+        user: mockAdminUser
       });
     }
 
