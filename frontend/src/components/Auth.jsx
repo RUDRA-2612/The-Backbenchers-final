@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, BookOpen } from 'lucide-react';
+import { Mail, Lock, User, BookOpen, Eye, EyeOff } from 'lucide-react';
 import { API_URL } from '../config';
 
 export default function Auth({ onLoginSuccess }) {
@@ -9,6 +9,7 @@ export default function Auth({ onLoginSuccess }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -175,14 +176,33 @@ export default function Auth({ onLoginSuccess }) {
               <Lock size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '13px' }} />
               <input 
                 id="accountPassword"
-                type="password" 
+                type={showPassword ? "text" : "password"} 
                 className="form-input" 
-                style={{ paddingLeft: '40px' }}
+                style={{ paddingLeft: '40px', paddingRight: '40px' }}
                 placeholder="••••••••" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required 
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '13px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--text-muted)'
+                }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
