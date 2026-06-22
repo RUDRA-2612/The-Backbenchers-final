@@ -60,7 +60,6 @@ const seedDatabase = async () => {
         subcategory: file.subcategory || null,
         filename: file.filename,
         filepath: dummyUrl,
-        year: '2025',
         isDefault: true
       }));
       await supabase.from('materials').insert(materialsToInsert);
@@ -124,38 +123,36 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password, isGoogleLogin, name } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
-    const emailLower = email.trim().toLowerCase();
-    const adminCredentials = {
-      'rudrapal2612@gmail.com': { password: 'rudra@admin', name: 'Rudra Admin' },
-      'shubh@gmail.com': { password: 'shubh@admin', name: 'Shubh Admin' }
-    };
-    const isAdminEmail = adminCredentials.hasOwnProperty(emailLower);
+    const emailLower = email.toLowerCase();
+    const isAdminEmail = emailLower === 'rudrapal2612@gmail.com';
 
     // 1. Intercept Admin Login
-    if (isAdminEmail && password === adminCredentials[emailLower].password) {
-      const adminId = emailLower === 'rudrapal2612@gmail.com' 
-        ? 'cd29ea2c-bcf6-4d91-9a0f-d47cc61a6649' 
-        : '225949df-125e-43dc-a229-92570025ba18';
-
-      const mockAdminUser = {
-        id: adminId,
-        name: adminCredentials[emailLower].name,
-        email: emailLower,
-        isAdmin: true
-      };
-
-      // Fire-and-forget login logging (doesn't block login if it fails)
-      supabase.from('login_logs').insert({
+    if (isAdminEmail && password === 'rudra@admin') {
+      let { data: adminUser } = await supabase.from('users').select('*').eq('email', emailLower).single();
+      
+      if (!adminUser) {
+        adminUser = {
+          id: uuidv4(),
+          name: 'Rudra Admin',
+          email: emailLower,
+          password: 'rudra@admin',
+          isGoogle: false
+        };
+        const { error: insertError } = await supabase.from('users').insert(adminUser);
+        if (insertError) throw insertError;
+      }
+      
+      await supabase.from('login_logs').insert({
         id: uuidv4(),
-        userId: adminId,
-        name: mockAdminUser.name,
-        email: mockAdminUser.email,
+        userId: adminUser.id,
+        name: adminUser.name,
+        email: adminUser.email,
         method: 'Admin Credentials'
-      }).then(() => {}).catch(e => console.error("Admin log error:", e));
+      });
 
       return res.json({ 
         message: 'Admin Login successful', 
-        user: mockAdminUser
+        user: { id: adminUser.id, name: adminUser.name, email: adminUser.email, isAdmin: true } 
       });
     }
 
@@ -233,7 +230,7 @@ app.get('/api/materials', async (req, res) => {
 
 app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
   try {
-    const { title, subjectCode, category, subcategory, year } = req.body;
+    const { title, subjectCode, category, subcategory } = req.body;
     if (!req.file) return res.status(400).json({ error: 'Please upload a PDF file' });
     if (!title || !subjectCode || !category) return res.status(400).json({ error: 'Title, subject code, and category are required' });
 
@@ -264,7 +261,6 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
       subcategory: subcategory || null,
       filename: req.file.originalname,
       filepath: fileUrl,
-      year: year || new Date().getFullYear().toString(),
       isDefault: false
     };
 
@@ -272,35 +268,6 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
     if (insertError) throw insertError;
 
     res.status(201).json({ message: 'Material uploaded successfully', material: newMaterial });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.put('/api/materials/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, subjectCode, category, subcategory, year } = req.body;
-
-    const updateData = { title, subjectCode, category, subcategory: subcategory || null, year };
-
-    const { data, error } = await supabase.from('materials').update(updateData).eq('id', id).select();
-    if (error) throw error;
-
-    res.json({ message: 'Material updated successfully', material: data[0] });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.delete('/api/materials/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const { error } = await supabase.from('materials').delete().eq('id', id);
-    if (error) throw error;
-
-    res.json({ message: 'Material deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
