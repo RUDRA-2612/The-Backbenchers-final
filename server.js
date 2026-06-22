@@ -60,6 +60,7 @@ const seedDatabase = async () => {
         subcategory: file.subcategory || null,
         filename: file.filename,
         filepath: dummyUrl,
+        year: '2025',
         isDefault: true
       }));
       await supabase.from('materials').insert(materialsToInsert);
@@ -234,7 +235,7 @@ app.get('/api/materials', async (req, res) => {
 
 app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
   try {
-    const { title, subjectCode, category, subcategory } = req.body;
+    const { title, subjectCode, category, subcategory, year } = req.body;
     if (!req.file) return res.status(400).json({ error: 'Please upload a PDF file' });
     if (!title || !subjectCode || !category) return res.status(400).json({ error: 'Title, subject code, and category are required' });
 
@@ -265,6 +266,7 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
       subcategory: subcategory || null,
       filename: req.file.originalname,
       filepath: fileUrl,
+      year: year || new Date().getFullYear().toString(),
       isDefault: false
     };
 
@@ -272,6 +274,35 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
     if (insertError) throw insertError;
 
     res.status(201).json({ message: 'Material uploaded successfully', material: newMaterial });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/materials/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, subjectCode, category, subcategory, year } = req.body;
+
+    const updateData = { title, subjectCode, category, subcategory: subcategory || null, year };
+
+    const { data, error } = await supabase.from('materials').update(updateData).eq('id', id).select();
+    if (error) throw error;
+
+    res.json({ message: 'Material updated successfully', material: data[0] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/materials/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase.from('materials').delete().eq('id', id);
+    if (error) throw error;
+
+    res.json({ message: 'Material deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

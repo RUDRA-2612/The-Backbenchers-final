@@ -100,7 +100,14 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
                   {getCategoryIcon(file.category)}
                 </div>
                 <div className="resource-text">
-                  <h4 className="resource-title">{file.title}</h4>
+                  <h4 className="resource-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    {file.title}
+                    {file.year && (
+                      <span className="tag-method" style={{ fontSize: '0.75rem', padding: '0.1rem 0.4rem', backgroundColor: 'var(--bg-card-hover)', color: 'var(--text-primary)' }}>
+                        {file.year}
+                      </span>
+                    )}
+                  </h4>
                   <span className="resource-meta">
                     Added: {new Date(file.uploadedAt).toLocaleDateString()}
                   </span>

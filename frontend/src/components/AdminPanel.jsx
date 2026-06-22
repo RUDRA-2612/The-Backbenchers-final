@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Edit2, Trash2, X } from 'lucide-react';
 import { API_URL } from '../config';
 
 const subjectsList = [
@@ -12,19 +12,24 @@ const subjectsList = [
 ];
 
 export default function AdminPanel({ onMaterialUploaded }) {
-  const [adminTab, setAdminTab] = useState('upload'); // upload, logins, downloads, students
+  const [adminTab, setAdminTab] = useState('upload'); // upload, manage, logins, downloads, students
   const [logins, setLogins] = useState([]);
   const [downloads, setDownloads] = useState([]);
   const [students, setStudents] = useState([]);
+  const [allMaterials, setAllMaterials] = useState([]);
 
   // Form State
   const [title, setTitle] = useState('');
   const [subjectCode, setSubjectCode] = useState('CS1139');
   const [category, setCategory] = useState('notes');
   const [subcategory, setSubcategory] = useState('mid-term-1');
+  const [year, setYear] = useState('2025');
   const [file, setFile] = useState(null);
   const [uploadMessage, setUploadMessage] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(false);
+
+  // Edit State
+  const [editingMaterial, setEditingMaterial] = useState(null);
 
   // Fetch admin logs
   const fetchLogs = async () => {
@@ -40,6 +45,10 @@ export default function AdminPanel({ onMaterialUploaded }) {
       const studentRes = await fetch(`${API_URL}/api/admin/users`);
       const studentData = await studentRes.json();
       setStudents(studentData);
+
+      const materialRes = await fetch(`${API_URL}/api/materials`);
+      const materialData = await materialRes.json();
+      setAllMaterials(materialData);
     } catch (err) {
       console.error('Error fetching admin details:', err);
     }
@@ -67,6 +76,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
     formData.append('title', title);
     formData.append('subjectCode', subjectCode);
     formData.append('category', category);
+    formData.append('year', year);
     if (category === 'papers') {
       formData.append('subcategory', subcategory);
     }
@@ -86,13 +96,53 @@ export default function AdminPanel({ onMaterialUploaded }) {
       setUploadMessage({ type: 'success', text: 'PDF material uploaded successfully!' });
       setTitle('');
       setFile(null);
+      setYear('2025');
       // Reset file input element
       document.getElementById('pdf-file-input').value = '';
 
       // Trigger parent callback to refresh materials list
       onMaterialUploaded();
+      fetchLogs(); // refresh all materials
     } catch (err) {
       setUploadMessage({ type: 'error', text: err.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteMaterial = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this material?")) return;
+    try {
+      const res = await fetch(`${API_URL}/api/materials/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete');
+      setAllMaterials(prev => prev.filter(m => m.id !== id));
+      onMaterialUploaded(); // trigger parent refresh
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleUpdateMaterial = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/materials/${editingMaterial.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: editingMaterial.title,
+          subjectCode: editingMaterial.subjectCode,
+          category: editingMaterial.category,
+          subcategory: editingMaterial.subcategory,
+          year: editingMaterial.year
+        })
+      });
+      if (!res.ok) throw new Error('Failed to update');
+      setEditingMaterial(null);
+      fetchLogs();
+      onMaterialUploaded();
+    } catch (err) {
+      alert(err.message);
     } finally {
       setLoading(false);
     }
@@ -106,34 +156,41 @@ export default function AdminPanel({ onMaterialUploaded }) {
       </div>
 
       {/* Admin tabs */}
-      <div className="tabs-container">
+      <div className="tabs-container" style={{ flexWrap: 'wrap' }}>
         <button
           className={`tab-btn ${adminTab === 'upload' ? 'active' : ''}`}
-          onClick={() => setAdminTab('upload')}
+          onClick={() => { setAdminTab('upload'); setEditingMaterial(null); }}
         >
           <UploadCloud size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
-          Upload Study Material
+          Upload Material
+        </button>
+        <button
+          className={`tab-btn ${adminTab === 'manage' ? 'active' : ''}`}
+          onClick={() => { setAdminTab('manage'); setEditingMaterial(null); }}
+        >
+          <FileText size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
+          Manage Materials
         </button>
         <button
           className={`tab-btn ${adminTab === 'logins' ? 'active' : ''}`}
           onClick={() => setAdminTab('logins')}
         >
           <History size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
-          Student Login Audit
+          Logins
         </button>
         <button
           className={`tab-btn ${adminTab === 'downloads' ? 'active' : ''}`}
           onClick={() => setAdminTab('downloads')}
         >
           <Download size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
-          Downloads Audit
+          Downloads
         </button>
         <button
           className={`tab-btn ${adminTab === 'students' ? 'active' : ''}`}
           onClick={() => setAdminTab('students')}
         >
           <Users size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
-          Registered Students
+          Students
         </button>
       </div>
 
@@ -172,18 +229,34 @@ export default function AdminPanel({ onMaterialUploaded }) {
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="docSubject">Subject</label>
-                <select
-                  id="docSubject"
-                  className="form-input"
-                  value={subjectCode}
-                  onChange={(e) => setSubjectCode(e.target.value)}
-                >
-                  {subjectsList.map(s => (
-                    <option key={s.code} value={s.code}>{s.code} - {s.name}</option>
-                  ))}
-                </select>
+              <div className="form-row" style={{ display: 'flex', gap: '1rem' }}>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label className="form-label" htmlFor="docSubject">Subject</label>
+                  <select
+                    id="docSubject"
+                    className="form-input"
+                    value={subjectCode}
+                    onChange={(e) => setSubjectCode(e.target.value)}
+                  >
+                    {subjectsList.map(s => (
+                      <option key={s.code} value={s.code}>{s.code} - {s.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group" style={{ width: '120px' }}>
+                  <label className="form-label" htmlFor="docYear">Year</label>
+                  <select
+                    id="docYear"
+                    className="form-input"
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                  >
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                  </select>
+                </div>
               </div>
 
               <div className="form-group">
@@ -239,6 +312,142 @@ export default function AdminPanel({ onMaterialUploaded }) {
                 {loading ? 'Uploading File...' : 'Upload Document'}
               </button>
             </form>
+          </div>
+        )}
+
+        {/* TAB 1.5: MANAGE MATERIALS */}
+        {adminTab === 'manage' && (
+          <div className="admin-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h3 className="admin-title" style={{ margin: 0 }}>
+                {editingMaterial ? <Edit2 size={20} /> : <FileText size={20} />}
+                {editingMaterial ? 'Edit Material' : 'Manage Materials'}
+              </h3>
+              {editingMaterial && (
+                <button className="btn btn-secondary" onClick={() => setEditingMaterial(null)} style={{ padding: '0.4rem 0.8rem' }}>
+                  <X size={16} /> Cancel
+                </button>
+              )}
+            </div>
+
+            {editingMaterial ? (
+              <form onSubmit={handleUpdateMaterial} className="admin-upload-form" style={{ maxWidth: '600px' }}>
+                <div className="form-group">
+                  <label className="form-label">Document Title</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={editingMaterial.title}
+                    onChange={(e) => setEditingMaterial({...editingMaterial, title: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-row" style={{ display: 'flex', gap: '1rem' }}>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Subject</label>
+                    <select
+                      className="form-input"
+                      value={editingMaterial.subjectCode}
+                      onChange={(e) => setEditingMaterial({...editingMaterial, subjectCode: e.target.value})}
+                    >
+                      {subjectsList.map(s => (
+                        <option key={s.code} value={s.code}>{s.code} - {s.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group" style={{ width: '120px' }}>
+                    <label className="form-label">Year</label>
+                    <select
+                      className="form-input"
+                      value={editingMaterial.year || '2025'}
+                      onChange={(e) => setEditingMaterial({...editingMaterial, year: e.target.value})}
+                    >
+                      <option value="2025">2025</option>
+                      <option value="2024">2024</option>
+                      <option value="2023">2023</option>
+                      <option value="2022">2022</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Resource Category</label>
+                  <select
+                    className="form-input"
+                    value={editingMaterial.category}
+                    onChange={(e) => setEditingMaterial({...editingMaterial, category: e.target.value})}
+                  >
+                    <option value="notes">Notes</option>
+                    <option value="papers">Previous Year Papers</option>
+                    <option value="formulas">Formula Sheets</option>
+                    <option value="topics">Important Topics</option>
+                  </select>
+                </div>
+
+                {editingMaterial.category === 'papers' && (
+                  <div className="form-group">
+                    <label className="form-label">Exam Subcategory</label>
+                    <select
+                      className="form-input"
+                      value={editingMaterial.subcategory || 'mid-term-1'}
+                      onChange={(e) => setEditingMaterial({...editingMaterial, subcategory: e.target.value})}
+                    >
+                      <option value="mid-term-1">Mid Term 1</option>
+                      <option value="mid-term-2">Mid Term 2</option>
+                      <option value="end-term">End Term</option>
+                    </select>
+                  </div>
+                )}
+
+                <button type="submit" className="btn btn-primary" disabled={loading} style={{ marginTop: '0.5rem' }}>
+                  {loading ? 'Saving Changes...' : 'Save Changes'}
+                </button>
+              </form>
+            ) : (
+              allMaterials.length > 0 ? (
+                <div className="admin-table-container">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Subject</th>
+                        <th>Category</th>
+                        <th>Year</th>
+                        <th style={{ textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allMaterials.map(m => (
+                        <tr key={m.id}>
+                          <td style={{ fontWeight: '600' }}>{m.title}</td>
+                          <td style={{ fontFamily: 'monospace' }}>{m.subjectCode}</td>
+                          <td style={{ textTransform: 'capitalize' }}>{m.category}</td>
+                          <td>
+                            <span className="tag-method" style={{ backgroundColor: 'var(--bg-card-hover)', color: 'var(--text-primary)' }}>
+                              {m.year || 'N/A'}
+                            </span>
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <button className="btn btn-secondary" style={{ padding: '0.4rem', marginRight: '0.5rem' }} onClick={() => setEditingMaterial(m)} title="Edit">
+                              <Edit2 size={16} />
+                            </button>
+                            <button className="btn btn-secondary" style={{ padding: '0.4rem', color: '#ff4d4f', borderColor: '#ff4d4f' }} onClick={() => handleDeleteMaterial(m.id)} title="Delete">
+                              <Trash2 size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="empty-state" style={{ padding: '2rem' }}>
+                  <FileText size={32} />
+                  <p>No study materials uploaded yet.</p>
+                </div>
+              )
+            )}
           </div>
         )}
 
