@@ -211,7 +211,7 @@ app.get('/api/materials', async (req, res) => {
 
 app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
   try {
-    const { title, subjectCode, category, subcategory } = req.body;
+    const { title, subjectCode, category, subcategory, year } = req.body;
     if (!req.file) return res.status(400).json({ error: 'Please upload a PDF file' });
     if (!title || !subjectCode || !category) return res.status(400).json({ error: 'Title, subject code, and category are required' });
 
@@ -240,6 +240,7 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
       subjectCode,
       category,
       subcategory: subcategory || null,
+      year: year || null,
       filename: req.file.originalname,
       filepath: fileUrl,
       isDefault: false

@@ -24,6 +24,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const [subjectCode, setSubjectCode] = useState('CS1139');
   const [category, setCategory] = useState('notes');
   const [subcategory, setSubcategory] = useState('mid-term-1');
+  const [year, setYear] = useState('2025');
   const [file, setFile] = useState(null);
   const [uploadMessage, setUploadMessage] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(false);
@@ -111,6 +112,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
     formData.append('category', category);
     if (category === 'papers') {
       formData.append('subcategory', subcategory);
+      formData.append('year', year);
     }
     formData.append('file', file);
 
@@ -252,19 +254,35 @@ export default function AdminPanel({ onMaterialUploaded }) {
               </div>
 
               {category === 'papers' && (
-                <div className="form-group">
-                  <label className="form-label" htmlFor="docSubcategory">Exam Subcategory</label>
-                  <select
-                    id="docSubcategory"
-                    className="form-input"
-                    value={subcategory}
-                    onChange={(e) => setSubcategory(e.target.value)}
-                  >
-                    <option value="mid-term-1">Mid Term 1</option>
-                    <option value="mid-term-2">Mid Term 2</option>
-                    <option value="end-term">End Term</option>
-                  </select>
-                </div>
+                <>
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="docSubcategory">Exam Subcategory</label>
+                    <select
+                      id="docSubcategory"
+                      className="form-input"
+                      value={subcategory}
+                      onChange={(e) => setSubcategory(e.target.value)}
+                    >
+                      <option value="mid-term-1">Mid Term 1</option>
+                      <option value="mid-term-2">Mid Term 2</option>
+                      <option value="end-term">End Term</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="docYear">Year</label>
+                    <select
+                      id="docYear"
+                      className="form-input"
+                      value={year}
+                      onChange={(e) => setYear(e.target.value)}
+                    >
+                      <option value="2025">2025</option>
+                      <option value="2024">2024</option>
+                      <option value="2023">2023</option>
+                    </select>
+                  </div>
+                </>
               )}
 
               <div className="form-group">
@@ -445,7 +463,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                         <td style={{ fontFamily: 'monospace' }}>{m.subjectCode}</td>
                         <td>
                           <span className="tag-method" style={{ backgroundColor: 'var(--bg-card-hover)', color: 'var(--text-primary)' }}>
-                            {m.category} {m.subcategory && `> ${m.subcategory}`}
+                            {m.category} {m.subcategory && `> ${m.subcategory}`} {m.year && `(${m.year})`}
                           </span>
                         </td>
                         <td style={{ display: 'flex', gap: '0.5rem' }}>

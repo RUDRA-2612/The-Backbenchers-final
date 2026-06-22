@@ -4,13 +4,16 @@ import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bo
 export default function SubjectDetail({ subject, materials, onBack, onViewFile, onDownloadFile }) {
   const [activeTab, setActiveTab] = useState('papers'); // papers, notes, formulas, topics
   const [activeSubTab, setActiveSubTab] = useState('mid-term-1'); // mid-term-1, mid-term-2, end-term
+  const [activeYear, setActiveYear] = useState('2025');
 
   // Filter materials based on current subject and active tab
   const filteredMaterials = materials.filter(item => {
     if (item.subjectCode !== subject.code) return false;
     if (item.category !== activeTab) return false;
     if (activeTab === 'papers') {
-      return item.subcategory === activeSubTab;
+      if (item.subcategory !== activeSubTab) return false;
+      if (item.year && activeYear !== 'All' && item.year !== activeYear) return false;
+      return true;
     }
     return true;
   });
@@ -75,19 +78,56 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
           >
             Mid Term 1
           </button>
-          <button 
-            className={`subtab-btn ${activeSubTab === 'mid-term-2' ? 'active' : ''}`}
-            onClick={() => setActiveSubTab('mid-term-2')}
-          >
-            Mid Term 2
-          </button>
-          <button 
-            className={`subtab-btn ${activeSubTab === 'end-term' ? 'active' : ''}`}
-            onClick={() => setActiveSubTab('end-term')}
-          >
-            End Term
-          </button>
-        </div>
+        <>
+          <div className="subtabs-container">
+            <button 
+              className={`subtab-btn ${activeSubTab === 'mid-term-1' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('mid-term-1')}
+            >
+              Mid Term 1
+            </button>
+            <button 
+              className={`subtab-btn ${activeSubTab === 'mid-term-2' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('mid-term-2')}
+            >
+              Mid Term 2
+            </button>
+            <button 
+              className={`subtab-btn ${activeSubTab === 'end-term' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('end-term')}
+            >
+              End Term
+            </button>
+          </div>
+
+          <div className="subtabs-container" style={{ marginTop: '0.5rem' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.5rem' }}>Year:</span>
+            <button 
+              className={`subtab-btn ${activeYear === '2025' ? 'active' : ''}`}
+              onClick={() => setActiveYear('2025')}
+            >
+              2025
+            </button>
+            <button 
+              className={`subtab-btn ${activeYear === '2024' ? 'active' : ''}`}
+              onClick={() => setActiveYear('2024')}
+            >
+              2024
+            </button>
+            <button 
+              className={`subtab-btn ${activeYear === '2023' ? 'active' : ''}`}
+              onClick={() => setActiveYear('2023')}
+            >
+              2023
+            </button>
+            <button 
+              className={`subtab-btn ${activeYear === 'All' ? 'active' : ''}`}
+              onClick={() => setActiveYear('All')}
+            >
+              All
+            </button>
+          </div>
+        </>
       )}
 
       {/* Resource list */}
@@ -103,6 +143,7 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
                   <h4 className="resource-title">{file.title}</h4>
                   <span className="resource-meta">
                     Added: {new Date(file.uploadedAt).toLocaleDateString()}
+                    {file.year && <span style={{ marginLeft: '10px', color: 'var(--accent)' }}>Year: {file.year}</span>}
                   </span>
                 </div>
               </div>
