@@ -186,7 +186,6 @@ export default function AdminPanel({ onMaterialUploaded }) {
           <Users size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Registered Students
         </button>
-        </button>
       </div>
 
       {/* Admin content */}

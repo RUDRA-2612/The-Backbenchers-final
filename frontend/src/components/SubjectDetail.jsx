@@ -71,13 +71,6 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
 
       {/* Subtabs for Papers */}
       {activeTab === 'papers' && (
-        <div className="subtabs-container">
-          <button 
-            className={`subtab-btn ${activeSubTab === 'mid-term-1' ? 'active' : ''}`}
-            onClick={() => setActiveSubTab('mid-term-1')}
-          >
-            Mid Term 1
-          </button>
         <>
           <div className="subtabs-container">
             <button 
