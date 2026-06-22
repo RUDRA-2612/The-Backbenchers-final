@@ -253,6 +253,54 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+app.delete('/api/materials/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { error } = await supabase.from('materials').delete().eq('id', id);
+    if (error) throw error;
+    res.json({ message: 'Material deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/materials/:id', upload.single('file'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!req.file) return res.status(400).json({ error: 'Please upload a PDF file' });
+
+    // Generate unique filename
+    const ext = path.extname(req.file.originalname);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const filename = 'document-' + uniqueSuffix + (ext ? ext : '.pdf');
+
+    // Upload to Supabase Storage Bucket 'materials'
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('materials')
+      .upload(filename, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage.from('materials').getPublicUrl(filename);
+    const fileUrl = publicUrlData.publicUrl;
+
+    const updateData = {
+      filename: req.file.originalname,
+      filepath: fileUrl
+    };
+
+    const { data, error } = await supabase.from('materials').update(updateData).eq('id', id).select();
+    if (error) throw error;
+
+    res.json({ message: 'Material file updated successfully', material: data[0] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.post('/api/downloads', async (req, res) => {
   try {

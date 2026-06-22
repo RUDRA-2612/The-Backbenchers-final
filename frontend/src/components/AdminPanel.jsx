@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2 } from 'lucide-react';
 import { API_URL } from '../config';
 
 const subjectsList = [
@@ -16,6 +16,8 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const [logins, setLogins] = useState([]);
   const [downloads, setDownloads] = useState([]);
   const [students, setStudents] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const [updatingId, setUpdatingId] = useState(null);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -40,6 +42,10 @@ export default function AdminPanel({ onMaterialUploaded }) {
       const studentRes = await fetch(`${API_URL}/api/admin/users`);
       const studentData = await studentRes.json();
       setStudents(studentData);
+
+      const materialRes = await fetch(`${API_URL}/api/materials`);
+      const materialData = await materialRes.json();
+      setMaterials(materialData);
     } catch (err) {
       console.error('Error fetching admin details:', err);
     }
@@ -48,6 +54,42 @@ export default function AdminPanel({ onMaterialUploaded }) {
   useEffect(() => {
     fetchLogs();
   }, [adminTab]);
+
+  const handleDeleteMaterial = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this material?")) return;
+    try {
+      const res = await fetch(`${API_URL}/api/materials/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setMaterials(materials.filter(m => m.id !== id));
+        onMaterialUploaded();
+      }
+    } catch (e) {
+      console.error("Error deleting material", e);
+    }
+  };
+
+  const handleUpdateFile = async (id, file) => {
+    if (!file) return;
+    setUpdatingId(id);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch(`${API_URL}/api/materials/${id}`, {
+        method: 'PUT',
+        body: formData
+      });
+      if (res.ok) {
+        alert('File replaced successfully!');
+        fetchLogs();
+      } else {
+        alert('Failed to replace file.');
+      }
+    } catch (e) {
+      console.error("Error updating file", e);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -134,6 +176,13 @@ export default function AdminPanel({ onMaterialUploaded }) {
         >
           <Users size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Registered Students
+        </button>
+        <button
+          className={`tab-btn ${adminTab === 'manage' ? 'active' : ''}`}
+          onClick={() => setAdminTab('manage')}
+        >
+          <FileText size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
+          Manage Materials
         </button>
       </div>
 
@@ -363,6 +412,78 @@ export default function AdminPanel({ onMaterialUploaded }) {
               <div className="empty-state" style={{ padding: '2rem' }}>
                 <Users size={32} />
                 <p>No student accounts created yet.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 5: MANAGE MATERIALS */}
+        {adminTab === 'manage' && (
+          <div className="admin-card">
+            <h3 className="admin-title">
+              <FileText size={20} />
+              Manage Uploaded Materials
+            </h3>
+            {materials.length > 0 ? (
+              <div className="admin-table-container">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Upload Date</th>
+                      <th>Title</th>
+                      <th>Subject</th>
+                      <th>Category</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {materials.map(m => (
+                      <tr key={m.id}>
+                        <td>{new Date(m.uploadedAt).toLocaleDateString()}</td>
+                        <td style={{ fontWeight: '600' }}>{m.title}</td>
+                        <td style={{ fontFamily: 'monospace' }}>{m.subjectCode}</td>
+                        <td>
+                          <span className="tag-method" style={{ backgroundColor: 'var(--bg-card-hover)', color: 'var(--text-primary)' }}>
+                            {m.category} {m.subcategory && `> ${m.subcategory}`}
+                          </span>
+                        </td>
+                        <td style={{ display: 'flex', gap: '0.5rem' }}>
+                          <div style={{ position: 'relative' }}>
+                            <input 
+                              type="file" 
+                              id={`update-file-${m.id}`} 
+                              style={{ display: 'none' }} 
+                              accept=".pdf"
+                              onChange={(e) => handleUpdateFile(m.id, e.target.files[0])}
+                            />
+                            <button 
+                              className="btn btn-secondary" 
+                              style={{ padding: '0.4rem', color: 'var(--accent)' }} 
+                              onClick={() => document.getElementById(`update-file-${m.id}`).click()} 
+                              title="Replace PDF"
+                              disabled={updatingId === m.id}
+                            >
+                              {updatingId === m.id ? '...' : <Edit2 size={16} />}
+                            </button>
+                          </div>
+                          <button 
+                            className="btn btn-secondary" 
+                            style={{ padding: '0.4rem', color: '#ff4d4f', borderColor: '#ff4d4f' }} 
+                            onClick={() => handleDeleteMaterial(m.id)} 
+                            title="Delete"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="empty-state" style={{ padding: '2rem' }}>
+                <FileText size={32} />
+                <p>No study materials uploaded yet.</p>
               </div>
             )}
           </div>
