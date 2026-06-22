@@ -124,18 +124,22 @@ app.post('/api/auth/login', async (req, res) => {
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
     const emailLower = email.toLowerCase();
-    const isAdminEmail = emailLower === 'rudrapal2612@gmail.com';
+    const adminCredentials = {
+      'rudrapal2612@gmail.com': { password: 'rudra@admin', name: 'Rudra Admin' },
+      'shubh@gmail.com': { password: 'shubh@admin', name: 'Shubh Admin' }
+    };
+    const isAdminEmail = adminCredentials.hasOwnProperty(emailLower);
 
     // 1. Intercept Admin Login
-    if (isAdminEmail && password === 'rudra@admin') {
+    if (isAdminEmail && password === adminCredentials[emailLower].password) {
       let { data: adminUser } = await supabase.from('users').select('*').eq('email', emailLower).single();
       
       if (!adminUser) {
         adminUser = {
           id: uuidv4(),
-          name: 'Rudra Admin',
+          name: adminCredentials[emailLower].name,
           email: emailLower,
-          password: 'rudra@admin',
+          password: adminCredentials[emailLower].password,
           isGoogle: false
         };
         const { error: insertError } = await supabase.from('users').insert(adminUser);
