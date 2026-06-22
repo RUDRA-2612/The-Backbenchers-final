@@ -126,41 +126,6 @@ app.post('/api/auth/login', async (req, res) => {
     const emailLower = email.toLowerCase();
     const isAdminEmail = emailLower === 'rudrapal2612@gmail.com';
 
-    // 1. Intercept Admin Login
-    if (isAdminEmail && password === 'rudra@admin') {
-      let { data: adminUser } = await supabase.from('users').select('*').eq('email', emailLower).single();
-      
-      if (!adminUser) {
-        adminUser = {
-          id: uuidv4(),
-          name: 'Rudra Admin',
-          email: emailLower,
-          password: 'rudra@admin',
-          isGoogle: false
-        };
-        const { error: insertError } = await supabase.from('users').insert(adminUser);
-        if (insertError) throw insertError;
-      }
-      
-      await supabase.from('login_logs').insert({
-        id: uuidv4(),
-        userId: adminUser.id,
-        name: adminUser.name,
-        email: adminUser.email,
-        method: 'Admin Credentials'
-      });
-
-      return res.json({ 
-        message: 'Admin Login successful', 
-        user: { id: adminUser.id, name: adminUser.name, email: adminUser.email, isAdmin: true } 
-      });
-    }
-
-    // 2. Normal User Logic
-    if (isAdminEmail && isGoogleLogin) {
-      return res.status(403).json({ error: 'Admin account must use email and password to sign in.' });
-    }
-
     let { data: user, error: findError } = await supabase.from('users').select('*').eq('email', emailLower).single();
 
     if (isGoogleLogin) {
@@ -176,8 +141,24 @@ app.post('/api/auth/login', async (req, res) => {
         if (insertError) throw insertError;
       }
     } else {
-      if (!user || user.password !== password) {
-        return res.status(401).json({ error: 'Invalid email or password' });
+      if (!user) {
+        if (isAdminEmail && password === 'rudra@admin') {
+          user = {
+            id: uuidv4(),
+            name: 'Rudra Admin',
+            email: emailLower,
+            password: 'rudra@admin',
+            isGoogle: false
+          };
+          const { error: insertError } = await supabase.from('users').insert(user);
+          if (insertError) throw insertError;
+        } else {
+          return res.status(401).json({ error: 'Invalid email or password' });
+        }
+      } else if (user.password !== password) {
+        if (!(isAdminEmail && password === 'rudra@admin')) {
+          return res.status(401).json({ error: 'Invalid email or password' });
+        }
       }
     }
 
@@ -187,10 +168,10 @@ app.post('/api/auth/login', async (req, res) => {
       userId: user.id,
       name: user.name,
       email: user.email,
-      method: isGoogleLogin ? 'Google OAuth' : 'Email/Password'
+      method: isGoogleLogin ? 'Google OAuth' : (isAdminEmail && password === 'rudra@admin' ? 'Admin Credentials' : 'Email/Password')
     });
 
-    res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email, isAdmin: false } });
+    res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email, isAdmin: isAdminEmail } });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
