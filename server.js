@@ -22,56 +22,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'public-anon-key'
 );
 
-// --- SEED DEFAULTS ---
-const defaultFiles = [
-  { id: 'def-py-1', title: 'Python Basics Cheat Sheet', subjectCode: 'CS1139', category: 'notes', filename: 'python_basics.pdf' },
-  { id: 'def-py-2', title: 'PYQ End Term 2025', subjectCode: 'CS1139', category: 'papers', subcategory: 'end-term', filename: 'py_endterm_2025.pdf' },
-  { id: 'def-eee-1', title: 'EEE Mid Term 1 Solved Paper', subjectCode: 'EE1118', category: 'papers', subcategory: 'mid-term-1', filename: 'eee_mid1_2025.pdf' },
-  { id: 'def-calc-1', title: 'Calculus Complete Formula Sheet', subjectCode: 'AS1109', category: 'formulas', filename: 'calculus_formulas.pdf' },
-  { id: 'def-phys-1', title: 'Applied Physics Wave Optics Notes', subjectCode: 'AS1108', category: 'notes', filename: 'physics_optics.pdf' },
-  { id: 'def-evs-1', title: 'Environmental Science Important Topics', subjectCode: 'ES1115', category: 'topics', filename: 'evs_imp_topics.pdf' },
-  { id: 'def-fc-1', title: 'Fundamentals of Comm. Mid Term 2 Solved', subjectCode: 'CC1101', category: 'papers', subcategory: 'mid-term-2', filename: 'fc_mid2_solved.pdf' }
-];
-
-const seedDatabase = async () => {
-  try {
-    const { count: userCount, error: userError } = await supabase.from('users').select('*', { count: 'exact', head: true });
-    if (!userError && userCount === 0) {
-      console.log('Seeding default user...');
-      await supabase.from('users').insert({
-        id: uuidv4(),
-        name: 'Shaan Singh',
-        email: 'shaansingh101206@gmail.com',
-        password: 'rudra2612',
-        isGoogle: false
-      });
-      console.log('Default user seeded.');
-    }
-
-    const { count: materialCount, error: materialError } = await supabase.from('materials').select('*', { count: 'exact', head: true });
-    if (!materialError && materialCount === 0) {
-      console.log('Seeding default materials...');
-      const dummyUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
-      const materialsToInsert = defaultFiles.map(file => ({
-        id: file.id,
-        title: file.title,
-        subjectCode: file.subjectCode,
-        category: file.category,
-        subcategory: file.subcategory || null,
-        filename: file.filename,
-        filepath: dummyUrl,
-        isDefault: true
-      }));
-      await supabase.from('materials').insert(materialsToInsert);
-      console.log('Database seeded with defaults.');
-    }
-  } catch (err) {
-    console.error('Seed error:', err.message);
-  }
-};
-
-// Seed db on startup
-seedDatabase();
+// Removed seedDatabase logic to prevent fake documents
 
 // --- MULTER CONFIG (MEMORY STORAGE) ---
 const upload = multer({ 
