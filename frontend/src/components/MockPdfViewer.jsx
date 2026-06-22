@@ -179,7 +179,7 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
         </div>
         <div className="pdf-body">
           <iframe 
-            src={file.filepath} 
+            src={`https://docs.google.com/viewer?url=${encodeURIComponent(file.filepath)}&embedded=true`} 
             title={file.title} 
             width="100%" 
             height="100%" 
