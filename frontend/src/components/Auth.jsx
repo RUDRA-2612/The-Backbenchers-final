@@ -62,7 +62,7 @@ export default function Auth({ onLoginSuccess }) {
 
     // Simulate Google Login
     // Prompt for a gmail or generate one
-    const mockGmail = prompt("Enter your Gmail address:", "shaansingh101206@gmail.com");
+    const mockGmail = prompt("Enter your Gmail address:", "");
     if (!mockGmail) {
       setLoading(false);
       return;
@@ -143,7 +143,7 @@ export default function Auth({ onLoginSuccess }) {
                   type="text" 
                   className="form-input" 
                   style={{ paddingLeft: '40px' }}
-                  placeholder="Shubh Dixit" 
+                  placeholder="e.g. John Doe" 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required 
@@ -161,7 +161,7 @@ export default function Auth({ onLoginSuccess }) {
                 type="email" 
                 className="form-input" 
                 style={{ paddingLeft: '40px' }}
-                placeholder="shubh@college.edu" 
+                placeholder="e.g. student@college.edu" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required 
