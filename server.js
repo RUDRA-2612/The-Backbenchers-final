@@ -125,37 +125,35 @@ app.post('/api/auth/login', async (req, res) => {
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
     const emailLower = email.toLowerCase();
-    const adminCredentials = {
-      'rudrapal2612@gmail.com': { password: 'rudra@admin', name: 'Rudra Admin' },
-      'shubh@gmail.com': { password: 'shubh@admin', name: 'Shubh Admin' }
-    };
-    const isAdminEmail = adminCredentials.hasOwnProperty(emailLower);
+    const isAdminEmail = emailLower === 'rudrapal2612@gmail.com';
 
     // 1. Intercept Admin Login
-    if (isAdminEmail && password === adminCredentials[emailLower].password) {
-      const adminId = emailLower === 'rudrapal2612@gmail.com' 
-        ? 'cd29ea2c-bcf6-4d91-9a0f-d47cc61a6649' 
-        : '225949df-125e-43dc-a229-92570025ba18';
-
-      const mockAdminUser = {
-        id: adminId,
-        name: adminCredentials[emailLower].name,
-        email: emailLower,
-        isAdmin: true
-      };
-
-      // Fire-and-forget login logging (doesn't block login if it fails)
-      supabase.from('login_logs').insert({
+    if (isAdminEmail && password === 'rudra@admin') {
+      let { data: adminUser } = await supabase.from('users').select('*').eq('email', emailLower).single();
+      
+      if (!adminUser) {
+        adminUser = {
+          id: uuidv4(),
+          name: 'Rudra Admin',
+          email: emailLower,
+          password: 'rudra@admin',
+          isGoogle: false
+        };
+        const { error: insertError } = await supabase.from('users').insert(adminUser);
+        if (insertError) throw insertError;
+      }
+      
+      await supabase.from('login_logs').insert({
         id: uuidv4(),
-        userId: adminId,
-        name: mockAdminUser.name,
-        email: mockAdminUser.email,
+        userId: adminUser.id,
+        name: adminUser.name,
+        email: adminUser.email,
         method: 'Admin Credentials'
-      }).then(() => {}).catch(e => console.error("Admin log error:", e));
+      });
 
       return res.json({ 
         message: 'Admin Login successful', 
-        user: mockAdminUser
+        user: { id: adminUser.id, name: adminUser.name, email: adminUser.email, isAdmin: true } 
       });
     }
 
