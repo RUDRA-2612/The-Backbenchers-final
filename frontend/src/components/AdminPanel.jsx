@@ -157,6 +157,13 @@ export default function AdminPanel({ onMaterialUploaded }) {
           Upload Study Material
         </button>
         <button
+          className={`tab-btn ${adminTab === 'manage' ? 'active' : ''}`}
+          onClick={() => setAdminTab('manage')}
+        >
+          <FileText size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
+          Manage Materials
+        </button>
+        <button
           className={`tab-btn ${adminTab === 'logins' ? 'active' : ''}`}
           onClick={() => setAdminTab('logins')}
         >
@@ -177,12 +184,6 @@ export default function AdminPanel({ onMaterialUploaded }) {
           <Users size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Registered Students
         </button>
-        <button
-          className={`tab-btn ${adminTab === 'manage' ? 'active' : ''}`}
-          onClick={() => setAdminTab('manage')}
-        >
-          <FileText size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
-          Manage Materials
         </button>
       </div>
 
