@@ -165,11 +165,17 @@ export default function App() {
 
       // 2. Trigger browser file download (blob fetch or custom file download)
       // Since these are PDF/text guides, we trigger a browser download from the server path
-      const fileUrl = file.filepath.startsWith('http') ? file.filepath : `${API_URL}${file.filepath}`;
+      let fileUrl = file.filepath.startsWith('http') ? file.filepath : `${API_URL}${file.filepath}`;
+      
+      // Force Supabase to send as attachment for direct local download
+      if (fileUrl.includes('supabase.co/storage')) {
+        fileUrl += '?download=';
+      }
       
       const link = document.createElement('a');
       link.href = fileUrl;
-      link.setAttribute('download', file.filename);
+      link.setAttribute('download', file.filename || 'download.pdf');
+      link.setAttribute('target', '_blank'); // fallback
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

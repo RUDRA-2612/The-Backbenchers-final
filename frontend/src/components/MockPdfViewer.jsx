@@ -178,9 +178,13 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
           </div>
         </div>
         <div className="pdf-body">
-          <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center', transition: 'transform 0.1s ease' }}>
-            {renderPdfContent()}
-          </div>
+          <iframe 
+            src={file.filepath} 
+            title={file.title} 
+            width="100%" 
+            height="100%" 
+            style={{ border: 'none', backgroundColor: '#fff', height: '80vh' }}
+          />
         </div>
       </div>
     </div>
