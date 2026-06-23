@@ -78,6 +78,11 @@ export default function App() {
         setActivePdfFile(null);
         window.location.replace('#home');
       }
+
+      // Automatically close sidebar on mobile when navigating
+      if (window.innerWidth < 768) {
+        setSidebarCollapsed(true);
+      }
     };
 
     window.addEventListener('hashchange', handleHashChange);
