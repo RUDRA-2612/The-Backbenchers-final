@@ -160,18 +160,65 @@ app.get('/api/materials', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.post('/api/materials/signed-url', async (req, res) => {
+  try {
+    const { filename } = req.body;
+    if (!filename) return res.status(400).json({ error: 'Filename is required' });
+    
+    // Generate unique filename
+    const ext = path.extname(filename);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const uniqueFilename = 'document-' + uniqueSuffix + (ext ? ext : '.pdf');
+
+    const { data, error } = await supabase.storage.from('materials').createSignedUploadUrl(uniqueFilename);
+    if (error) throw error;
+    
+    // Also return the public URL so frontend knows what to save
+    const { data: publicUrlData } = supabase.storage.from('materials').getPublicUrl(uniqueFilename);
+    
+    res.json({ ...data, publicUrl: publicUrlData.publicUrl, uniqueFilename });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/materials/record', async (req, res) => {
+  try {
+    const { title, subjectCode, category, subcategory, year, filename, filepath } = req.body;
+    if (!title || !subjectCode || !category || !filepath) return res.status(400).json({ error: 'Missing required fields' });
+
+    const newMaterial = {
+      id: uuidv4(),
+      title,
+      subjectCode,
+      category,
+      subcategory: subcategory || null,
+      year: year || null,
+      filename,
+      filepath,
+      isDefault: false
+    };
+
+    const { error: insertError } = await supabase.from('materials').insert(newMaterial);
+    if (insertError) throw insertError;
+
+    res.status(201).json({ message: 'Material uploaded successfully', material: newMaterial });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
+  // Keeping this for backward compatibility if needed
   try {
     const { title, subjectCode, category, subcategory, year } = req.body;
     if (!req.file) return res.status(400).json({ error: 'Please upload a PDF file' });
     if (!title || !subjectCode || !category) return res.status(400).json({ error: 'Title, subject code, and category are required' });
 
-    // Generate unique filename
     const ext = path.extname(req.file.originalname);
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const filename = 'document-' + uniqueSuffix + (ext ? ext : '.pdf');
 
-    // Upload to Supabase Storage Bucket 'materials'
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('materials')
       .upload(filename, req.file.buffer, {
@@ -181,7 +228,6 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
 
     if (uploadError) throw uploadError;
 
-    // Get public URL
     const { data: publicUrlData } = supabase.storage.from('materials').getPublicUrl(filename);
     const fileUrl = publicUrlData.publicUrl;
 
@@ -205,6 +251,7 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 app.delete('/api/materials/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -216,33 +263,15 @@ app.delete('/api/materials/:id', async (req, res) => {
   }
 });
 
-app.put('/api/materials/:id', upload.single('file'), async (req, res) => {
+app.put('/api/materials/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    if (!req.file) return res.status(400).json({ error: 'Please upload a PDF file' });
-
-    // Generate unique filename
-    const ext = path.extname(req.file.originalname);
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const filename = 'document-' + uniqueSuffix + (ext ? ext : '.pdf');
-
-    // Upload to Supabase Storage Bucket 'materials'
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('materials')
-      .upload(filename, req.file.buffer, {
-        contentType: req.file.mimetype,
-        upsert: false
-      });
-
-    if (uploadError) throw uploadError;
-
-    // Get public URL
-    const { data: publicUrlData } = supabase.storage.from('materials').getPublicUrl(filename);
-    const fileUrl = publicUrlData.publicUrl;
+    const { filename, filepath } = req.body;
+    if (!filename || !filepath) return res.status(400).json({ error: 'Missing filename or filepath' });
 
     const updateData = {
-      filename: req.file.originalname,
-      filepath: fileUrl
+      filename,
+      filepath
     };
 
     const { data, error } = await supabase.from('materials').update(updateData).eq('id', id).select();

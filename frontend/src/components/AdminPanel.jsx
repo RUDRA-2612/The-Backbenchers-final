@@ -72,21 +72,45 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const handleUpdateFile = async (id, file) => {
     if (!file) return;
     setUpdatingId(id);
-    const formData = new FormData();
-    formData.append('file', file);
+    
     try {
+      // 1. Get signed URL
+      const signedUrlRes = await fetch(`${API_URL}/api/materials/signed-url`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name })
+      });
+      const signedUrlData = await signedUrlRes.json();
+      if (!signedUrlRes.ok) throw new Error(signedUrlData.error || 'Failed to get upload URL');
+
+      // 2. Upload file directly to Supabase Storage
+      const uploadRes = await fetch(signedUrlData.signedUrl, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+          'Authorization': `Bearer ${signedUrlData.token}`
+        }
+      });
+      if (!uploadRes.ok) throw new Error('Failed to upload file to storage');
+
+      // 3. Update DB
       const res = await fetch(`${API_URL}/api/materials/${id}`, {
         method: 'PUT',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, filepath: signedUrlData.publicUrl })
       });
+      
       if (res.ok) {
         alert('File replaced successfully!');
         fetchLogs();
       } else {
-        alert('Failed to replace file.');
+        const errorData = await res.json();
+        alert('Failed to replace file: ' + (errorData.error || 'Unknown error'));
       }
     } catch (e) {
       console.error("Error updating file", e);
+      alert('Error updating file: ' + e.message);
     } finally {
       setUpdatingId(null);
     }
@@ -106,26 +130,46 @@ export default function AdminPanel({ onMaterialUploaded }) {
     }
 
     setLoading(true);
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('subjectCode', subjectCode);
-    formData.append('category', category);
-    if (category === 'papers') {
-      formData.append('subcategory', subcategory);
-      formData.append('year', year);
-    }
-    formData.append('file', file);
 
     try {
-      const res = await fetch(`${API_URL}/api/materials/upload`, {
+      // 1. Get signed URL
+      const signedUrlRes = await fetch(`${API_URL}/api/materials/signed-url`, {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name })
       });
+      const signedUrlData = await signedUrlRes.json();
+      if (!signedUrlRes.ok) throw new Error(signedUrlData.error || 'Failed to get upload URL');
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to upload file');
-      }
+      // 2. Upload file directly to Supabase Storage
+      const uploadRes = await fetch(signedUrlData.signedUrl, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+          'Authorization': `Bearer ${signedUrlData.token}`
+        }
+      });
+      if (!uploadRes.ok) throw new Error('Failed to upload file to storage');
+
+      // 3. Save record to DB
+      const recordPayload = {
+        title,
+        subjectCode,
+        category,
+        subcategory: category === 'papers' ? subcategory : null,
+        year: category === 'papers' ? year : null,
+        filename: file.name,
+        filepath: signedUrlData.publicUrl
+      };
+
+      const recordRes = await fetch(`${API_URL}/api/materials/record`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(recordPayload)
+      });
+      const recordData = await recordRes.json();
+      if (!recordRes.ok) throw new Error(recordData.error || 'Failed to save record');
 
       setUploadMessage({ type: 'success', text: 'PDF material uploaded successfully!' });
       setTitle('');
