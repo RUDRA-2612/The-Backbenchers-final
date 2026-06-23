@@ -13,7 +13,7 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
 
   return (
     <div className="pdf-viewer-overlay">
-      <div className="pdf-viewer-container" style={{ width: '90vw', maxWidth: '1200px', height: '90vh' }}>
+      <div className="pdf-viewer-container">
         <div className="pdf-viewer-header">
           <div className="pdf-title-box">
             <span className="pdf-tag">PDF</span>
@@ -29,7 +29,7 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
           </div>
         </div>
         
-        <div className="pdf-body" style={{ height: 'calc(100% - 60px)', width: '100%', backgroundColor: '#e2e8f0' }}>
+        <div className="pdf-body">
           {/* Using object tag to prefer native PDF viewer which handles touchpad zoom natively.
               If the browser doesn't support native PDF (like mobile), it will fallback to Google Docs viewer */}
           <object 
