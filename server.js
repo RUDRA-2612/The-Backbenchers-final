@@ -255,9 +255,23 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
 app.delete('/api/materials/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // 1. Get the material to find the filepath
+    const { data: material, error: fetchError } = await supabase.from('materials').select('filepath').eq('id', id).single();
+    if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
+    
+    // 2. Extract filename from public URL and delete from storage
+    if (material && material.filepath) {
+      const filename = material.filepath.split('/').pop();
+      const cleanFilename = filename.split('?')[0]; // Remove query params if any
+      await supabase.storage.from('materials').remove([cleanFilename]).catch(e => console.error("Storage cleanup error:", e));
+    }
+    
+    // 3. Delete from database
     const { error } = await supabase.from('materials').delete().eq('id', id);
     if (error) throw error;
-    res.json({ message: 'Material deleted successfully' });
+    
+    res.json({ message: 'Material and file deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -268,6 +282,15 @@ app.put('/api/materials/:id', async (req, res) => {
     const { id } = req.params;
     const { filename, filepath } = req.body;
     if (!filename || !filepath) return res.status(400).json({ error: 'Missing filename or filepath' });
+
+    // 1. Get the old material to find the old filepath
+    const { data: oldMaterial } = await supabase.from('materials').select('filepath').eq('id', id).single();
+    
+    // 2. Delete the old file from storage to prevent orphans
+    if (oldMaterial && oldMaterial.filepath && oldMaterial.filepath !== filepath) {
+      const oldFilename = oldMaterial.filepath.split('/').pop().split('?')[0];
+      await supabase.storage.from('materials').remove([oldFilename]).catch(e => console.error("Storage cleanup error:", e));
+    }
 
     const updateData = {
       filename,
