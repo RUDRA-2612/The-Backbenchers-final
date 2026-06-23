@@ -79,10 +79,8 @@ export default function App() {
         window.location.replace('#home');
       }
 
-      // Automatically close sidebar on mobile when navigating
-      if (window.innerWidth < 768) {
-        setSidebarCollapsed(true);
-      }
+      // Automatically close sidebar on navigating for all devices (mobile + laptop)
+      setSidebarCollapsed(true);
     };
 
     window.addEventListener('hashchange', handleHashChange);
@@ -261,13 +259,13 @@ export default function App() {
           activeView={activeView} 
           setActiveView={(view) => {
             if (view === activeView) {
-              if (window.innerWidth < 768) setSidebarCollapsed(true);
+              setSidebarCollapsed(true);
               return;
             }
             setActiveView(view);
             if (view === 'home') setSelectedSubject(null);
             window.location.hash = view;
-            if (window.innerWidth < 768) setSidebarCollapsed(true);
+            setSidebarCollapsed(true);
           }}
           isCollapsed={sidebarCollapsed}
           isAdmin={user?.isAdmin}
