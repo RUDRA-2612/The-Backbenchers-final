@@ -174,8 +174,11 @@ export default function AdminPanel({ onMaterialUploaded }) {
       setUploadMessage({ type: 'success', text: 'PDF material uploaded successfully!' });
       setTitle('');
       setFile(null);
-      // Reset file input element
-      document.getElementById('pdf-file-input').value = '';
+      // Reset file input element safely
+      const fileInput = document.getElementById('pdf-file-input');
+      if (fileInput) {
+        fileInput.value = '';
+      }
 
       // Trigger parent callback to refresh materials list
       onMaterialUploaded();
