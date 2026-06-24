@@ -128,6 +128,28 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+app.post('/api/auth/change-password', async (req, res) => {
+  try {
+    const { email, oldPassword, newPassword } = req.body;
+    if (!email || !oldPassword || !newPassword) return res.status(400).json({ error: 'All fields are required' });
+
+    const emailLower = email.toLowerCase();
+    
+    const { data: user, error: findError } = await supabase.from('users').select('*').eq('email', emailLower).single();
+    if (findError || !user) return res.status(404).json({ error: 'User not found' });
+    
+    if (user.isGoogle) return res.status(400).json({ error: 'Cannot change password for Google logged-in accounts' });
+    if (user.password !== oldPassword) return res.status(401).json({ error: 'Incorrect old password' });
+
+    const { error: updateError } = await supabase.from('users').update({ password: newPassword }).eq('id', user.id);
+    if (updateError) throw updateError;
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/admin/logins', async (req, res) => {
   try {
     const { data: logs, error } = await supabase.from('login_logs').select('*').order('timestamp', { ascending: false });

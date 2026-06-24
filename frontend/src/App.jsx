@@ -6,6 +6,7 @@ import SubjectGrid from './components/SubjectGrid';
 import SubjectDetail from './components/SubjectDetail';
 import Downloads from './components/Downloads';
 import AdminPanel from './components/AdminPanel';
+import Profile from './components/Profile';
 import MockPdfViewer from './components/MockPdfViewer';
 import Footer from './components/Footer';
 import { API_URL } from './config';
@@ -68,7 +69,7 @@ export default function App() {
         // Do nothing on hashchange to pdf-viewer.
         // The PDF modal is opened by handleViewFile setting activePdfFile synchronously.
         // If we check activePdfFile here, it fails due to stale closures.
-      } else if (hash === 'home' || hash === 'admin' || hash === 'downloads') {
+      } else if (hash === 'home' || hash === 'admin' || hash === 'downloads' || hash === 'profile') {
         setActiveView(hash);
         setActivePdfFile(null);
         if (hash === 'home') setSelectedSubject(null);
@@ -228,6 +229,8 @@ export default function App() {
             onRemoveDownload={handleRemoveDownload}
           />
         );
+      case 'profile':
+        return <Profile user={user} />;
       case 'admin':
         return user?.isAdmin ? <AdminPanel onMaterialUploaded={fetchMaterials} /> : <SubjectGrid onSelectSubject={handleSelectSubject} />;
       default:

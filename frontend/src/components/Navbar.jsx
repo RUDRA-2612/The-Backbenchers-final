@@ -57,36 +57,28 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
 
             {showDropdown && (
               <div className="profile-dropdown">
-                <div 
-                  className="dropdown-header" 
-                  style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: showProfileDetails ? '1px solid var(--border)' : 'none', paddingBottom: showProfileDetails ? '0.75rem' : '0' }} 
-                  onClick={() => setShowProfileDetails(!showProfileDetails)}
+                <button 
+                  className="dropdown-logout" 
+                  style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border)', borderRadius: '8px 8px 0 0', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }} 
+                  onClick={() => {
+                    setShowDropdown(false);
+                    window.location.hash = 'profile';
+                  }}
                 >
-                  <div className="dropdown-name" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <User size={16} />
-                    <span>Profile</span>
-                  </div>
-                  {showProfileDetails ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </div>
-
-                {showProfileDetails && (
-                  <div className="profile-details" style={{ padding: '0.75rem 0', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <div>
-                      <div className="dropdown-name" style={{ fontSize: '0.95rem' }}>{user.name}</div>
-                      <div className="dropdown-email">{user.email}</div>
-                    </div>
-                    <button className="btn btn-secondary" style={{ width: '100%', fontSize: '0.85rem', padding: '0.5rem' }}>
-                      <Key size={14} /> Change Password
-                    </button>
-                  </div>
-                )}
-
-                <div style={{ marginTop: showProfileDetails ? '0.25rem' : '0.75rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
-                  <button className="dropdown-logout" onClick={onLogout}>
-                    <LogOut size={16} />
-                    <span>Log Out</span>
-                  </button>
-                </div>
+                  <User size={16} />
+                  <span>Profile</span>
+                </button>
+                <button 
+                  className="dropdown-logout" 
+                  style={{ borderTop: 'none', borderRadius: '0 0 8px 8px' }}
+                  onClick={() => {
+                    setShowDropdown(false);
+                    onLogout();
+                  }}
+                >
+                  <LogOut size={16} />
+                  <span>Log Out</span>
+                </button>
               </div>
             )}
           </div>
