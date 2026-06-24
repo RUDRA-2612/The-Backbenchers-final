@@ -1,5 +1,5 @@
 import React from 'react';
-import { Terminal, Zap, Calculator, Leaf, Radio, Cpu, ArrowRight, Book, Frown, Code, Atom } from 'lucide-react';
+import { Terminal, Zap, Calculator, Leaf, Radio, Cpu, ArrowRight, Book, Frown, Code, Atom, Smile, Sparkles, Music } from 'lucide-react';
 
 const subjects = [
   { name: 'Programming 1 (Python)', code: 'CS1139', icon: Terminal, desc: 'Introductory programming, control flow, functions, lists, and file handling.' },
@@ -16,17 +16,24 @@ export default function SubjectGrid({ onSelectSubject }) {
     <div>
       <div className="hero-section">
         <h1 className="hero-title" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
-          <div className="confused-student-container">
-             <div className="student-body-confused">
-               <Frown className="student-face-confused" size={38} color="#f59e0b" strokeWidth={1.5} />
-             </div>
-             <Code className="floating-icon icon-code" size={16} color="#10b981" />
-             <Atom className="floating-icon icon-atom" size={18} color="#3b82f6" />
-             <Cpu className="floating-icon icon-cpu" size={16} color="#ef4444" />
-             <Calculator className="floating-icon icon-calc" size={16} color="#8b5cf6" />
-          </div>
-          <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)', lineHeight: '1' }}>Welcome to</span>
-          <span className="hero-brand-name">
+          <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)', lineHeight: '1', position: 'relative', zIndex: 1 }}>Welcome to</span>
+          <span className="hero-brand-name" style={{ position: 'relative', display: 'inline-block', zIndex: 2 }}>
+            <div className="story-cartoon-track">
+               <div className="story-cartoon-walker">
+                 <div className="story-face face-smile-start"><Smile size={32} color="#f59e0b" strokeWidth={2} /></div>
+                 <div className="story-face face-tense"><Frown size={32} color="#ef4444" strokeWidth={2} /></div>
+                 <div className="story-face face-smile-end"><Smile size={32} color="#10b981" strokeWidth={2} /></div>
+                 
+                 <div className="story-symbols symbols-tense">
+                   <Code className="story-icon story-icon-1" size={14} />
+                   <Atom className="story-icon story-icon-2" size={14} />
+                 </div>
+                 <div className="story-symbols symbols-happy">
+                   <Sparkles className="story-icon story-icon-3" size={16} />
+                   <Music className="story-icon story-icon-4" size={14} />
+                 </div>
+               </div>
+            </div>
             {"Backbenchers".split('').map((char, idx) => (
               <span 
                 key={idx} 

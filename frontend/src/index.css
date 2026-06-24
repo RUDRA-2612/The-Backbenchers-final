@@ -650,83 +650,147 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.02em;
 }
 
-/* CONFUSED STUDENT CARTOON */
-.confused-student-container {
-  position: relative;
-  width: 120px;
-  height: 90px;
+/* STORY WALKING CARTOON */
+.story-cartoon-track {
+  position: absolute;
+  top: -45px; /* Adjust to overlap "Welcome to" */
+  left: 0;
+  right: 0;
+  height: 40px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.story-cartoon-walker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  animation: walk-across-story 12s infinite;
+}
+
+.story-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  margin: 0 auto;
-}
-
-.student-body-confused {
-  animation: head-shake 3s ease-in-out infinite;
-  z-index: 2;
-  margin-bottom: 5px;
-}
-
-.student-face-confused {
   background: var(--bg-primary);
   border-radius: 50%;
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-.floating-icon {
+.face-smile-start {
+  animation: face-smile-start 12s infinite;
+}
+.face-tense {
+  animation: face-tense 12s infinite;
+}
+.face-smile-end {
+  animation: face-smile-end 12s infinite;
+}
+
+.story-symbols {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.symbols-tense {
+  animation: symbols-tense-show 12s infinite;
+}
+.symbols-happy {
+  animation: symbols-happy-show 12s infinite;
+}
+
+.story-icon {
   position: absolute;
   opacity: 0;
-  bottom: 30px;
-  z-index: 1;
 }
 
-.icon-code {
-  animation: float-pop-left 3s ease-in infinite 0s;
+.story-icon-1 { color: #10b981; animation: float-pop-story 1.5s infinite 0s; }
+.story-icon-2 { color: #3b82f6; animation: float-pop-story 1.5s infinite 0.75s; }
+.story-icon-3 { color: #fbbf24; animation: float-pop-story-happy 1.2s infinite 0s; }
+.story-icon-4 { color: #a855f7; animation: float-pop-story-happy 1.2s infinite 0.6s; }
+
+/* Timeline: 
+   0-10% at 'B', smile
+   10-60% walking, tense
+   60-70% arriving at 's', happy
+   70-85% jumping at 's', happy
+   85-100% fading and resetting
+*/
+
+@keyframes walk-across-story {
+  0%, 10% { left: 0; transform: translateY(0); opacity: 1; }
+  
+  /* Walking with a slight bob */
+  15% { left: 10%; transform: translateY(-4px); }
+  20% { left: 20%; transform: translateY(0); }
+  25% { left: 30%; transform: translateY(-4px); }
+  30% { left: 40%; transform: translateY(0); }
+  35% { left: 50%; transform: translateY(-4px); }
+  40% { left: 60%; transform: translateY(0); }
+  45% { left: 70%; transform: translateY(-4px); }
+  50% { left: 80%; transform: translateY(0); }
+  55% { left: 90%; transform: translateY(-4px); }
+  
+  /* Arrive at 's' */
+  60%, 70% { left: calc(100% - 32px); transform: translateY(0); opacity: 1; }
+  
+  /* Jump with joy at 's' */
+  75% { left: calc(100% - 32px); transform: translateY(0) scaleY(0.8); opacity: 1; }
+  80% { left: calc(100% - 32px); transform: translateY(-30px) scaleY(1.1); opacity: 1; }
+  85% { left: calc(100% - 32px); transform: translateY(0) scaleY(1); opacity: 1; }
+  
+  /* Fade out */
+  90%, 100% { left: calc(100% - 32px); transform: translateY(0); opacity: 0; }
 }
 
-.icon-atom {
-  animation: float-pop-right 3.2s ease-in infinite 0.5s;
+@keyframes face-smile-start {
+  0%, 10% { opacity: 1; }
+  10.1%, 100% { opacity: 0; }
 }
 
-.icon-cpu {
-  animation: float-pop-left-high 2.8s ease-in infinite 1.2s;
+@keyframes face-tense {
+  0%, 10% { opacity: 0; }
+  10.1%, 60% { opacity: 1; }
+  60.1%, 100% { opacity: 0; }
 }
 
-.icon-calc {
-  animation: float-pop-right-high 3.5s ease-in infinite 1.8s;
+@keyframes face-smile-end {
+  0%, 60% { opacity: 0; }
+  60.1%, 100% { opacity: 1; }
 }
 
-@keyframes head-shake {
-  0%, 100% { transform: rotate(-5deg); }
-  50% { transform: rotate(5deg); }
+@keyframes symbols-tense-show {
+  0%, 10% { opacity: 0; }
+  10.1%, 60% { opacity: 1; }
+  60.1%, 100% { opacity: 0; }
 }
 
-@keyframes float-pop-left {
-  0% { transform: translate(0, 0) scale(0.5) rotate(0deg); opacity: 0; }
-  20% { opacity: 1; transform: translate(-15px, -20px) scale(1) rotate(-15deg); }
-  80% { opacity: 0.8; }
-  100% { transform: translate(-30px, -50px) scale(1.2) rotate(-30deg); opacity: 0; }
+@keyframes symbols-happy-show {
+  0%, 60% { opacity: 0; }
+  60.1%, 85% { opacity: 1; }
+  85.1%, 100% { opacity: 0; }
 }
 
-@keyframes float-pop-right {
-  0% { transform: translate(0, 0) scale(0.5) rotate(0deg); opacity: 0; }
-  20% { opacity: 1; transform: translate(15px, -15px) scale(1) rotate(15deg); }
-  80% { opacity: 0.8; }
-  100% { transform: translate(35px, -45px) scale(1.2) rotate(30deg); opacity: 0; }
+@keyframes float-pop-story {
+  0% { transform: translate(5px, 0) scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translate(-10px, -25px) scale(1.2); opacity: 0; }
 }
 
-@keyframes float-pop-left-high {
-  0% { transform: translate(0, 0) scale(0.5) rotate(0deg); opacity: 0; }
-  20% { opacity: 1; transform: translate(-8px, -30px) scale(1) rotate(-10deg); }
-  80% { opacity: 0.8; }
-  100% { transform: translate(-20px, -70px) scale(1.2) rotate(-25deg); opacity: 0; }
-}
-
-@keyframes float-pop-right-high {
-  0% { transform: translate(0, 0) scale(0.5) rotate(0deg); opacity: 0; }
-  20% { opacity: 1; transform: translate(8px, -25px) scale(1) rotate(10deg); }
-  80% { opacity: 0.8; }
-  100% { transform: translate(25px, -60px) scale(1.2) rotate(25deg); opacity: 0; }
+@keyframes float-pop-story-happy {
+  0% { transform: translate(5px, 0) scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translate(15px, -25px) scale(1.2); opacity: 0; }
 }
 
 /* SUBJECTS GRID */
