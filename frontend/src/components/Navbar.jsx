@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, User, LogOut, Menu, BookOpen } from 'lucide-react';
+import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key } from 'lucide-react';
 
 export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSidebar }) {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showProfileDetails, setShowProfileDetails] = useState(false);
   const dropdownRef = useRef(null);
 
   // Close dropdown if clicked outside
@@ -10,6 +11,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
+        setShowProfileDetails(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -55,14 +57,36 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
 
             {showDropdown && (
               <div className="profile-dropdown">
-                <div className="dropdown-header">
-                  <div className="dropdown-name">{user.name}</div>
-                  <div className="dropdown-email">{user.email}</div>
+                <div 
+                  className="dropdown-header" 
+                  style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: showProfileDetails ? '1px solid var(--border)' : 'none', paddingBottom: showProfileDetails ? '0.75rem' : '0' }} 
+                  onClick={() => setShowProfileDetails(!showProfileDetails)}
+                >
+                  <div className="dropdown-name" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <User size={16} />
+                    <span>Profile</span>
+                  </div>
+                  {showProfileDetails ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </div>
-                <button className="dropdown-logout" onClick={onLogout}>
-                  <LogOut size={16} />
-                  <span>Log Out</span>
-                </button>
+
+                {showProfileDetails && (
+                  <div className="profile-details" style={{ padding: '0.75rem 0', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div>
+                      <div className="dropdown-name" style={{ fontSize: '0.95rem' }}>{user.name}</div>
+                      <div className="dropdown-email">{user.email}</div>
+                    </div>
+                    <button className="btn btn-secondary" style={{ width: '100%', fontSize: '0.85rem', padding: '0.5rem' }}>
+                      <Key size={14} /> Change Password
+                    </button>
+                  </div>
+                )}
+
+                <div style={{ marginTop: showProfileDetails ? '0.25rem' : '0.75rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
+                  <button className="dropdown-logout" onClick={onLogout}>
+                    <LogOut size={16} />
+                    <span>Log Out</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
