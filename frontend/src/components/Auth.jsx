@@ -110,7 +110,7 @@ export default function Auth({ onLoginSuccess }) {
             <img src="/logo.png" alt="Logo" className="nav-logo-img" style={{ height: '85px' }} />
           </div>
           <p className="auth-subtitle">
-            {isLogin ? 'Sign in to access B.Tech notes & papers' : 'Create an account to start studying'}
+            {isLogin ? 'Log in to access B.Tech notes & papers' : 'Create an account to start studying'}
           </p>
         </div>
 
@@ -224,7 +224,7 @@ export default function Auth({ onLoginSuccess }) {
             style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', marginTop: '0.5rem' }}
             disabled={loading}
           >
-            {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
+            {loading ? 'Processing...' : isLogin ? 'Log In' : 'Create Account'}
           </button>
         </form>
 
@@ -232,7 +232,7 @@ export default function Auth({ onLoginSuccess }) {
           {isLogin ? (
             <>Don't have an account? <span onClick={() => setIsLogin(false)}>Sign Up</span></>
           ) : (
-            <>Already have an account? <span onClick={() => setIsLogin(true)}>Sign In</span></>
+            <>Already have an account? <span onClick={() => setIsLogin(true)}>Log In</span></>
           )}
         </p>
       </div>
