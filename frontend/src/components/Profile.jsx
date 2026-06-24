@@ -91,7 +91,7 @@ export default function Profile({ user }) {
         </div>
 
         {!user.isGoogle ? (
-          <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }} autoComplete="off">
             <h3 style={{ fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
               <Key size={18} style={{ color: 'var(--accent)' }} /> Change Password
             </h3>
@@ -118,6 +118,7 @@ export default function Profile({ user }) {
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
                   required
+                  autoComplete="new-password"
                   placeholder="Enter current password"
                 />
                 <button
@@ -140,6 +141,7 @@ export default function Profile({ user }) {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
+                  autoComplete="new-password"
                   placeholder="Enter new password"
                 />
                 <button
@@ -162,6 +164,7 @@ export default function Profile({ user }) {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  autoComplete="new-password"
                   placeholder="Confirm new password"
                 />
                 <button

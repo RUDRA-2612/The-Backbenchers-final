@@ -133,7 +133,7 @@ export default function Auth({ onLoginSuccess }) {
 
         <div className="auth-divider">or use email</div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }} autoComplete="off">
           {!isLogin && (
             <div className="form-group">
               <label className="form-label" htmlFor="fullName">Full Name</label>
@@ -148,6 +148,7 @@ export default function Auth({ onLoginSuccess }) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required 
+                  autoComplete="off"
                 />
               </div>
             </div>
@@ -166,6 +167,7 @@ export default function Auth({ onLoginSuccess }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required 
+                autoComplete="off"
               />
             </div>
           </div>
@@ -183,6 +185,7 @@ export default function Auth({ onLoginSuccess }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required 
+                autoComplete="new-password"
               />
               <button
                 type="button"
