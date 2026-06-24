@@ -653,10 +653,10 @@ h1, h2, h3, h4, h5, h6 {
 /* STORY WALKING CARTOON */
 .story-cartoon-track {
   position: absolute;
-  top: -45px; /* Adjust to overlap "Welcome to" */
+  top: -65px; /* Adjust to sit perfectly above "Welcome to" */
   left: 0;
   right: 0;
-  height: 40px;
+  height: 60px;
   pointer-events: none;
   z-index: 10;
 }
@@ -665,39 +665,124 @@ h1, h2, h3, h4, h5, h6 {
   position: absolute;
   top: 0;
   left: 0;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 50px;
   animation: walk-across-story 12s infinite;
 }
 
-.story-face {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-primary);
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+/* Walking Student CSS Figure */
+.student-figure {
+  position: relative;
+  width: 30px;
+  height: 50px;
+  animation: body-bob 0.5s infinite alternate ease-in-out;
 }
 
-.face-smile-start {
-  animation: face-smile-start 12s infinite;
+.student-head {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  width: 20px;
+  height: 20px;
+  background: var(--bg-primary);
+  border: 2px solid var(--text-primary);
+  border-radius: 50%;
+  z-index: 3;
 }
-.face-tense {
-  animation: face-tense 12s infinite;
+
+.face {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  color: var(--text-primary);
 }
-.face-smile-end {
-  animation: face-smile-end 12s infinite;
+
+.sad-face {
+  animation: fade-sad-to-happy 12s infinite;
+}
+
+.happy-face {
+  animation: fade-happy-to-sad 12s infinite;
+}
+
+.student-torso {
+  position: absolute;
+  top: 20px;
+  left: 13px;
+  width: 4px;
+  height: 15px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  z-index: 2;
+}
+
+.student-backpack {
+  position: absolute;
+  top: 2px;
+  left: -5px;
+  width: 8px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+.student-arm {
+  position: absolute;
+  top: 22px;
+  left: 13.5px;
+  width: 3px;
+  height: 12px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transform-origin: top center;
+  z-index: 4;
+}
+
+.arm-left {
+  animation: swing-leg 0.6s infinite alternate ease-in-out;
+}
+.arm-right {
+  animation: swing-leg-opp 0.6s infinite alternate ease-in-out;
+  z-index: 1;
+}
+
+.student-leg {
+  position: absolute;
+  top: 33px;
+  left: 13px;
+  width: 4px;
+  height: 15px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transform-origin: top center;
+  z-index: 2;
+}
+
+.leg-left {
+  animation: swing-leg-opp 0.6s infinite alternate ease-in-out;
+}
+.leg-right {
+  animation: swing-leg 0.6s infinite alternate ease-in-out;
+}
+
+@keyframes swing-leg {
+  0% { transform: rotate(-40deg); }
+  100% { transform: rotate(40deg); }
+}
+
+@keyframes swing-leg-opp {
+  0% { transform: rotate(40deg); }
+  100% { transform: rotate(-40deg); }
+}
+
+@keyframes body-bob {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(3px); }
 }
 
 .story-symbols {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: -10px;
+  left: 5px;
   width: 100%;
   height: 100%;
 }
@@ -714,10 +799,17 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0;
 }
 
-.story-icon-1 { color: #10b981; animation: float-pop-story 1.5s infinite 0s; }
-.story-icon-2 { color: #3b82f6; animation: float-pop-story 1.5s infinite 0.75s; }
-.story-icon-3 { color: #fbbf24; animation: float-pop-story-happy 1.2s infinite 0s; }
-.story-icon-4 { color: #a855f7; animation: float-pop-story-happy 1.2s infinite 0.6s; }
+.story-text-icon {
+  font-family: serif;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.icon-alpha { color: #ef4444; animation: float-pop-story 1.5s infinite 0s; }
+.icon-beta { color: #f59e0b; animation: float-pop-story 1.5s infinite 0.5s; }
+.icon-gamma { color: #10b981; animation: float-pop-story 1.5s infinite 1s; }
+.icon-happy-1 { color: #fbbf24; animation: float-pop-story-happy 1.2s infinite 0s; }
+.icon-happy-2 { color: #a855f7; animation: float-pop-story-happy 1.2s infinite 0.6s; }
 
 /* Timeline: 
    0-10% at 'B', smile
@@ -730,43 +822,29 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes walk-across-story {
   0%, 10% { left: 0; transform: translateY(0); opacity: 1; }
   
-  /* Walking with a slight bob */
-  15% { left: 10%; transform: translateY(-4px); }
-  20% { left: 20%; transform: translateY(0); }
-  25% { left: 30%; transform: translateY(-4px); }
-  30% { left: 40%; transform: translateY(0); }
-  35% { left: 50%; transform: translateY(-4px); }
-  40% { left: 60%; transform: translateY(0); }
-  45% { left: 70%; transform: translateY(-4px); }
-  50% { left: 80%; transform: translateY(0); }
-  55% { left: 90%; transform: translateY(-4px); }
-  
-  /* Arrive at 's' */
-  60%, 70% { left: calc(100% - 32px); transform: translateY(0); opacity: 1; }
+  /* Walking */
+  10.1%, 55% { left: 0; opacity: 1; } /* Transition via keyframes is smooth */
+  60%, 70% { left: calc(100% - 30px); transform: translateY(0); opacity: 1; }
   
   /* Jump with joy at 's' */
-  75% { left: calc(100% - 32px); transform: translateY(0) scaleY(0.8); opacity: 1; }
-  80% { left: calc(100% - 32px); transform: translateY(-30px) scaleY(1.1); opacity: 1; }
-  85% { left: calc(100% - 32px); transform: translateY(0) scaleY(1); opacity: 1; }
+  75% { left: calc(100% - 30px); transform: translateY(0) scaleY(0.8); opacity: 1; }
+  80% { left: calc(100% - 30px); transform: translateY(-40px) scaleY(1.1); opacity: 1; }
+  85% { left: calc(100% - 30px); transform: translateY(0) scaleY(1); opacity: 1; }
   
   /* Fade out */
-  90%, 100% { left: calc(100% - 32px); transform: translateY(0); opacity: 0; }
+  90%, 100% { left: calc(100% - 30px); transform: translateY(0); opacity: 0; }
 }
 
-@keyframes face-smile-start {
-  0%, 10% { opacity: 1; }
-  10.1%, 100% { opacity: 0; }
+@keyframes fade-sad-to-happy {
+  0%, 15% { opacity: 1; }
+  60%, 90% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
-@keyframes face-tense {
-  0%, 10% { opacity: 0; }
-  10.1%, 60% { opacity: 1; }
-  60.1%, 100% { opacity: 0; }
-}
-
-@keyframes face-smile-end {
-  0%, 60% { opacity: 0; }
-  60.1%, 100% { opacity: 1; }
+@keyframes fade-happy-to-sad {
+  0%, 15% { opacity: 0; }
+  60%, 90% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @keyframes symbols-tense-show {

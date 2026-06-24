@@ -20,17 +20,40 @@ export default function SubjectGrid({ onSelectSubject }) {
           <span className="hero-brand-name" style={{ position: 'relative', display: 'inline-block', zIndex: 2 }}>
             <div className="story-cartoon-track">
                <div className="story-cartoon-walker">
-                 <div className="story-face face-smile-start"><Smile size={32} color="#f59e0b" strokeWidth={2} /></div>
-                 <div className="story-face face-tense"><Frown size={32} color="#ef4444" strokeWidth={2} /></div>
-                 <div className="story-face face-smile-end"><Smile size={32} color="#10b981" strokeWidth={2} /></div>
+                 <div className="student-figure">
+                   <div className="student-head">
+                     <div className="face sad-face">
+                       <svg viewBox="0 0 24 24" style={{ width: '100%', height: '100%' }}>
+                         <path d="M7 15 Q12 12 17 15" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round"/>
+                         <circle cx="8" cy="9" r="1.5" fill="currentColor"/>
+                         <circle cx="16" cy="9" r="1.5" fill="currentColor"/>
+                       </svg>
+                     </div>
+                     <div className="face happy-face">
+                       <svg viewBox="0 0 24 24" style={{ width: '100%', height: '100%' }}>
+                         <path d="M7 13 Q12 17 17 13" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round"/>
+                         <circle cx="8" cy="9" r="1.5" fill="currentColor"/>
+                         <circle cx="16" cy="9" r="1.5" fill="currentColor"/>
+                       </svg>
+                     </div>
+                   </div>
+                   <div className="student-torso">
+                     <div className="student-backpack"></div>
+                   </div>
+                   <div className="student-arm arm-left"></div>
+                   <div className="student-arm arm-right"></div>
+                   <div className="student-leg leg-left"></div>
+                   <div className="student-leg leg-right"></div>
+                 </div>
                  
                  <div className="story-symbols symbols-tense">
-                   <Code className="story-icon story-icon-1" size={14} />
-                   <Atom className="story-icon story-icon-2" size={14} />
+                   <span className="story-icon story-text-icon icon-alpha">α</span>
+                   <span className="story-icon story-text-icon icon-beta">β</span>
+                   <span className="story-icon story-text-icon icon-gamma">γ</span>
                  </div>
                  <div className="story-symbols symbols-happy">
-                   <Sparkles className="story-icon story-icon-3" size={16} />
-                   <Music className="story-icon story-icon-4" size={14} />
+                   <Sparkles className="story-icon icon-happy-1" size={16} />
+                   <Music className="story-icon icon-happy-2" size={14} />
                  </div>
                </div>
             </div>
