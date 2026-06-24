@@ -653,7 +653,7 @@ h1, h2, h3, h4, h5, h6 {
 /* STORY WALKING CARTOON */
 .story-cartoon-track {
   position: absolute;
-  top: -65px; /* Adjust to sit perfectly above "Welcome to" */
+  top: -75px; /* Adjust to sit perfectly above "Welcome to" */
   left: 0;
   right: 0;
   height: 60px;
@@ -665,124 +665,161 @@ h1, h2, h3, h4, h5, h6 {
   position: absolute;
   top: 0;
   left: 0;
-  width: 30px;
-  height: 50px;
-  animation: walk-across-story 12s infinite;
+  width: 35px;
+  height: 60px;
+  animation: walk-across-story 12s infinite linear;
 }
 
-/* Walking Student CSS Figure */
+/* Walking Student CSS Figure - Dressed Up */
 .student-figure {
   position: relative;
-  width: 30px;
-  height: 50px;
-  animation: body-bob 0.5s infinite alternate ease-in-out;
+  width: 35px;
+  height: 60px;
+  animation: stylish-bob 0.5s infinite alternate ease-in-out;
 }
 
 .student-head {
   position: absolute;
   top: 0;
   left: 5px;
-  width: 20px;
-  height: 20px;
-  background: var(--bg-primary);
-  border: 2px solid var(--text-primary);
+  width: 24px;
+  height: 24px;
+  background: #fde047; /* Yellowish skin */
+  border: 1.5px solid #ca8a04;
   border-radius: 50%;
-  z-index: 3;
+  z-index: 5;
 }
 
 .face {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
-  color: var(--text-primary);
 }
 
 .sad-face {
-  animation: fade-sad-to-happy 12s infinite;
+  animation: fade-sad-to-happy 12s infinite linear;
 }
 
 .happy-face {
-  animation: fade-happy-to-sad 12s infinite;
+  animation: fade-happy-to-sad 12s infinite linear;
 }
 
 .student-torso {
   position: absolute;
-  top: 20px;
-  left: 13px;
-  width: 4px;
-  height: 15px;
-  background: var(--text-primary);
-  border-radius: 2px;
-  z-index: 2;
+  top: 23px;
+  left: 9px;
+  width: 16px;
+  height: 20px;
+  background: #3b82f6; /* Blue shirt */
+  border-radius: 4px;
+  z-index: 4;
 }
 
 .student-backpack {
   position: absolute;
-  top: 2px;
-  left: -5px;
-  width: 8px;
-  height: 12px;
-  background: var(--accent);
-  border-radius: 3px;
+  top: 25px;
+  left: 3px;
+  width: 10px;
+  height: 16px;
+  background: #ef4444; /* Red backpack */
+  border-radius: 4px;
+  z-index: 2;
 }
 
 .student-arm {
   position: absolute;
-  top: 22px;
-  left: 13.5px;
-  width: 3px;
-  height: 12px;
-  background: var(--text-primary);
-  border-radius: 2px;
+  top: 25px;
+  width: 6px;
+  height: 16px;
+  background: #3b82f6; /* Blue sleeves matching shirt */
+  border-radius: 3px;
   transform-origin: top center;
-  z-index: 4;
+}
+.student-arm::after {
+  /* Hand */
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 1px;
+  width: 4px;
+  height: 4px;
+  background: #fde047; /* Skin tone hand */
+  border-radius: 50%;
 }
 
 .arm-left {
-  animation: swing-leg 0.6s infinite alternate ease-in-out;
+  left: 11px;
+  z-index: 5; /* In front of torso */
+  animation: strut-arm-left 0.5s infinite alternate ease-in-out;
 }
 .arm-right {
-  animation: swing-leg-opp 0.6s infinite alternate ease-in-out;
-  z-index: 1;
+  left: 21px;
+  z-index: 3; /* Behind torso */
+  animation: strut-arm-right 0.5s infinite alternate ease-in-out;
 }
 
 .student-leg {
   position: absolute;
-  top: 33px;
-  left: 13px;
-  width: 4px;
-  height: 15px;
-  background: var(--text-primary);
-  border-radius: 2px;
+  top: 41px;
+  width: 7px;
+  height: 18px;
+  background: #1e293b; /* Dark pants */
+  border-radius: 3px;
   transform-origin: top center;
-  z-index: 2;
+}
+.student-leg::after {
+  /* Shoe */
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: -1px;
+  width: 9px;
+  height: 4px;
+  background: #475569; /* Grey shoes */
+  border-radius: 3px;
 }
 
 .leg-left {
-  animation: swing-leg-opp 0.6s infinite alternate ease-in-out;
+  left: 10px;
+  z-index: 3;
+  animation: strut-leg-left 0.5s infinite alternate ease-in-out;
 }
 .leg-right {
-  animation: swing-leg 0.6s infinite alternate ease-in-out;
+  left: 17px;
+  z-index: 2;
+  animation: strut-leg-right 0.5s infinite alternate ease-in-out;
 }
 
-@keyframes swing-leg {
-  0% { transform: rotate(-40deg); }
-  100% { transform: rotate(40deg); }
+/* Stylish Strut Keyframes */
+@keyframes stylish-bob {
+  0% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(4px) rotate(3deg); }
+  100% { transform: translateY(0) rotate(-3deg); }
 }
 
-@keyframes swing-leg-opp {
-  0% { transform: rotate(40deg); }
-  100% { transform: rotate(-40deg); }
+@keyframes strut-arm-left {
+  0% { transform: rotate(-50deg); }
+  100% { transform: rotate(50deg); }
 }
 
-@keyframes body-bob {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(3px); }
+@keyframes strut-arm-right {
+  0% { transform: rotate(50deg); }
+  100% { transform: rotate(-50deg); }
+}
+
+@keyframes strut-leg-left {
+  0% { transform: rotate(45deg); }
+  100% { transform: rotate(-45deg); }
+}
+
+@keyframes strut-leg-right {
+  0% { transform: rotate(-45deg); }
+  100% { transform: rotate(45deg); }
 }
 
 .story-symbols {
   position: absolute;
-  top: -10px;
-  left: 5px;
+  top: -15px;
+  left: 10px;
   width: 100%;
   height: 100%;
 }
@@ -812,51 +849,49 @@ h1, h2, h3, h4, h5, h6 {
 .icon-happy-2 { color: #a855f7; animation: float-pop-story-happy 1.2s infinite 0.6s; }
 
 /* Timeline: 
-   0-10% at 'B', smile
-   10-60% walking, tense
-   60-70% arriving at 's', happy
-   70-85% jumping at 's', happy
+   0-5% at 'B', standing
+   5-65% walking smoothly from B to s
+   65-75% arriving at 's'
+   75-85% jumping at 's'
    85-100% fading and resetting
 */
 
 @keyframes walk-across-story {
-  0%, 10% { left: 0; transform: translateY(0); opacity: 1; }
+  0%, 5% { left: 0; transform: translateY(0); opacity: 1; }
   
-  /* Walking */
-  10.1%, 55% { left: 0; opacity: 1; } /* Transition via keyframes is smooth */
-  60%, 70% { left: calc(100% - 30px); transform: translateY(0); opacity: 1; }
+  /* Smooth walking transition */
+  65%, 75% { left: calc(100% - 35px); transform: translateY(0); opacity: 1; }
   
   /* Jump with joy at 's' */
-  75% { left: calc(100% - 30px); transform: translateY(0) scaleY(0.8); opacity: 1; }
-  80% { left: calc(100% - 30px); transform: translateY(-40px) scaleY(1.1); opacity: 1; }
-  85% { left: calc(100% - 30px); transform: translateY(0) scaleY(1); opacity: 1; }
+  78% { left: calc(100% - 35px); transform: translateY(0) scaleY(0.8); opacity: 1; }
+  85% { left: calc(100% - 35px); transform: translateY(-40px) scaleY(1.1); opacity: 1; }
+  90% { left: calc(100% - 35px); transform: translateY(0) scaleY(1); opacity: 1; }
   
   /* Fade out */
-  90%, 100% { left: calc(100% - 30px); transform: translateY(0); opacity: 0; }
+  95%, 100% { left: calc(100% - 35px); transform: translateY(0); opacity: 0; }
 }
 
 @keyframes fade-sad-to-happy {
-  0%, 15% { opacity: 1; }
-  60%, 90% { opacity: 0; }
-  100% { opacity: 1; }
+  0%, 5% { opacity: 1; }
+  65%, 100% { opacity: 0; }
 }
 
 @keyframes fade-happy-to-sad {
-  0%, 15% { opacity: 0; }
-  60%, 90% { opacity: 1; }
+  0%, 5% { opacity: 0; }
+  65%, 90% { opacity: 1; }
   100% { opacity: 0; }
 }
 
 @keyframes symbols-tense-show {
-  0%, 10% { opacity: 0; }
-  10.1%, 60% { opacity: 1; }
-  60.1%, 100% { opacity: 0; }
+  0%, 5% { opacity: 0; }
+  5.1%, 50% { opacity: 1; }
+  50.1%, 100% { opacity: 0; }
 }
 
 @keyframes symbols-happy-show {
-  0%, 60% { opacity: 0; }
-  60.1%, 85% { opacity: 1; }
-  85.1%, 100% { opacity: 0; }
+  0%, 50% { opacity: 0; }
+  50.1%, 90% { opacity: 1; }
+  90.1%, 100% { opacity: 0; }
 }
 
 @keyframes float-pop-story {
