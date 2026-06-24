@@ -1,5 +1,5 @@
 import React from 'react';
-import { Terminal, Zap, Calculator, Leaf, Radio, Cpu, ArrowRight, Book, Dizzy, Code, Atom } from 'lucide-react';
+import { Terminal, Zap, Calculator, Leaf, Radio, Cpu, ArrowRight, Book, Frown, Code, Atom } from 'lucide-react';
 
 const subjects = [
   { name: 'Programming 1 (Python)', code: 'CS1139', icon: Terminal, desc: 'Introductory programming, control flow, functions, lists, and file handling.' },
@@ -18,7 +18,7 @@ export default function SubjectGrid({ onSelectSubject }) {
         <h1 className="hero-title" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
           <div className="confused-student-container">
              <div className="student-body-confused">
-               <Dizzy className="student-face-confused" size={38} color="#f59e0b" strokeWidth={1.5} />
+               <Frown className="student-face-confused" size={38} color="#f59e0b" strokeWidth={1.5} />
              </div>
              <Code className="floating-icon icon-code" size={16} color="#10b981" />
              <Atom className="floating-icon icon-atom" size={18} color="#3b82f6" />
