@@ -134,6 +134,11 @@ export default function Auth({ onLoginSuccess }) {
         <div className="auth-divider">or use email</div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }} autoComplete="off">
+          {/* Dummy hidden inputs to trap aggressive browser autofill */}
+          <div style={{ width: 0, height: 0, overflow: 'hidden', position: 'absolute', top: '-9999px', zIndex: -1 }}>
+            <input type="text" name="fake_email_trap" tabIndex="-1" autoComplete="username" />
+            <input type="password" name="fake_password_trap" tabIndex="-1" autoComplete="current-password" />
+          </div>
           {!isLogin && (
             <div className="form-group">
               <label className="form-label" htmlFor="fullName">Full Name</label>
@@ -154,39 +159,43 @@ export default function Auth({ onLoginSuccess }) {
             </div>
           )}
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="emailAddress">Email Address</label>
-            <div style={{ position: 'relative' }}>
-              <Mail size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '13px' }} />
-              <input 
-                id="emailAddress"
-                type="email" 
-                className="form-input" 
-                style={{ paddingLeft: '40px' }}
-                placeholder="e.g. student@college.edu" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required 
-                autoComplete="off"
-              />
+            <div className="form-group">
+              <label className="form-label" htmlFor="user_contact_data">Email Address</label>
+              <div style={{ position: 'relative' }}>
+                <Mail size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '13px' }} />
+                <input 
+                  id="user_contact_data"
+                  name="contact_data_field"
+                  type="email" 
+                  className="form-input" 
+                  style={{ paddingLeft: '40px' }}
+                  placeholder="e.g. student@college.edu" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required 
+                  autoComplete="new-password"
+                  data-lpignore="true"
+                />
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="accountPassword">Password</label>
-            <div style={{ position: 'relative' }}>
-              <Lock size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '13px' }} />
-              <input 
-                id="accountPassword"
-                type={showPassword ? "text" : "password"} 
-                className="form-input" 
-                style={{ paddingLeft: '40px', paddingRight: '40px' }}
-                placeholder="••••••••" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required 
-                autoComplete="new-password"
-              />
+            <div className="form-group">
+              <label className="form-label" htmlFor="secure_key_data">Password</label>
+              <div style={{ position: 'relative' }}>
+                <Lock size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '13px' }} />
+                <input 
+                  id="secure_key_data"
+                  name="secure_key_field"
+                  type={showPassword ? "text" : "password"} 
+                  className="form-input" 
+                  style={{ paddingLeft: '40px', paddingRight: '40px' }}
+                  placeholder="••••••••" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required 
+                  autoComplete="new-password"
+                  data-lpignore="true"
+                />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}

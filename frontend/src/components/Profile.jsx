@@ -92,6 +92,12 @@ export default function Profile({ user }) {
 
         {!user.isGoogle ? (
           <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }} autoComplete="off">
+            {/* Dummy hidden inputs to trap aggressive browser autofill */}
+            <div style={{ width: 0, height: 0, overflow: 'hidden', position: 'absolute', top: '-9999px', zIndex: -1 }}>
+              <input type="text" name="fake_email_trap" tabIndex="-1" autoComplete="username" />
+              <input type="password" name="fake_password_trap" tabIndex="-1" autoComplete="current-password" />
+            </div>
+            
             <h3 style={{ fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
               <Key size={18} style={{ color: 'var(--accent)' }} /> Change Password
             </h3>
