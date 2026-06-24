@@ -24,7 +24,7 @@ export default function Footer() {
           </li>
         </ul>
       </div>
-      <p className="footer-copyright">&copy; {new Date().getFullYear()} Backbenchers Portal. All rights reserved.</p>
+      <p className="footer-copyright">&copy; {new Date().getFullYear()} Back<span style={{ color: 'var(--accent)', fontWeight: '600' }}>benchers</span> Portal. All rights reserved.</p>
     </footer>
   );
 }
