@@ -26,8 +26,19 @@ export default function SubjectGrid({ onSelectSubject }) {
              <Sparkles className="sparkle-1" size={18} />
           </div>
           <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)', lineHeight: '1' }}>Welcome to</span>
-          <span className="hero-brand-name" style={{ color: 'var(--text-primary)' }}>
-            Back<span style={{ color: 'var(--accent)' }}>benchers</span>
+          <span className="hero-brand-name">
+            {"Backbenchers".split('').map((char, idx) => (
+              <span 
+                key={idx} 
+                className="dance-letter" 
+                style={{ 
+                  animationDelay: `${idx * 0.04}s`,
+                  color: idx >= 4 ? 'var(--accent)' : 'var(--text-primary)'
+                }}
+              >
+                {char}
+              </span>
+            ))}
           </span>
         </h1>
         <p className="hero-subtitle">Your ultimate portal for 1st-semester notes, PYQs, solutions, formula sheets, and important exam topics.</p>
