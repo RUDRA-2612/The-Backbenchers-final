@@ -1,5 +1,5 @@
 import React from 'react';
-import { Terminal, Zap, Calculator, Leaf, Radio, Cpu, ArrowRight, Book, Frown, Code, Atom, Smile, Sparkles, Music } from 'lucide-react';
+import { Terminal, Zap, Calculator, Leaf, Radio, Cpu, ArrowRight, Book, Frown, Code, Atom } from 'lucide-react';
 
 const subjects = [
   { name: 'Programming 1 (Python)', code: 'CS1139', icon: Terminal, desc: 'Introductory programming, control flow, functions, lists, and file handling.' },
@@ -16,47 +16,17 @@ export default function SubjectGrid({ onSelectSubject }) {
     <div>
       <div className="hero-section">
         <h1 className="hero-title" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)', lineHeight: '1', position: 'relative', zIndex: 1 }}>Welcome to</span>
-          <span className="hero-brand-name" style={{ position: 'relative', display: 'inline-block', zIndex: 2 }}>
-            <div className="story-cartoon-track">
-               <div className="story-cartoon-walker">
-                 <div className="student-figure">
-                   <div className="student-head">
-                     <div className="face sad-face">
-                       <svg viewBox="0 0 24 24" style={{ width: '100%', height: '100%' }}>
-                         <path d="M7 15 Q12 12 17 15" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round"/>
-                         <circle cx="8" cy="9" r="1.5" fill="currentColor"/>
-                         <circle cx="16" cy="9" r="1.5" fill="currentColor"/>
-                       </svg>
-                     </div>
-                     <div className="face happy-face">
-                       <svg viewBox="0 0 24 24" style={{ width: '100%', height: '100%' }}>
-                         <path d="M7 13 Q12 17 17 13" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round"/>
-                         <circle cx="8" cy="9" r="1.5" fill="currentColor"/>
-                         <circle cx="16" cy="9" r="1.5" fill="currentColor"/>
-                       </svg>
-                     </div>
-                   </div>
-                   <div className="student-torso">
-                     <div className="student-backpack"></div>
-                   </div>
-                   <div className="student-arm arm-left"></div>
-                   <div className="student-arm arm-right"></div>
-                   <div className="student-leg leg-left"></div>
-                   <div className="student-leg leg-right"></div>
-                 </div>
-                 
-                 <div className="story-symbols symbols-tense">
-                   <span className="story-icon story-text-icon icon-alpha">α</span>
-                   <span className="story-icon story-text-icon icon-beta">β</span>
-                   <span className="story-icon story-text-icon icon-gamma">γ</span>
-                 </div>
-                 <div className="story-symbols symbols-happy">
-                   <Sparkles className="story-icon icon-happy-1" size={16} />
-                   <Music className="story-icon icon-happy-2" size={14} />
-                 </div>
-               </div>
-            </div>
+          <div className="confused-student-container">
+             <div className="student-body-confused">
+               <Frown className="student-face-confused" size={38} color="#f59e0b" strokeWidth={1.5} />
+             </div>
+             <Code className="floating-icon icon-code" size={16} color="#10b981" />
+             <Atom className="floating-icon icon-atom" size={18} color="#3b82f6" />
+             <Cpu className="floating-icon icon-cpu" size={16} color="#ef4444" />
+             <Calculator className="floating-icon icon-calc" size={16} color="#8b5cf6" />
+          </div>
+          <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)', lineHeight: '1' }}>Welcome to</span>
+          <span className="hero-brand-name">
             {"Backbenchers".split('').map((char, idx) => (
               <span 
                 key={idx} 
