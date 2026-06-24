@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { User, Mail, Key, Shield, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { User, Mail, Key, Shield, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { API_URL } from '../config';
 
 export default function Profile({ user }) {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [status, setStatus] = useState(null); // 'idle', 'loading', 'success', 'error'
   const [message, setMessage] = useState('');
@@ -106,38 +110,68 @@ export default function Profile({ user }) {
 
             <div className="form-group">
               <label className="form-label">Current Password</label>
-              <input 
-                type="password" 
-                className="form-input" 
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                required
-                placeholder="Enter current password"
-              />
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type={showOldPassword ? "text" : "password"} 
+                  className="form-input" 
+                  style={{ paddingRight: '40px' }}
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  required
+                  placeholder="Enter current password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowOldPassword(!showOldPassword)}
+                  style={{ position: 'absolute', right: '12px', top: '13px', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}
+                >
+                  {showOldPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             
             <div className="form-group">
               <label className="form-label">New Password</label>
-              <input 
-                type="password" 
-                className="form-input" 
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                placeholder="Enter new password"
-              />
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type={showNewPassword ? "text" : "password"} 
+                  className="form-input" 
+                  style={{ paddingRight: '40px' }}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  placeholder="Enter new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  style={{ position: 'absolute', right: '12px', top: '13px', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}
+                >
+                  {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             
             <div className="form-group">
               <label className="form-label">Confirm New Password</label>
-              <input 
-                type="password" 
-                className="form-input" 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                placeholder="Confirm new password"
-              />
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type={showConfirmPassword ? "text" : "password"} 
+                  className="form-input" 
+                  style={{ paddingRight: '40px' }}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  placeholder="Confirm new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{ position: 'absolute', right: '12px', top: '13px', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <button 
