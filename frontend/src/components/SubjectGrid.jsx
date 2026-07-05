@@ -16,15 +16,7 @@ export default function SubjectGrid({ onSelectSubject }) {
     <div>
       <div className="hero-section">
         <h1 className="hero-title" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
-          <div className="confused-student-container">
-             <div className="student-body-confused">
-               <Frown className="student-face-confused" size={38} color="#f59e0b" strokeWidth={1.5} />
-             </div>
-             <Code className="floating-icon icon-code" size={16} color="#10b981" />
-             <Atom className="floating-icon icon-atom" size={18} color="#3b82f6" />
-             <Cpu className="floating-icon icon-cpu" size={16} color="#ef4444" />
-             <Calculator className="floating-icon icon-calc" size={16} color="#8b5cf6" />
-          </div>
+
           <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)', lineHeight: '1' }}>Welcome to</span>
           <span className="hero-brand-name">
             {"Backbenchers".split('').map((char, idx) => (
