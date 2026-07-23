@@ -73,6 +73,23 @@ export default function SubjectGrid({ onSelectSubject, materials = [], onViewFil
            item.filename?.toLowerCase().includes(q);
   });
 
+  const handleVote = async (requestId, voteType) => {
+    try {
+      const userIdentifier = user?.email || user?.name || 'guest';
+      const res = await fetch(`${API_URL}/api/requests/${requestId}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voteType, userIdentifier })
+      });
+      const data = await res.json();
+      if (res.ok && data.allRequests) {
+        setRequests(data.allRequests);
+      }
+    } catch (err) {
+      console.error('Error recording vote:', err);
+    }
+  };
+
   return (
     <div>
       <div className="hero-section">
@@ -207,26 +224,143 @@ export default function SubjectGrid({ onSelectSubject, materials = [], onViewFil
         })}
       </div>
 
-      {/* Open Student Requests Board */}
+      {/* Open Student Requests & Priority Polling Board */}
       {requests.length > 0 && (
-        <div style={{ marginTop: '3rem', padding: '1.5rem', background: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-            <HelpCircle size={22} color="var(--accent)" />
-            <h3 style={{ fontSize: '1.2rem', margin: 0 }}>Open Student Requests ({requests.length})</h3>
-          </div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-            Students have requested the following study resources. Admins and contributors update missing materials regularly.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.75rem' }}>
-            {requests.map(req => (
-              <div key={req.id} style={{ padding: '0.8rem 1rem', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                <div style={{ fontWeight: '600', color: 'var(--text-main)', fontSize: '0.95rem' }}>{req.title}</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem', display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Subject: <strong>{req.subjectCode}</strong></span>
-                  <span>By: {req.requestedBy}</span>
-                </div>
+        <div style={{ marginTop: '3rem', padding: '1.5rem', background: 'var(--bg-card)', borderRadius: '16px', border: '1px solid var(--border)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ background: 'var(--accent-soft)', color: 'var(--accent)', padding: '0.5rem', borderRadius: '8px', display: 'flex' }}>
+                <HelpCircle size={22} />
               </div>
-            ))}
+              <div>
+                <h3 style={{ fontSize: '1.25rem', margin: 0, color: 'var(--text-main)' }}>Student Resource Requests & Priority Poll</h3>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Highest voted requests are prioritized by contributors & admins first!</span>
+              </div>
+            </div>
+            <span style={{ fontSize: '0.85rem', background: 'var(--bg-main)', padding: '0.3rem 0.8rem', borderRadius: '20px', border: '1px solid var(--border)', fontWeight: '600', color: 'var(--text-muted)' }}>
+              {requests.length} Open Requests
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem', marginTop: '1.25rem' }}>
+            {requests.map((req, idx) => {
+              const yesCount = req.votes?.yes || 0;
+              const noCount = req.votes?.no || 0;
+              const total = yesCount + noCount;
+              const yesPercent = total > 0 ? Math.round((yesCount / total) * 100) : 100;
+              const userIdentifier = user?.email || user?.name || 'guest';
+              const userVote = req.votedUsers ? req.votedUsers[userIdentifier] : null;
+
+              return (
+                <div 
+                  key={req.id} 
+                  style={{ 
+                    padding: '1.2rem', 
+                    background: 'var(--bg-main)', 
+                    borderRadius: '12px', 
+                    border: idx === 0 ? '2px solid var(--accent)' : '1px solid var(--border)',
+                    position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justify: 'space-between',
+                    boxShadow: idx === 0 ? '0 4px 15px rgba(99, 102, 241, 0.15)' : 'none'
+                  }}
+                >
+                  <div>
+                    {idx === 0 && (
+                      <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.3rem',
+                        fontSize: '0.75rem',
+                        fontWeight: '700',
+                        color: '#ef4444',
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        padding: '0.2rem 0.6rem',
+                        borderRadius: '20px',
+                        marginBottom: '0.6rem'
+                      }}>
+                        🔥 High Priority (#1 Most Requested)
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                      <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', fontWeight: 'bold', background: 'var(--bg-card)', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border)' }}>
+                        {req.subjectCode}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'capitalize' }}>
+                        Category: <strong>{req.category}</strong>
+                      </span>
+                    </div>
+
+                    <h4 style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--text-main)', margin: '0.4rem 0 0.5rem 0', lineHeight: '1.3' }}>
+                      {req.title}
+                    </h4>
+
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.8rem' }}>
+                      Requested by: <span style={{ color: 'var(--text-main)', fontWeight: '500' }}>{req.requestedBy}</span>
+                    </div>
+                  </div>
+
+                  {/* Priority Bar */}
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.3rem', fontWeight: '600' }}>
+                      <span>Student Need Score</span>
+                      <span style={{ color: 'var(--accent)' }}>{yesPercent}% Yes ({yesCount} votes)</span>
+                    </div>
+                    <div style={{ width: '100%', height: '6px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden', marginBottom: '0.8rem' }}>
+                      <div style={{ width: `${yesPercent}%`, height: '100%', background: 'linear-gradient(90deg, #6366f1, #10b981)', borderRadius: '3px', transition: 'width 0.3s ease' }}></div>
+                    </div>
+
+                    {/* Voting Poll Actions */}
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button
+                        type="button"
+                        className="btn"
+                        style={{
+                          flex: 1,
+                          fontSize: '0.8rem',
+                          padding: '0.4rem 0.6rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.35rem',
+                          borderRadius: '8px',
+                          background: userVote === 'yes' ? 'var(--accent)' : 'var(--bg-card)',
+                          color: userVote === 'yes' ? '#ffffff' : 'var(--text-main)',
+                          border: userVote === 'yes' ? '1px solid var(--accent)' : '1px solid var(--border)',
+                          fontWeight: '600'
+                        }}
+                        onClick={() => handleVote(req.id, 'yes')}
+                      >
+                        👍 Yes, I need this! ({yesCount})
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btn"
+                        style={{
+                          fontSize: '0.8rem',
+                          padding: '0.4rem 0.6rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.35rem',
+                          borderRadius: '8px',
+                          background: userVote === 'no' ? 'rgba(239, 68, 68, 0.15)' : 'var(--bg-card)',
+                          color: userVote === 'no' ? '#ef4444' : 'var(--text-muted)',
+                          border: userVote === 'no' ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--border)',
+                          fontWeight: '500'
+                        }}
+                        onClick={() => handleVote(req.id, 'no')}
+                      >
+                        👎 No ({noCount})
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

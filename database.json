@@ -22,12 +22,25 @@
   "downloadLogs": [],
   "requests": [
     {
+      "id": "req-sample-2",
+      "title": "Python Unit 4 & 5 Complete Handwritten Notes",
+      "subjectCode": "CS1139",
+      "category": "notes",
+      "requestedBy": "shubh@college.edu",
+      "status": "open",
+      "votes": { "yes": 29, "no": 1 },
+      "votedUsers": {},
+      "requestedAt": "2026-07-23T19:05:00.000Z"
+    },
+    {
       "id": "req-sample-1",
       "title": "Calculus 2024 End Term Solved Paper",
       "subjectCode": "AS1109",
       "category": "papers",
       "requestedBy": "student@backbenchers.com",
       "status": "open",
+      "votes": { "yes": 14, "no": 2 },
+      "votedUsers": {},
       "requestedAt": "2026-07-23T19:00:00.000Z"
     }
   ],

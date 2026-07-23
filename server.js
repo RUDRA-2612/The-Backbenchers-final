@@ -411,10 +411,15 @@ app.post('/api/downloads', async (req, res) => {
   }
 });
 
-// Requests: Get List
+// Requests: Get List (sorted by highest net votes)
 app.get('/api/requests', async (req, res) => {
   const dbData = readDB();
-  res.json(dbData.requests || []);
+  const sorted = (dbData.requests || []).slice().sort((a, b) => {
+    const scoreA = (a.votes?.yes || 0) - (a.votes?.no || 0);
+    const scoreB = (b.votes?.yes || 0) - (b.votes?.no || 0);
+    return scoreB - scoreA;
+  });
+  res.json(sorted);
 });
 
 // Requests: Submit New Student Request
@@ -434,6 +439,8 @@ app.post('/api/requests', async (req, res) => {
       category: category || 'notes',
       requestedBy: requestedBy || 'Anonymous Student',
       status: 'open',
+      votes: { yes: 1, no: 0 },
+      votedUsers: requestedBy ? { [requestedBy]: 'yes' } : {},
       requestedAt: new Date().toISOString()
     };
 
@@ -441,6 +448,56 @@ app.post('/api/requests', async (req, res) => {
     writeDB(dbData);
 
     res.status(201).json({ message: 'Request submitted successfully', request: newRequest });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Requests: Vote on a Request (Yes / No Poll)
+app.post('/api/requests/:id/vote', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { voteType, userIdentifier } = req.body; // voteType: 'yes' | 'no'
+    if (!['yes', 'no'].includes(voteType)) {
+      return res.status(400).json({ error: 'Invalid vote type' });
+    }
+
+    const dbData = readDB();
+    const request = (dbData.requests || []).find(r => r.id === id);
+
+    if (!request) {
+      return res.status(404).json({ error: 'Request not found' });
+    }
+
+    if (!request.votes) request.votes = { yes: 0, no: 0 };
+    if (!request.votedUsers) request.votedUsers = {};
+
+    const userId = userIdentifier || 'guest';
+    const previousVote = request.votedUsers[userId];
+
+    if (previousVote === voteType) {
+      // Toggle off / remove vote if clicking same button again
+      request.votes[voteType] = Math.max(0, (request.votes[voteType] || 0) - 1);
+      delete request.votedUsers[userId];
+    } else {
+      if (previousVote) {
+        // Decrease previous vote count
+        request.votes[previousVote] = Math.max(0, (request.votes[previousVote] || 0) - 1);
+      }
+      // Increase new vote count
+      request.votes[voteType] = (request.votes[voteType] || 0) + 1;
+      request.votedUsers[userId] = voteType;
+    }
+
+    // Re-sort all requests by net score
+    dbData.requests.sort((a, b) => {
+      const scoreA = (a.votes?.yes || 0) - (a.votes?.no || 0);
+      const scoreB = (b.votes?.yes || 0) - (b.votes?.no || 0);
+      return scoreB - scoreA;
+    });
+
+    writeDB(dbData);
+    res.json({ message: 'Vote recorded', request, allRequests: dbData.requests });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
