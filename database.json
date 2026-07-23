@@ -20,6 +20,17 @@
     }
   ],
   "downloadLogs": [],
+  "requests": [
+    {
+      "id": "req-sample-1",
+      "title": "Calculus 2024 End Term Solved Paper",
+      "subjectCode": "AS1109",
+      "category": "papers",
+      "requestedBy": "student@backbenchers.com",
+      "status": "open",
+      "requestedAt": "2026-07-23T19:00:00.000Z"
+    }
+  ],
   "materials": [
     {
       "id": "def-py-1",

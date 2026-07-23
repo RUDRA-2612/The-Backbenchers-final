@@ -411,6 +411,54 @@ app.post('/api/downloads', async (req, res) => {
   }
 });
 
+// Requests: Get List
+app.get('/api/requests', async (req, res) => {
+  const dbData = readDB();
+  res.json(dbData.requests || []);
+});
+
+// Requests: Submit New Student Request
+app.post('/api/requests', async (req, res) => {
+  try {
+    const { title, subjectCode, category, requestedBy } = req.body;
+    if (!title || !subjectCode) {
+      return res.status(400).json({ error: 'Title and subject code are required' });
+    }
+
+    const dbData = readDB();
+    dbData.requests = dbData.requests || [];
+    const newRequest = {
+      id: uuidv4(),
+      title,
+      subjectCode,
+      category: category || 'notes',
+      requestedBy: requestedBy || 'Anonymous Student',
+      status: 'open',
+      requestedAt: new Date().toISOString()
+    };
+
+    dbData.requests.unshift(newRequest);
+    writeDB(dbData);
+
+    res.status(201).json({ message: 'Request submitted successfully', request: newRequest });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Requests: Delete / Fulfill Request
+app.delete('/api/requests/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const dbData = readDB();
+    dbData.requests = (dbData.requests || []).filter(r => r.id !== id);
+    writeDB(dbData);
+    res.json({ message: 'Request removed successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 if (require.main === module) {
   app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 }
