@@ -1,24 +1,6 @@
 {
-  "users": [
-    {
-      "id": "f1473891-34ed-4ad2-b03f-f2c4cb803eb6",
-      "name": "Rudra Admin",
-      "email": "rudrapal2612@gmail.com",
-      "password": "rudra@admin",
-      "isGoogle": false,
-      "createdAt": "2026-07-23T18:50:21.808Z"
-    }
-  ],
-  "loginLogs": [
-    {
-      "id": "5a06025a-5b8a-4215-88ac-3ce4f79951d6",
-      "userId": "f1473891-34ed-4ad2-b03f-f2c4cb803eb6",
-      "name": "Rudra Admin",
-      "email": "rudrapal2612@gmail.com",
-      "timestamp": "2026-07-23T18:50:21.808Z",
-      "method": "Admin Credentials"
-    }
-  ],
+  "users": [],
+  "loginLogs": [],
   "downloadLogs": [],
   "requests": [],
   "materials": [
