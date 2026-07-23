@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Terminal, Zap, Calculator, Leaf, Radio, Cpu, ArrowRight, Book, Search, PlusCircle, HelpCircle, Eye, Download, CheckCircle, FileText } from 'lucide-react';
+import { Terminal, Zap, Calculator, Leaf, Radio, Cpu, ArrowRight, Book, Search, PlusCircle, HelpCircle, Eye, Download, CheckCircle, FileText, Trash2 } from 'lucide-react';
 import { API_URL } from '../config';
 
 const subjects = [
@@ -72,6 +72,20 @@ export default function SubjectGrid({ onSelectSubject, materials = [], onViewFil
            item.category?.toLowerCase().includes(q) ||
            item.filename?.toLowerCase().includes(q);
   });
+
+  const handleDeleteRequest = async (requestId) => {
+    if (!window.confirm("Admin: Mark as fulfilled / remove this student request?")) return;
+    try {
+      const res = await fetch(`${API_URL}/api/requests/${requestId}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        setRequests(prev => prev.filter(r => r.id !== requestId));
+      }
+    } catch (err) {
+      console.error('Error removing request:', err);
+    }
+  };
 
   const handleVote = async (requestId, voteType) => {
     try {
@@ -263,26 +277,51 @@ export default function SubjectGrid({ onSelectSubject, materials = [], onViewFil
                     display: 'flex',
                     flexDirection: 'column',
                     justify: 'space-between',
-                    boxShadow: idx === 0 ? '0 4px 15px rgba(99, 102, 241, 0.15)' : 'none'
+                    boxShadow: idx === 0 ? '0 4px 15px rgba(249, 115, 22, 0.12)' : 'none'
                   }}
                 >
                   <div>
-                    {idx === 0 && (
-                      <div style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.3rem',
-                        fontSize: '0.75rem',
-                        fontWeight: '700',
-                        color: '#ef4444',
-                        background: 'rgba(239, 68, 68, 0.1)',
-                        padding: '0.2rem 0.6rem',
-                        borderRadius: '20px',
-                        marginBottom: '0.6rem'
-                      }}>
-                        🔥 High Priority (#1 Most Requested)
-                      </div>
-                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                      {idx === 0 ? (
+                        <div style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.3rem',
+                          fontSize: '0.75rem',
+                          fontWeight: '700',
+                          color: '#ef4444',
+                          background: 'rgba(239, 68, 68, 0.1)',
+                          padding: '0.25rem 0.65rem',
+                          borderRadius: '20px'
+                        }}>
+                          🔥 High Priority (#1 Most Requested)
+                        </div>
+                      ) : <div />}
+
+                      {user?.isAdmin && (
+                        <button
+                          type="button"
+                          className="btn"
+                          style={{
+                            padding: '0.25rem 0.55rem',
+                            fontSize: '0.75rem',
+                            background: 'rgba(239, 68, 68, 0.1)',
+                            color: '#ef4444',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            borderRadius: '6px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => handleDeleteRequest(req.id)}
+                          title="Admin: Fulfill / Remove Request"
+                        >
+                          <Trash2 size={13} />
+                          <span>Remove Request</span>
+                        </button>
+                      )}
+                    </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.4rem' }}>
                       <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', fontWeight: 'bold', background: 'var(--bg-card)', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border)' }}>
@@ -298,18 +337,20 @@ export default function SubjectGrid({ onSelectSubject, materials = [], onViewFil
                     </h4>
 
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.8rem' }}>
-                      Requested by: <span style={{ color: 'var(--text-main)', fontWeight: '500' }}>{req.requestedBy}</span>
+                      Requested by: <span style={{ color: user?.isAdmin ? 'var(--accent)' : 'var(--text-main)', fontWeight: '500' }}>
+                        {user?.isAdmin ? req.requestedBy : 'Student'}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Priority Bar */}
+                  {/* Unified Progress Bar matching brand theme */}
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.3rem', fontWeight: '600' }}>
                       <span>Student Need Score</span>
                       <span style={{ color: 'var(--accent)' }}>{yesPercent}% Yes ({yesCount} votes)</span>
                     </div>
                     <div style={{ width: '100%', height: '6px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden', marginBottom: '0.8rem' }}>
-                      <div style={{ width: `${yesPercent}%`, height: '100%', background: 'linear-gradient(90deg, #6366f1, #10b981)', borderRadius: '3px', transition: 'width 0.3s ease' }}></div>
+                      <div style={{ width: `${yesPercent}%`, height: '100%', background: 'linear-gradient(90deg, var(--accent), #ff7a00)', borderRadius: '3px', transition: 'width 0.3s ease' }}></div>
                     </div>
 
                     {/* Voting Poll Actions */}

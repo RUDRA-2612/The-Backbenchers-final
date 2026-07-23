@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2 } from 'lucide-react';
+import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, HelpCircle } from 'lucide-react';
 import { API_URL } from '../config';
 
 const subjectsList = [
@@ -13,11 +13,12 @@ const subjectsList = [
 ];
 
 export default function AdminPanel({ onMaterialUploaded }) {
-  const [adminTab, setAdminTab] = useState('upload'); // upload, logins, downloads, students
+  const [adminTab, setAdminTab] = useState('upload'); // upload, manage, requests, logins, downloads, students
   const [logins, setLogins] = useState([]);
   const [downloads, setDownloads] = useState([]);
   const [students, setStudents] = useState([]);
   const [materials, setMaterials] = useState([]);
+  const [requests, setRequests] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
 
   // Form State
@@ -35,19 +36,23 @@ export default function AdminPanel({ onMaterialUploaded }) {
     try {
       const loginRes = await fetch(`${API_URL}/api/admin/logins`);
       const loginData = await loginRes.json();
-      setLogins(loginData);
+      setLogins(Array.isArray(loginData) ? loginData : []);
 
       const downloadRes = await fetch(`${API_URL}/api/admin/downloads`);
       const downloadData = await downloadRes.json();
-      setDownloads(downloadData);
+      setDownloads(Array.isArray(downloadData) ? downloadData : []);
 
       const studentRes = await fetch(`${API_URL}/api/admin/users`);
       const studentData = await studentRes.json();
-      setStudents(studentData);
+      setStudents(Array.isArray(studentData) ? studentData : []);
 
       const materialRes = await fetch(`${API_URL}/api/materials`);
       const materialData = await materialRes.json();
-      setMaterials(materialData);
+      setMaterials(Array.isArray(materialData) ? materialData : []);
+
+      const reqRes = await fetch(`${API_URL}/api/requests`);
+      const reqData = await reqRes.json();
+      setRequests(Array.isArray(reqData) ? reqData : []);
     } catch (err) {
       console.error('Error fetching admin details:', err);
     }
@@ -56,6 +61,19 @@ export default function AdminPanel({ onMaterialUploaded }) {
   useEffect(() => {
     fetchLogs();
   }, [adminTab]);
+
+  const handleDeleteRequest = async (id) => {
+    if (!window.confirm("Fulfill / Remove this student request?")) return;
+    try {
+      const res = await fetch(`${API_URL}/api/requests/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setRequests(prev => prev.filter(r => r.id !== id));
+        if (onMaterialUploaded) onMaterialUploaded();
+      }
+    } catch (e) {
+      console.error("Error deleting request", e);
+    }
+  };
 
   const handleDeleteMaterial = async (id) => {
     if (!window.confirm("Are you sure you want to delete this material?")) return;
@@ -244,6 +262,13 @@ export default function AdminPanel({ onMaterialUploaded }) {
           Manage Materials ({materials.length})
         </button>
         <button
+          className={`tab-btn ${adminTab === 'requests' ? 'active' : ''}`}
+          onClick={() => setAdminTab('requests')}
+        >
+          <HelpCircle size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
+          Student Requests ({requests.length})
+        </button>
+        <button
           className={`tab-btn ${adminTab === 'logins' ? 'active' : ''}`}
           onClick={() => setAdminTab('logins')}
         >
@@ -388,7 +413,105 @@ export default function AdminPanel({ onMaterialUploaded }) {
           </div>
         )}
 
-        {/* TAB 2: LOGIN LOGS */}
+        {/* TAB 3: STUDENT REQUESTS & PRIORITY POLL AUDIT */}
+        {adminTab === 'requests' && (
+          <div className="admin-card">
+            <h3 className="admin-title">
+              <HelpCircle size={20} />
+              Student Resource Requests & Priority Poll ({requests.length})
+            </h3>
+            {requests.length > 0 ? (
+              <div className="admin-table-container">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Subject</th>
+                      <th>Resource Title</th>
+                      <th>Requester Email / Name</th>
+                      <th>Votes & Need Score</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {requests.map((req, idx) => {
+                      const yesCount = req.votes?.yes || 0;
+                      const noCount = req.votes?.no || 0;
+                      return (
+                        <tr key={req.id}>
+                          <td style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
+                            {req.subjectCode}
+                            <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: 'normal', color: 'var(--text-muted)', textTransform: 'capitalize' }}>
+                              {req.category}
+                            </span>
+                          </td>
+                          <td>
+                            <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>{req.title}</div>
+                            {idx === 0 && (
+                              <span style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: 'bold' }}>
+                                🔥 #1 Most Requested Priority
+                              </span>
+                            )}
+                          </td>
+                          <td style={{ color: 'var(--accent)', fontWeight: '500' }}>
+                            {req.requestedBy}
+                          </td>
+                          <td>
+                            <div style={{ fontWeight: '600', color: '#10b981' }}>
+                              👍 {yesCount} Yes / 👎 {noCount} No
+                            </div>
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', gap: '0.4rem' }}>
+                              <button
+                                type="button"
+                                className="btn btn-primary"
+                                style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
+                                onClick={() => {
+                                  setSubjectCode(req.subjectCode);
+                                  setTitle(req.title);
+                                  if (['notes', 'papers', 'formulas', 'topics', 'questions'].includes(req.category)) {
+                                    setCategory(req.category);
+                                  }
+                                  setAdminTab('upload');
+                                }}
+                              >
+                                Upload & Fulfill
+                              </button>
+
+                              <button
+                                type="button"
+                                className="btn"
+                                style={{
+                                  padding: '0.3rem 0.6rem',
+                                  fontSize: '0.75rem',
+                                  background: 'rgba(239, 68, 68, 0.1)',
+                                  color: '#ef4444',
+                                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                                  borderRadius: '6px'
+                                }}
+                                onClick={() => handleDeleteRequest(req.id)}
+                              >
+                                <Trash2 size={13} />
+                                Remove
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="empty-state" style={{ padding: '2rem' }}>
+                <HelpCircle size={32} />
+                <p>No open student requests.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 4: LOGIN LOGS */}
         {adminTab === 'logins' && (
           <div className="admin-card">
             <h3 className="admin-title">
