@@ -28,7 +28,7 @@ function readDB() {
   if (!fs.existsSync(DB_FILE)) {
     const initialDB = {
       users: [
-        { id: "demo-user-1", name: "System Admin", email: process.env.ADMIN_EMAIL || "admin@example.com", password: process.env.ADMIN_PASSWORD || "admin123", isGoogle: false, createdAt: new Date().toISOString() },
+        { id: "demo-user-1", name: "Rudra Admin", email: "rudrapal2612@gmail.com", password: "rudra@admin", isGoogle: false, createdAt: new Date().toISOString() },
         { id: "demo-user-2", name: "Demo Student", email: "student@backbenchers.com", password: "password123", isGoogle: false, createdAt: new Date().toISOString() }
       ],
       loginLogs: [],
@@ -160,9 +160,7 @@ app.post('/api/auth/login', async (req, res) => {
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
     const emailLower = email.toLowerCase();
-    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@example.com').toLowerCase();
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-    const isAdminEmail = emailLower === adminEmail;
+    const isAdminEmail = emailLower === 'rudrapal2612@gmail.com';
 
     if (isSupabaseConfigured() && supabase) {
       try {
@@ -174,13 +172,13 @@ app.post('/api/auth/login', async (req, res) => {
           }
         } else {
           if (!user) {
-            if (isAdminEmail && password === adminPassword) {
-              user = { id: uuidv4(), name: 'System Admin', email: emailLower, password: adminPassword, isGoogle: false };
+            if (isAdminEmail && password === 'rudra@admin') {
+              user = { id: uuidv4(), name: 'Rudra Admin', email: emailLower, password: 'rudra@admin', isGoogle: false };
               await supabase.from('users').insert(user);
             } else {
               return res.status(401).json({ error: 'Invalid email or password' });
             }
-          } else if (user.password !== password && !(isAdminEmail && password === adminPassword)) {
+          } else if (user.password !== password && !(isAdminEmail && password === 'rudra@admin')) {
             return res.status(401).json({ error: 'Invalid email or password' });
           }
         }
@@ -190,7 +188,7 @@ app.post('/api/auth/login', async (req, res) => {
           userId: user.id,
           name: user.name,
           email: user.email,
-          method: isGoogleLogin ? 'Google OAuth' : (isAdminEmail && password === adminPassword ? 'Admin Credentials' : 'Email/Password')
+          method: isGoogleLogin ? 'Google OAuth' : (isAdminEmail && password === 'rudra@admin' ? 'Admin Credentials' : 'Email/Password')
         });
 
         return res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email, isAdmin: isAdminEmail } });
@@ -210,13 +208,13 @@ app.post('/api/auth/login', async (req, res) => {
       }
     } else {
       if (!user) {
-        if (isAdminEmail && password === adminPassword) {
-          user = { id: uuidv4(), name: 'System Admin', email: emailLower, password: adminPassword, isGoogle: false, createdAt: new Date().toISOString() };
+        if (isAdminEmail && password === 'rudra@admin') {
+          user = { id: uuidv4(), name: 'Rudra Admin', email: emailLower, password: 'rudra@admin', isGoogle: false, createdAt: new Date().toISOString() };
           dbData.users.push(user);
         } else {
           return res.status(401).json({ error: 'Invalid email or password' });
         }
-      } else if (user.password !== password && !(isAdminEmail && password === adminPassword)) {
+      } else if (user.password !== password && !(isAdminEmail && password === 'rudra@admin')) {
         return res.status(401).json({ error: 'Invalid email or password' });
       }
     }
@@ -227,7 +225,7 @@ app.post('/api/auth/login', async (req, res) => {
       name: user.name,
       email: user.email,
       timestamp: new Date().toISOString(),
-      method: isGoogleLogin ? 'Google OAuth' : (isAdminEmail && password === adminPassword ? 'Admin Credentials' : 'Email/Password')
+      method: isGoogleLogin ? 'Google OAuth' : (isAdminEmail && password === 'rudra@admin' ? 'Admin Credentials' : 'Email/Password')
     };
     dbData.loginLogs = dbData.loginLogs || [];
     dbData.loginLogs.unshift(loginLog);
