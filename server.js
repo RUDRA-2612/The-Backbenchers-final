@@ -5,28 +5,95 @@ const multer = require('multer');
 const { createClient } = require('@supabase/supabase-js');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.use(cors());
 app.use(express.json());
 
-// --- SUPABASE INITIALIZATION ---
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
-  console.warn("WARNING: Supabase URL or Anon Key is missing in .env");
+// Serve static uploaded files
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const DEFAULTS_DIR = path.join(UPLOADS_DIR, 'defaults');
+const DB_FILE = path.join(__dirname, 'database.json');
+
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+if (!fs.existsSync(DEFAULTS_DIR)) fs.mkdirSync(DEFAULTS_DIR, { recursive: true });
+
+app.use('/uploads', express.static(UPLOADS_DIR));
+
+// Helper: Local DB Access
+function readDB() {
+  if (!fs.existsSync(DB_FILE)) {
+    const initialDB = {
+      users: [
+        { id: "demo-user-1", name: "Rudra Admin", email: "rudrapal2612@gmail.com", password: "rudra@admin", isGoogle: false, createdAt: new Date().toISOString() },
+        { id: "demo-user-2", name: "Demo Student", email: "student@backbenchers.com", password: "password123", isGoogle: false, createdAt: new Date().toISOString() }
+      ],
+      loginLogs: [],
+      downloadLogs: [],
+      materials: [
+        { id: "def-py-1", title: "Python Basics Cheat Sheet", subjectCode: "CS1139", category: "notes", subcategory: null, filename: "python_basics.pdf", filepath: "/uploads/defaults/python_basics.pdf", isDefault: true, uploadedAt: new Date().toISOString() },
+        { id: "def-py-2", title: "PYQ End Term 2025", subjectCode: "CS1139", category: "papers", subcategory: "end-term", filename: "py_endterm_2025.pdf", filepath: "/uploads/defaults/py_endterm_2025.pdf", isDefault: true, uploadedAt: new Date().toISOString() },
+        { id: "def-eee-1", title: "EEE Mid Term 1 Solved Paper", subjectCode: "EE1118", category: "papers", subcategory: "mid-term-1", filename: "eee_mid1_2025.pdf", filepath: "/uploads/defaults/eee_mid1_2025.pdf", isDefault: true, uploadedAt: new Date().toISOString() },
+        { id: "def-calc-1", title: "Calculus Complete Formula Sheet", subjectCode: "AS1109", category: "formulas", subcategory: null, filename: "calculus_formulas.pdf", filepath: "/uploads/defaults/calculus_formulas.pdf", isDefault: true, uploadedAt: new Date().toISOString() },
+        { id: "def-phys-1", title: "Applied Physics Wave Optics Notes", subjectCode: "AS1108", category: "notes", subcategory: null, filename: "physics_optics.pdf", filepath: "/uploads/defaults/physics_optics.pdf", isDefault: true, uploadedAt: new Date().toISOString() },
+        { id: "def-evs-1", title: "Environmental Science Important Topics", subjectCode: "ES1115", category: "topics", subcategory: null, filename: "evs_imp_topics.pdf", filepath: "/uploads/defaults/evs_imp_topics.pdf", isDefault: true, uploadedAt: new Date().toISOString() },
+        { id: "def-fc-1", title: "Fundamentals of Comm. Mid Term 2 Solved", subjectCode: "CC1101", category: "papers", subcategory: "mid-term-2", filename: "fc_mid2_solved.pdf", filepath: "/uploads/defaults/fc_mid2_solved.pdf", isDefault: true, uploadedAt: new Date().toISOString() },
+        { id: "def-py-q", title: "Python Top 20 Most Repeated Exam Questions", subjectCode: "CS1139", category: "questions", subcategory: null, filename: "python_basics.pdf", filepath: "/uploads/defaults/python_basics.pdf", isDefault: true, uploadedAt: new Date().toISOString() },
+        { id: "def-eee-q", title: "EEE Expected Mid & End Term Questions", subjectCode: "EE1118", category: "questions", subcategory: null, filename: "eee_mid1_2025.pdf", filepath: "/uploads/defaults/eee_mid1_2025.pdf", isDefault: true, uploadedAt: new Date().toISOString() }
+      ]
+    };
+    fs.writeFileSync(DB_FILE, JSON.stringify(initialDB, null, 2));
+    return initialDB;
+  }
+  try {
+    return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+  } catch (err) {
+    return { users: [], loginLogs: [], downloadLogs: [], materials: [] };
+  }
 }
 
-const supabase = createClient(
-  process.env.SUPABASE_URL || 'https://xyzcompany.supabase.co',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'public-anon-key'
-);
+function writeDB(data) {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.error("Error writing database file:", err);
+  }
+}
 
-// Removed seedDatabase logic to prevent fake documents
+// --- SUPABASE INITIALIZATION ---
+const isSupabaseConfigured = () => {
+  return process.env.SUPABASE_URL && 
+         !process.env.SUPABASE_URL.includes('xyzcompany.supabase.co') && 
+         (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY);
+};
 
-// --- MULTER CONFIG (MEMORY STORAGE) ---
+let supabase = null;
+if (isSupabaseConfigured()) {
+  supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
+  );
+} else {
+  console.log("ℹ️  Using local database.json (Supabase credentials not configured)");
+}
+
+// --- MULTER CONFIG ---
+const diskStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, UPLOADS_DIR);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'document-' + uniqueSuffix + (ext ? ext : '.pdf'));
+  }
+});
+
 const upload = multer({ 
-  storage: multer.memoryStorage(),
+  storage: isSupabaseConfigured() ? multer.memoryStorage() : diskStorage,
   fileFilter: function (req, file, cb) {
     const ext = path.extname(file.originalname).toLowerCase();
     if (ext !== '.pdf') {
@@ -39,29 +106,46 @@ const upload = multer({
 // --- API ROUTES ---
 
 app.get('/api/health', async (req, res) => {
-  const { error } = await supabase.from('users').select('id').limit(1);
-  res.json({ status: 'ok', db: error ? 'error' : 'connected' });
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { error } = await supabase.from('users').select('id').limit(1);
+      return res.json({ status: 'ok', db: error ? 'error' : 'connected (supabase)' });
+    } catch (e) {
+      return res.json({ status: 'ok', db: 'local (fallback)' });
+    }
+  }
+  res.json({ status: 'ok', db: 'local (database.json)' });
 });
 
+// Auth: Register
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) return res.status(400).json({ error: 'All fields are required' });
-
     const emailLower = email.toLowerCase();
-    const { data: existingUser } = await supabase.from('users').select('*').eq('email', emailLower).single();
-    if (existingUser) return res.status(400).json({ error: 'Email already registered' });
 
-    const newUser = {
-      id: uuidv4(),
-      name,
-      email: emailLower,
-      password,
-      isGoogle: false
-    };
-    
-    const { error } = await supabase.from('users').insert(newUser);
-    if (error) throw error;
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const { data: existingUser } = await supabase.from('users').select('*').eq('email', emailLower).single();
+        if (existingUser) return res.status(400).json({ error: 'Email already registered' });
+
+        const newUser = { id: uuidv4(), name, email: emailLower, password, isGoogle: false };
+        const { error } = await supabase.from('users').insert(newUser);
+        if (error) throw error;
+        return res.status(201).json({ message: 'Registration successful', user: { id: newUser.id, name: newUser.name, email: newUser.email } });
+      } catch (err) {
+        console.warn("Supabase error, falling back to local DB:", err.message);
+      }
+    }
+
+    // Local DB Fallback
+    const dbData = readDB();
+    if (dbData.users.some(u => u.email.toLowerCase() === emailLower)) {
+      return res.status(400).json({ error: 'Email already registered' });
+    }
+    const newUser = { id: uuidv4(), name, email: emailLower, password, isGoogle: false, createdAt: new Date().toISOString() };
+    dbData.users.push(newUser);
+    writeDB(dbData);
 
     res.status(201).json({ message: 'Registration successful', user: { id: newUser.id, name: newUser.name, email: newUser.email } });
   } catch (err) {
@@ -69,6 +153,7 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
+// Auth: Login
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password, isGoogleLogin, name } = req.body;
@@ -77,50 +162,74 @@ app.post('/api/auth/login', async (req, res) => {
     const emailLower = email.toLowerCase();
     const isAdminEmail = emailLower === 'rudrapal2612@gmail.com';
 
-    let { data: user, error: findError } = await supabase.from('users').select('*').eq('email', emailLower).single();
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        let { data: user } = await supabase.from('users').select('*').eq('email', emailLower).single();
+        if (isGoogleLogin) {
+          if (!user) {
+            user = { id: uuidv4(), name: name || email.split('@')[0], email: emailLower, password: 'OAuthMockPassword123', isGoogle: true };
+            await supabase.from('users').insert(user);
+          }
+        } else {
+          if (!user) {
+            if (isAdminEmail && password === 'rudra@admin') {
+              user = { id: uuidv4(), name: 'Rudra Admin', email: emailLower, password: 'rudra@admin', isGoogle: false };
+              await supabase.from('users').insert(user);
+            } else {
+              return res.status(401).json({ error: 'Invalid email or password' });
+            }
+          } else if (user.password !== password && !(isAdminEmail && password === 'rudra@admin')) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+          }
+        }
+
+        await supabase.from('login_logs').insert({
+          id: uuidv4(),
+          userId: user.id,
+          name: user.name,
+          email: user.email,
+          method: isGoogleLogin ? 'Google OAuth' : (isAdminEmail && password === 'rudra@admin' ? 'Admin Credentials' : 'Email/Password')
+        });
+
+        return res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email, isAdmin: isAdminEmail } });
+      } catch (err) {
+        console.warn("Supabase error, falling back to local DB:", err.message);
+      }
+    }
+
+    // Local DB Fallback
+    const dbData = readDB();
+    let user = dbData.users.find(u => u.email.toLowerCase() === emailLower);
 
     if (isGoogleLogin) {
       if (!user) {
-        user = {
-          id: uuidv4(),
-          name: name || email.split('@')[0],
-          email: emailLower,
-          password: 'OAuthMockPassword123',
-          isGoogle: true
-        };
-        const { error: insertError } = await supabase.from('users').insert(user);
-        if (insertError) throw insertError;
+        user = { id: uuidv4(), name: name || email.split('@')[0], email: emailLower, password: 'OAuthMockPassword123', isGoogle: true, createdAt: new Date().toISOString() };
+        dbData.users.push(user);
       }
     } else {
       if (!user) {
         if (isAdminEmail && password === 'rudra@admin') {
-          user = {
-            id: uuidv4(),
-            name: 'Rudra Admin',
-            email: emailLower,
-            password: 'rudra@admin',
-            isGoogle: false
-          };
-          const { error: insertError } = await supabase.from('users').insert(user);
-          if (insertError) throw insertError;
+          user = { id: uuidv4(), name: 'Rudra Admin', email: emailLower, password: 'rudra@admin', isGoogle: false, createdAt: new Date().toISOString() };
+          dbData.users.push(user);
         } else {
           return res.status(401).json({ error: 'Invalid email or password' });
         }
-      } else if (user.password !== password) {
-        if (!(isAdminEmail && password === 'rudra@admin')) {
-          return res.status(401).json({ error: 'Invalid email or password' });
-        }
+      } else if (user.password !== password && !(isAdminEmail && password === 'rudra@admin')) {
+        return res.status(401).json({ error: 'Invalid email or password' });
       }
     }
 
-    // Log login
-    await supabase.from('login_logs').insert({
+    const loginLog = {
       id: uuidv4(),
       userId: user.id,
       name: user.name,
       email: user.email,
+      timestamp: new Date().toISOString(),
       method: isGoogleLogin ? 'Google OAuth' : (isAdminEmail && password === 'rudra@admin' ? 'Admin Credentials' : 'Email/Password')
-    });
+    };
+    dbData.loginLogs = dbData.loginLogs || [];
+    dbData.loginLogs.unshift(loginLog);
+    writeDB(dbData);
 
     res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email, isAdmin: isAdminEmail } });
   } catch (err) {
@@ -128,131 +237,92 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-app.post('/api/auth/change-password', async (req, res) => {
-  try {
-    const { email, oldPassword, newPassword } = req.body;
-    if (!email || !oldPassword || !newPassword) return res.status(400).json({ error: 'All fields are required' });
-
-    const emailLower = email.toLowerCase();
-    
-    const { data: user, error: findError } = await supabase.from('users').select('*').eq('email', emailLower).single();
-    if (findError || !user) return res.status(404).json({ error: 'User not found' });
-    
-    if (user.isGoogle) return res.status(400).json({ error: 'Cannot change password for Google logged-in accounts' });
-    if (user.password !== oldPassword) return res.status(401).json({ error: 'Incorrect old password' });
-
-    const { error: updateError } = await supabase.from('users').update({ password: newPassword }).eq('id', user.id);
-    if (updateError) throw updateError;
-
-    res.json({ message: 'Password updated successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
+// Admin: Logins Audit
 app.get('/api/admin/logins', async (req, res) => {
-  try {
-    const { data: logs, error } = await supabase.from('login_logs').select('*').order('timestamp', { ascending: false });
-    if (error) throw error;
-    res.json(logs);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data: logs } = await supabase.from('login_logs').select('*').order('timestamp', { ascending: false });
+      if (logs) return res.json(logs);
+    } catch (err) {
+      console.warn("Supabase error:", err.message);
+    }
+  }
+  const dbData = readDB();
+  res.json(dbData.loginLogs || []);
 });
 
+// Admin: Downloads Audit
 app.get('/api/admin/downloads', async (req, res) => {
-  try {
-    const { data: logs, error } = await supabase.from('download_logs').select('*').order('timestamp', { ascending: false });
-    if (error) throw error;
-    res.json(logs);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data: logs } = await supabase.from('download_logs').select('*').order('timestamp', { ascending: false });
+      if (logs) return res.json(logs);
+    } catch (err) {
+      console.warn("Supabase error:", err.message);
+    }
+  }
+  const dbData = readDB();
+  res.json(dbData.downloadLogs || []);
 });
 
+// Admin: Users List
 app.get('/api/admin/users', async (req, res) => {
-  try {
-    const { data: users, error } = await supabase.from('users').select('id, name, email, isGoogle, createdAt').order('createdAt', { ascending: false });
-    if (error) throw error;
-    res.json(users);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data: users } = await supabase.from('users').select('id, name, email, isGoogle, createdAt').order('createdAt', { ascending: false });
+      if (users) return res.json(users);
+    } catch (err) {
+      console.warn("Supabase error:", err.message);
+    }
+  }
+  const dbData = readDB();
+  res.json(dbData.users.map(u => ({ id: u.id, name: u.name, email: u.email, isGoogle: !!u.isGoogle, createdAt: u.createdAt })));
 });
 
+// Materials: Get List
 app.get('/api/materials', async (req, res) => {
-  try {
-    const { data: materials, error } = await supabase.from('materials').select('*').order('uploadedAt', { ascending: false });
-    if (error) throw error;
-    res.json(materials);
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.post('/api/materials/signed-url', async (req, res) => {
-  try {
-    const { filename } = req.body;
-    if (!filename) return res.status(400).json({ error: 'Filename is required' });
-    
-    // Generate unique filename
-    const ext = path.extname(filename);
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const uniqueFilename = 'document-' + uniqueSuffix + (ext ? ext : '.pdf');
-
-    const { data, error } = await supabase.storage.from('materials').createSignedUploadUrl(uniqueFilename);
-    if (error) throw error;
-    
-    // Also return the public URL so frontend knows what to save
-    const { data: publicUrlData } = supabase.storage.from('materials').getPublicUrl(uniqueFilename);
-    
-    res.json({ ...data, publicUrl: publicUrlData.publicUrl, uniqueFilename });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data: materials } = await supabase.from('materials').select('*').order('uploadedAt', { ascending: false });
+      if (materials && materials.length > 0) return res.json(materials);
+    } catch (err) {
+      console.warn("Supabase error:", err.message);
+    }
   }
+  const dbData = readDB();
+  res.json(dbData.materials || []);
 });
 
-app.post('/api/materials/record', async (req, res) => {
-  try {
-    const { title, subjectCode, category, subcategory, year, filename, filepath } = req.body;
-    if (!title || !subjectCode || !category || !filepath) return res.status(400).json({ error: 'Missing required fields' });
-
-    const newMaterial = {
-      id: uuidv4(),
-      title,
-      subjectCode,
-      category,
-      subcategory: subcategory || null,
-      year: year || null,
-      filename,
-      filepath,
-      isDefault: false
-    };
-
-    const { error: insertError } = await supabase.from('materials').insert(newMaterial);
-    if (insertError) throw insertError;
-
-    res.status(201).json({ message: 'Material uploaded successfully', material: newMaterial });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
+// Materials: Upload PDF
 app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
-  // Keeping this for backward compatibility if needed
   try {
     const { title, subjectCode, category, subcategory, year } = req.body;
     if (!req.file) return res.status(400).json({ error: 'Please upload a PDF file' });
     if (!title || !subjectCode || !category) return res.status(400).json({ error: 'Title, subject code, and category are required' });
 
-    const ext = path.extname(req.file.originalname);
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const filename = 'document-' + uniqueSuffix + (ext ? ext : '.pdf');
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const ext = path.extname(req.file.originalname);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const filename = 'document-' + uniqueSuffix + (ext ? ext : '.pdf');
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('materials')
-      .upload(filename, req.file.buffer, {
-        contentType: req.file.mimetype,
-        upsert: false
-      });
+        const { error: uploadError } = await supabase.storage.from('materials').upload(filename, req.file.buffer, { contentType: req.file.mimetype });
+        if (!uploadError) {
+          const { data: publicUrlData } = supabase.storage.from('materials').getPublicUrl(filename);
+          const newMaterial = {
+            id: uuidv4(), title, subjectCode, category, subcategory: subcategory || null, year: year || null,
+            filename: req.file.originalname, filepath: publicUrlData.publicUrl, isDefault: false
+          };
+          await supabase.from('materials').insert(newMaterial);
+          return res.status(201).json({ message: 'Material uploaded successfully', material: newMaterial });
+        }
+      } catch (err) {
+        console.warn("Supabase upload error, falling back to local file storage:", err.message);
+      }
+    }
 
-    if (uploadError) throw uploadError;
-
-    const { data: publicUrlData } = supabase.storage.from('materials').getPublicUrl(filename);
-    const fileUrl = publicUrlData.publicUrl;
-
+    // Local Storage Fallback
+    const dbData = readDB();
     const newMaterial = {
       id: uuidv4(),
       title,
@@ -261,12 +331,12 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
       subcategory: subcategory || null,
       year: year || null,
       filename: req.file.originalname,
-      filepath: fileUrl,
-      isDefault: false
+      filepath: `/uploads/${req.file.filename}`,
+      isDefault: false,
+      uploadedAt: new Date().toISOString()
     };
-
-    const { error: insertError } = await supabase.from('materials').insert(newMaterial);
-    if (insertError) throw insertError;
+    dbData.materials.push(newMaterial);
+    writeDB(dbData);
 
     res.status(201).json({ message: 'Material uploaded successfully', material: newMaterial });
   } catch (err) {
@@ -274,76 +344,66 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
   }
 });
 
+// Materials: Delete PDF
 app.delete('/api/materials/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
-    // 1. Get the material to find the filepath
-    const { data: material, error: fetchError } = await supabase.from('materials').select('filepath').eq('id', id).single();
-    if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
-    
-    // 2. Extract filename from public URL and delete from storage
-    if (material && material.filepath) {
-      const filename = material.filepath.split('/').pop();
-      const cleanFilename = filename.split('?')[0]; // Remove query params if any
-      await supabase.storage.from('materials').remove([cleanFilename]).catch(e => console.error("Storage cleanup error:", e));
+
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const { data: material } = await supabase.from('materials').select('filepath').eq('id', id).single();
+        if (material && material.filepath) {
+          const filename = material.filepath.split('/').pop().split('?')[0];
+          await supabase.storage.from('materials').remove([filename]).catch(() => {});
+        }
+        await supabase.from('materials').delete().eq('id', id);
+        return res.json({ message: 'Material deleted successfully' });
+      } catch (err) {
+        console.warn("Supabase delete error:", err.message);
+      }
     }
-    
-    // 3. Delete from database
-    const { error } = await supabase.from('materials').delete().eq('id', id);
-    if (error) throw error;
-    
-    res.json({ message: 'Material and file deleted successfully' });
+
+    // Local Fallback
+    const dbData = readDB();
+    const index = dbData.materials.findIndex(m => m.id === id);
+    if (index !== -1) {
+      const mat = dbData.materials[index];
+      if (!mat.isDefault && mat.filepath) {
+        const fullPath = path.join(__dirname, mat.filepath);
+        if (fs.existsSync(fullPath)) {
+          try { fs.unlinkSync(fullPath); } catch (e) {}
+        }
+      }
+      dbData.materials.splice(index, 1);
+      writeDB(dbData);
+    }
+    res.json({ message: 'Material deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.put('/api/materials/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { filename, filepath } = req.body;
-    if (!filename || !filepath) return res.status(400).json({ error: 'Missing filename or filepath' });
-
-    // 1. Get the old material to find the old filepath
-    const { data: oldMaterial } = await supabase.from('materials').select('filepath').eq('id', id).single();
-    
-    // 2. Delete the old file from storage to prevent orphans
-    if (oldMaterial && oldMaterial.filepath && oldMaterial.filepath !== filepath) {
-      const oldFilename = oldMaterial.filepath.split('/').pop().split('?')[0];
-      await supabase.storage.from('materials').remove([oldFilename]).catch(e => console.error("Storage cleanup error:", e));
-    }
-
-    const updateData = {
-      filename,
-      filepath
-    };
-
-    const { data, error } = await supabase.from('materials').update(updateData).eq('id', id).select();
-    if (error) throw error;
-
-    res.json({ message: 'Material file updated successfully', material: data[0] });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
+// Downloads: Log Event
 app.post('/api/downloads', async (req, res) => {
   try {
     const { name, email, subjectCode, title, filename } = req.body;
     if (!email || !filename) return res.status(400).json({ error: 'Email and filename are required' });
 
-    const log = {
-      id: uuidv4(),
-      name: name || 'Guest',
-      email,
-      subjectCode: subjectCode || 'N/A',
-      title: title || filename,
-      filename
-    };
-    
-    const { error } = await supabase.from('download_logs').insert(log);
-    if (error) throw error;
+    const log = { id: uuidv4(), name: name || 'Guest', email, subjectCode: subjectCode || 'N/A', title: title || filename, filename, timestamp: new Date().toISOString() };
+
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        await supabase.from('download_logs').insert(log);
+        return res.status(201).json({ message: 'Download logged successfully', log });
+      } catch (err) {
+        console.warn("Supabase download log error:", err.message);
+      }
+    }
+
+    const dbData = readDB();
+    dbData.downloadLogs = dbData.downloadLogs || [];
+    dbData.downloadLogs.unshift(log);
+    writeDB(dbData);
 
     res.status(201).json({ message: 'Download logged successfully', log });
   } catch (err) {

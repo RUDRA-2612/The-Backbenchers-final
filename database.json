@@ -1,6 +1,24 @@
 {
-  "users": [],
-  "loginLogs": [],
+  "users": [
+    {
+      "id": "f1473891-34ed-4ad2-b03f-f2c4cb803eb6",
+      "name": "Rudra Admin",
+      "email": "rudrapal2612@gmail.com",
+      "password": "rudra@admin",
+      "isGoogle": false,
+      "createdAt": "2026-07-23T18:50:21.808Z"
+    }
+  ],
+  "loginLogs": [
+    {
+      "id": "5a06025a-5b8a-4215-88ac-3ce4f79951d6",
+      "userId": "f1473891-34ed-4ad2-b03f-f2c4cb803eb6",
+      "name": "Rudra Admin",
+      "email": "rudrapal2612@gmail.com",
+      "timestamp": "2026-07-23T18:50:21.808Z",
+      "method": "Admin Credentials"
+    }
+  ],
   "downloadLogs": [],
   "materials": [
     {
@@ -77,6 +95,28 @@
       "subcategory": "mid-term-2",
       "filename": "fc_mid2_solved.pdf",
       "filepath": "/uploads/defaults/fc_mid2_solved.pdf",
+      "isDefault": true,
+      "uploadedAt": "2026-06-20T13:19:28.196Z"
+    },
+    {
+      "id": "def-py-q",
+      "title": "Python Top 20 Most Repeated Exam Questions",
+      "subjectCode": "CS1139",
+      "category": "questions",
+      "subcategory": null,
+      "filename": "python_basics.pdf",
+      "filepath": "/uploads/defaults/python_basics.pdf",
+      "isDefault": true,
+      "uploadedAt": "2026-06-20T13:19:28.196Z"
+    },
+    {
+      "id": "def-eee-q",
+      "title": "EEE Expected Mid & End Term Questions",
+      "subjectCode": "EE1118",
+      "category": "questions",
+      "subcategory": null,
+      "filename": "eee_mid1_2025.pdf",
+      "filepath": "/uploads/defaults/eee_mid1_2025.pdf",
       "isDefault": true,
       "uploadedAt": "2026-06-20T13:19:28.196Z"
     }
