@@ -232,9 +232,27 @@ export default function App() {
       case 'profile':
         return <Profile user={user} />;
       case 'admin':
-        return user?.isAdmin ? <AdminPanel onMaterialUploaded={fetchMaterials} /> : <SubjectGrid onSelectSubject={handleSelectSubject} />;
+        return user?.isAdmin ? (
+          <AdminPanel onMaterialUploaded={fetchMaterials} />
+        ) : (
+          <SubjectGrid 
+            onSelectSubject={handleSelectSubject} 
+            materials={materials} 
+            onViewFile={handleViewFile} 
+            onDownloadFile={handleDownloadFile}
+            user={user}
+          />
+        );
       default:
-        return <SubjectGrid onSelectSubject={handleSelectSubject} />;
+        return (
+          <SubjectGrid 
+            onSelectSubject={handleSelectSubject} 
+            materials={materials} 
+            onViewFile={handleViewFile} 
+            onDownloadFile={handleDownloadFile}
+            user={user}
+          />
+        );
     }
   };
 
