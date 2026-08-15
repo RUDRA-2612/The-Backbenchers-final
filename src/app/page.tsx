@@ -1,65 +1,140 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, Heart } from "lucide-react";
+import { Header } from "@/components/header";
 
 export default function Home() {
+  const subjects = [
+    {
+      name: "Programming-I",
+      category: "CORE",
+      code: "CSF101",
+    },
+    {
+      name: "Electrical & Electronics",
+      category: "ENGINEERING",
+      code: "EEE101",
+    },
+    {
+      name: "Calculus",
+      category: "MATH",
+      code: "MTH101",
+    },
+    {
+      name: "Environment & Sustainability",
+      category: "HUMANITIES",
+      code: "ENV101",
+    },
+    {
+      name: "Communication",
+      category: "SKILLS",
+      code: "COM101",
+    },
+    {
+      name: "Design Creativity",
+      category: "DESIGN",
+      code: "DES101",
+    },
+  ];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen bg-background flex flex-col items-center">
+      <Header />
+
+      {/* HERO SECTION */}
+      <main className="flex-1 w-full max-w-7xl px-8 flex flex-col items-center mt-20 md:mt-32">
+        <div className="flex flex-col items-center text-center max-w-3xl">
+          <h1 className="text-6xl md:text-8xl font-playfair font-bold text-primary italic mb-12">
+            The Backbenchers
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+          <div className="flex items-center gap-6">
+            <Link
+              href="/login"
+              className="bg-primary hover:bg-orange-600 text-white px-8 py-3 rounded-full font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2 group"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              Start Free
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="#subjects"
+              className="text-foreground hover:text-primary font-medium transition-colors flex items-center gap-2 group"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              Preview
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform -rotate-45" />
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* SUBJECTS SECTION */}
+        <div id="subjects" className="w-full mt-32 mb-20">
+          <div className="mb-10">
+            <h2 className="text-5xl font-bold text-foreground mb-4">Subjects</h2>
+            <p className="text-muted-foreground text-lg">
+              First-year curriculum. More semesters coming soon.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {subjects.map((subject) => (
+              <Link
+                href={`/subjects/${subject.code.toLowerCase()}`}
+                key={subject.code}
+                className="bg-card hover:bg-secondary border border-border/50 rounded-[2rem] p-8 flex flex-col h-[280px] transition-all hover:scale-[1.02] hover:shadow-xl group relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <h3 className="text-2xl font-semibold text-foreground mb-3 relative z-10">
+                  {subject.name}
+                </h3>
+                <span className="text-xs font-bold tracking-widest text-primary uppercase relative z-10">
+                  {subject.category}
+                </span>
+
+                <div className="mt-auto relative z-10">
+                  <span className="flex items-center gap-2 text-sm text-foreground/80 font-medium group-hover:text-primary transition-colors">
+                    Explore Subject
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                  <span className="block mt-6 text-xs font-bold tracking-widest text-foreground/50 uppercase">
+                    {subject.code}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </main>
+
+      {/* FOOTER */}
+      <footer className="w-full max-w-7xl px-8 py-16 mt-auto border-t border-border/50 flex flex-col items-center">
+        <div className="bg-secondary/50 px-6 py-2 rounded-full border border-primary/20 mb-12">
+          <p className="text-xs font-bold tracking-widest text-primary uppercase flex items-center gap-2">
+            CREATED WITH <Heart className="w-3 h-3 fill-primary" />
+          </p>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-6 mb-16 w-full justify-center">
+          <div className="bg-card border border-border/50 rounded-2xl p-8 text-center min-w-[300px]">
+            <h4 className="font-playfair text-2xl text-foreground mb-4">Shubh Dixit</h4>
+            <div className="flex items-center justify-center gap-2 text-xs font-bold tracking-widest text-muted-foreground uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              2ND YEAR
+            </div>
+          </div>
+          <div className="bg-card border border-border/50 rounded-2xl p-8 text-center min-w-[300px]">
+            <h4 className="font-playfair text-2xl text-foreground mb-4">Rudrapal Singh Shekhawat</h4>
+            <div className="flex items-center justify-center gap-2 text-xs font-bold tracking-widest text-muted-foreground uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              2ND YEAR
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center">
+          <p className="font-playfair text-primary italic mb-4">The Backbenchers</p>
+          <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+            © 2026 THE BACKBENCHERS. ALL RIGHTS RESERVED.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
