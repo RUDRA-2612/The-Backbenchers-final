@@ -79,22 +79,7 @@ export default function Auth({ onLoginSuccess }) {
         {error && <div className="auth-error">{error}</div>}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
-          <button 
-            type="button" 
-            className="auth-google-btn" 
-            onClick={() => handleOAuthLogin('Google')}
-            disabled={loading}
-            style={{ width: '100%' }}
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18">
-              <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.8 2.7l2.8 2.17c1.63-1.5 2.8-3.7 2.8-6.5z"/>
-              <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.2l-2.8-2.17c-.78.52-1.78.83-2.96.83-2.28 0-4.2-1.54-4.9-3.61L1.4 13.06C2.9 16.03 6 18 9 18z"/>
-              <path fill="#FBBC05" d="M4.1 10.85c-.18-.53-.28-1.1-.28-1.68s.1-1.15.28-1.68L1.4 5.34C.5 7.15 0 9.17 0 11.25s.5 4.1 1.4 5.91l2.7-2.31z"/>
-              <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 6 0 2.9 1.97 1.4 4.94l2.7 2.31c.7-2.07 2.62-3.67 4.9-3.67z"/>
-            </svg>
-            Sign in with Google
-          </button>
-          
+
           <button 
             type="button" 
             className="auth-google-btn" 
