@@ -54,8 +54,9 @@ export default function Auth({ onLoginSuccess }) {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="logo" style={{ justifyContent: 'center' }}>
+          <div className="logo" style={{ justifyContent: 'center', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
             <img src="/logo.png" alt="Logo" className="nav-logo-img" style={{ height: '85px' }} />
+            <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>Backbenchers</h2>
           </div>
           <p className="auth-subtitle">
             Log in to access B.Tech notes & papers
