@@ -56,7 +56,20 @@ export default function Auth({ onLoginSuccess }) {
         <div className="auth-header">
           <div className="logo" style={{ justifyContent: 'center', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
             <img src="/logo.png" alt="Logo" className="nav-logo-img" style={{ height: '85px' }} />
-            <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>Backbenchers</h2>
+            <h2 className="hero-brand-name" style={{ margin: 0, fontSize: '1.8rem', fontWeight: 'bold' }}>
+              {"Backbenchers".split('').map((char, idx) => (
+                <span 
+                  key={idx} 
+                  className="dance-letter" 
+                  style={{ 
+                    animationDelay: `${idx * 0.04}s`,
+                    color: idx >= 4 ? 'var(--accent)' : 'var(--text-primary)'
+                  }}
+                >
+                  {char}
+                </span>
+              ))}
+            </h2>
           </div>
           <p className="auth-subtitle">
             Log in to access B.Tech notes & papers
