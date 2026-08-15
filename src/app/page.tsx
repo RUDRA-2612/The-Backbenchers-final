@@ -43,22 +43,29 @@ export default function Home() {
       {/* HERO SECTION */}
       <main className="flex-1 w-full max-w-7xl px-8 flex flex-col items-center mt-20 md:mt-32">
         <div className="flex flex-col items-center text-center max-w-3xl">
-          <h1 className="text-6xl md:text-8xl font-playfair font-bold text-primary italic mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium text-sm mb-8 border border-primary/20">
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            V1.0 is now live
+          </div>
+          <h1 className="text-6xl md:text-8xl font-playfair font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400 italic mb-6">
             The Backbenchers
           </h1>
-          <div className="flex items-center gap-6">
+          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl">
+            Your ultimate academic companion. Access curated notes, previous year papers, and essential resources for your engineering journey.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
             <Link
               href="/login"
-              className="bg-primary hover:bg-orange-600 text-white px-8 py-3 rounded-full font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2 group"
+              className="w-full sm:w-auto bg-primary hover:bg-orange-600 text-white px-8 py-3.5 rounded-full font-medium transition-all shadow-[0_0_40px_-10px_rgba(249,115,22,0.5)] hover:shadow-[0_0_60px_-15px_rgba(249,115,22,0.6)] flex items-center justify-center gap-2 group hover:-translate-y-0.5"
             >
               Start Free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="#subjects"
-              className="text-foreground hover:text-primary font-medium transition-colors flex items-center gap-2 group"
+              className="w-full sm:w-auto text-foreground hover:text-primary font-medium transition-colors flex items-center justify-center gap-2 group px-8 py-3.5 bg-secondary/50 rounded-full hover:bg-secondary"
             >
-              Preview
+              Preview Subjects
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform -rotate-45" />
             </Link>
           </div>
