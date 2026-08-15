@@ -80,3 +80,9 @@ body {
   color: var(--color-foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes slideFace {
+  0% { left: -10%; transform: rotate(-15deg); }
+  50% { transform: rotate(15deg); }
+  100% { left: 90%; transform: rotate(-15deg); }
+}

@@ -47,8 +47,17 @@ export default function Home() {
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             V1.0 is now live
           </div>
-          <h1 className="text-6xl md:text-8xl font-playfair font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400 italic mb-6">
+          <h1 className="relative inline-block text-6xl md:text-8xl font-playfair font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400 italic mb-6 overflow-visible pb-2">
             The Backbenchers
+            <span 
+              className="absolute -top-4 md:-top-6 pointer-events-none drop-shadow-lg"
+              style={{ 
+                animation: 'slideFace 4s ease-in-out infinite alternate',
+                fontSize: '0.6em', // relative to the h1 size
+              }}
+            >
+              😀
+            </span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl">
             Your ultimate academic companion. Access curated notes, previous year papers, and essential resources for your engineering journey.
