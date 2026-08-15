@@ -71,15 +71,20 @@ app.post('/api/auth/register', async (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
   try {
-    const { email, password, isGoogleLogin, name } = req.body;
+    const { email, password, provider, isGoogleLogin, name } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
     const emailLower = email.toLowerCase();
-    const isAdminEmail = emailLower === 'rudrapal2612@gmail.com';
+    
+    if (!emailLower.endsWith('@jklu.edu.in')) {
+      return res.status(403).json({ error: 'Access restricted. Please use your @jklu.edu.in email address.' });
+    }
+
+    const isAdminEmail = emailLower === 'rudrapalsinghshekhawat@jklu.edu.in';
 
     let { data: user, error: findError } = await supabase.from('users').select('*').eq('email', emailLower).single();
 
-    if (isGoogleLogin) {
+    if (isGoogleLogin || provider) {
       if (!user) {
         user = {
           id: uuidv4(),
@@ -119,7 +124,7 @@ app.post('/api/auth/login', async (req, res) => {
       userId: user.id,
       name: user.name,
       email: user.email,
-      method: isGoogleLogin ? 'Google OAuth' : (isAdminEmail && password === 'rudra@admin' ? 'Admin Credentials' : 'Email/Password')
+      method: provider ? `${provider} OAuth` : (isGoogleLogin ? 'Google OAuth' : 'Email/Password')
     });
 
     res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email, isAdmin: isAdminEmail } });
