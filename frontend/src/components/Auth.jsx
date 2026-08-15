@@ -1,51 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest } from '../auth/authConfig';
 import { API_URL } from '../config';
 
 export default function Auth({ onLoginSuccess }) {
+  const { instance, inProgress } = useMsal();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleOAuthLogin = async (provider) => {
+  // If MSAL is already processing a login (e.g. returning from redirect), show loading state
+  useEffect(() => {
+    if (inProgress === 'login' || inProgress === 'handleRedirect') {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [inProgress]);
+
+  useEffect(() => {
+    const checkRedirect = async () => {
+      try {
+        // This will process the hash if we just returned from Microsoft
+        const loginResponse = await instance.handleRedirectPromise();
+        
+        if (loginResponse && loginResponse.account) {
+          const account = loginResponse.account;
+          const email = account.username || '';
+          const name = account.name || 'JKLU Student';
+          const microsoftAccountId = account.localAccountId;
+
+          // Validate domain
+          if (!email.toLowerCase().endsWith('@jklu.edu.in')) {
+            await instance.logoutRedirect({ account });
+            throw new Error('Access restricted to @jklu.edu.in accounts only.');
+          }
+
+          // Register/Login to our backend
+          const response = await fetch(`${API_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: email,
+              name: name,
+              provider: 'Microsoft',
+              microsoftAccountId: microsoftAccountId
+            })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to authenticate with backend.');
+          }
+
+          onLoginSuccess(data.user);
+        }
+      } catch (err) {
+        console.error("Redirect Login Error:", err);
+        setError(err.message || 'An error occurred during login. Please try again.');
+        setLoading(false);
+      }
+    };
+
+    checkRedirect();
+  }, [instance, onLoginSuccess]);
+
+  const handleMicrosoftLogin = async () => {
     setError('');
     setLoading(true);
-
-    // Simulate OAuth Login
-    const mockEmail = prompt(`Enter your ${provider} email address (must end with @jklu.edu.in):`, "");
-    if (!mockEmail) {
-      setLoading(false);
-      return;
-    }
-
-    if (!mockEmail.toLowerCase().endsWith('@jklu.edu.in')) {
-      setError('Please enter a valid @jklu.edu.in email address');
-      setLoading(false);
-      return;
-    }
-
-    const mockName = mockEmail.split('@')[0].split('.').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: mockEmail,
-          name: mockName,
-          provider: provider,
-          isGoogleLogin: provider === 'Google'
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to authenticate with Google');
-      }
-
-      onLoginSuccess(data.user);
+      // Use redirect instead of popup to avoid browser blocks
+      await instance.loginRedirect(loginRequest);
     } catch (err) {
-      setError(err.message);
-    } finally {
+      console.error("Login Error:", err);
+      setError(err.message || 'An error occurred starting login.');
       setLoading(false);
     }
   };
@@ -79,21 +107,26 @@ export default function Auth({ onLoginSuccess }) {
         {error && <div className="auth-error">{error}</div>}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
-
           <button 
             type="button" 
             className="auth-google-btn" 
-            onClick={() => handleOAuthLogin('Microsoft')}
-            disabled={loading}
+            onClick={handleMicrosoftLogin}
+            disabled={loading || inProgress !== 'none'}
             style={{ width: '100%' }}
           >
-            <svg width="18" height="18" viewBox="0 0 21 21">
-              <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
-              <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
-              <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
-              <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
-            </svg>
-            Sign in with Microsoft
+            {loading ? (
+              <span>Loading...</span>
+            ) : (
+              <>
+                <svg width="18" height="18" viewBox="0 0 21 21">
+                  <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+                  <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+                  <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+                  <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+                </svg>
+                Sign in with JKLU Microsoft Account
+              </>
+            )}
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useMsal } from '@azure/msal-react';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Auth from './components/Auth';
@@ -12,6 +13,7 @@ import Footer from './components/Footer';
 import { API_URL } from './config';
 
 export default function App() {
+  const { instance } = useMsal();
   // Authentication State
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('backbenchers_user');
@@ -54,7 +56,13 @@ export default function App() {
   // Handle browser back button via Native Hash Routing (100% reliable on mobile)
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '');
+      const rawHash = window.location.hash;
+      // Let MSAL process its own authentication hashes (code, state, error) in the popup/redirect
+      if (rawHash.includes('code=') || rawHash.includes('state=') || rawHash.includes('error=')) {
+        return; 
+      }
+      
+      const hash = rawHash.replace('#', '');
       
       if (hash === 'subject-detail') {
         // If they navigate to subject-detail but no subject is in state (e.g. refresh), go home
@@ -123,7 +131,13 @@ export default function App() {
     window.location.hash = nextView;
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await instance.logoutRedirect();
+    } catch (e) {
+      console.error("MSAL logout error:", e);
+      // We still want to log them out locally even if Microsoft popup fails/is blocked
+    }
     setUser(null);
     localStorage.removeItem('backbenchers_user');
     setActiveView('home');

@@ -71,7 +71,7 @@ app.post('/api/auth/register', async (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
   try {
-    const { email, password, provider, isGoogleLogin, name } = req.body;
+    const { email, password, provider, isGoogleLogin, name, microsoftAccountId } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
     const emailLower = email.toLowerCase();
@@ -84,17 +84,22 @@ app.post('/api/auth/login', async (req, res) => {
 
     let { data: user, error: findError } = await supabase.from('users').select('*').eq('email', emailLower).single();
 
-    if (isGoogleLogin || provider) {
+    if (provider === 'Microsoft' || isGoogleLogin) {
       if (!user) {
         user = {
           id: uuidv4(),
           name: name || email.split('@')[0],
           email: emailLower,
           password: 'OAuthMockPassword123',
-          isGoogle: true
+          isGoogle: true // isGoogle is used in DB to represent any OAuth user to disable password changes
         };
+        // If we wanted to store microsoftAccountId, we'd add it here after adding the column to Supabase
         const { error: insertError } = await supabase.from('users').insert(user);
         if (insertError) throw insertError;
+      } else if (name && user.name !== name) {
+        // Update user's name in case they changed it in Microsoft Entra ID
+        await supabase.from('users').update({ name: name }).eq('id', user.id);
+        user.name = name;
       }
     } else {
       if (!user) {
