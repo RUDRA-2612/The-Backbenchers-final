@@ -1,61 +1,9 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, BookOpen, Eye, EyeOff } from 'lucide-react';
 import { API_URL } from '../config';
 
 export default function Auth({ onLoginSuccess }) {
-  const [isLogin, setIsLogin] = useState(true);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    const url = isLogin ? '/api/auth/login' : '/api/auth/register';
-    const payload = isLogin ? { email, password } : { name, email, password };
-
-    try {
-      // Connect to the backend
-      const response = await fetch(`${API_URL}${url}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong');
-      }
-
-      if (isLogin) {
-        onLoginSuccess(data.user);
-      } else {
-        // Automatically login after successful signup
-        const loginRes = await fetch(`${API_URL}/api/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        const loginData = await loginRes.json();
-        if (loginRes.ok) {
-          onLoginSuccess(loginData.user);
-        } else {
-          setError('Account created, please sign in manually.');
-          setIsLogin(true);
-        }
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGoogleLogin = async () => {
     setError('');
@@ -110,7 +58,7 @@ export default function Auth({ onLoginSuccess }) {
             <img src="/logo.png" alt="Logo" className="nav-logo-img" style={{ height: '85px' }} />
           </div>
           <p className="auth-subtitle">
-            {isLogin ? 'Log in to access B.Tech notes & papers' : 'Create an account to start studying'}
+            Log in to access B.Tech notes & papers
           </p>
         </div>
 
@@ -121,6 +69,7 @@ export default function Auth({ onLoginSuccess }) {
           className="auth-google-btn" 
           onClick={handleGoogleLogin}
           disabled={loading}
+          style={{ width: '100%' }}
         >
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.8 2.7l2.8 2.17c1.63-1.5 2.8-3.7 2.8-6.5z"/>
@@ -130,111 +79,6 @@ export default function Auth({ onLoginSuccess }) {
           </svg>
           Sign in with Google
         </button>
-
-        <div className="auth-divider">or use email</div>
-
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }} autoComplete="off">
-          {/* Dummy hidden inputs to trap aggressive browser autofill */}
-          <div style={{ width: 0, height: 0, overflow: 'hidden', position: 'absolute', top: '-9999px', zIndex: -1 }}>
-            <input type="text" name="fake_email_trap" tabIndex="-1" autoComplete="username" />
-            <input type="password" name="fake_password_trap" tabIndex="-1" autoComplete="current-password" />
-          </div>
-          {!isLogin && (
-            <div className="form-group">
-              <label className="form-label" htmlFor="fullName">Full Name</label>
-              <div style={{ position: 'relative' }}>
-                <User size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '13px' }} />
-                <input 
-                  id="fullName"
-                  type="text" 
-                  className="form-input" 
-                  style={{ paddingLeft: '40px' }}
-                  placeholder="e.g. John Doe" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required 
-                  autoComplete="off"
-                />
-              </div>
-            </div>
-          )}
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="user_contact_data">Email Address</label>
-              <div style={{ position: 'relative' }}>
-                <Mail size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '13px' }} />
-                <input 
-                  id="user_contact_data"
-                  name="contact_data_field"
-                  type="email" 
-                  className="form-input" 
-                  style={{ paddingLeft: '40px' }}
-                  placeholder="e.g. student@college.edu" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required 
-                  autoComplete="new-password"
-                  data-lpignore="true"
-                />
-            </div>
-          </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="secure_key_data">Password</label>
-              <div style={{ position: 'relative' }}>
-                <Lock size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '13px' }} />
-                <input 
-                  id="secure_key_data"
-                  name="secure_key_field"
-                  type={showPassword ? "text" : "password"} 
-                  className="form-input" 
-                  style={{ paddingLeft: '40px', paddingRight: '40px' }}
-                  placeholder="••••••••" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required 
-                  autoComplete="new-password"
-                  data-lpignore="true"
-                />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: 'absolute',
-                  right: '12px',
-                  top: '13px',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--text-muted)'
-                }}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
-
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', marginTop: '0.5rem' }}
-            disabled={loading}
-          >
-            {loading ? 'Processing...' : isLogin ? 'Log In' : 'Create Account'}
-          </button>
-        </form>
-
-        <p className="auth-toggle-link">
-          {isLogin ? (
-            <>Don't have an account? <span onClick={() => setIsLogin(false)}>Sign Up</span></>
-          ) : (
-            <>Already have an account? <span onClick={() => setIsLogin(true)}>Log In</span></>
-          )}
-        </p>
       </div>
     </div>
   );
