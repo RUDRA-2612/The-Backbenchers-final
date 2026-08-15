@@ -132,16 +132,18 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    try {
-      await instance.logoutRedirect();
-    } catch (e) {
-      console.error("MSAL logout error:", e);
-      // We still want to log them out locally even if Microsoft popup fails/is blocked
-    }
+    // 1. Clear local state and cache FIRST so it isn't interrupted by the redirect
     setUser(null);
     localStorage.removeItem('backbenchers_user');
     setActiveView('home');
     window.location.hash = 'home';
+
+    // 2. Then redirect to Microsoft to kill the MSAL session
+    try {
+      await instance.logoutRedirect();
+    } catch (e) {
+      console.error("MSAL logout error:", e);
+    }
   };
 
   const toggleTheme = () => {
