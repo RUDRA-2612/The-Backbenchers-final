@@ -83,7 +83,7 @@ export default function Auth({ onLoginSuccess }) {
       <div className="auth-card">
         <div className="auth-header">
           <div className="logo" style={{ justifyContent: 'center', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-            <img src="/logo.png" alt="Logo" className="nav-logo-img" style={{ height: '85px' }} />
+            <img src="/logo.png" alt="Logo" className="nav-logo-img" style={{ height: '110px' }} />
             <h2 className="hero-brand-name" style={{ margin: 0, fontSize: '1.8rem', fontWeight: 'bold' }}>
               {"Backbenchers".split('').map((char, idx) => (
                 <span 
