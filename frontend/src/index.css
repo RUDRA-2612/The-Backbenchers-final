@@ -101,7 +101,7 @@ h1, h2, h3, h4, h5, h6 {
 .main-wrapper {
   display: flex;
   flex: 1;
-  padding-top: 70px; /* Space for fixed navbar */
+  padding-top: 90px; /* Space for fixed navbar */
 }
 
 .content-container {
@@ -109,7 +109,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 2rem;
   background-color: var(--bg-secondary);
   transition: background-color var(--transition-speed) var(--transition-ease);
-  min-height: calc(100vh - 70px);
+  min-height: calc(100vh - 90px);
   display: flex;
   flex-direction: column;
 }
@@ -179,7 +179,7 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   left: 0;
   right: 0;
-  height: 70px;
+  height: 90px;
   background-color: var(--bg-primary);
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -209,7 +209,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .nav-logo-img {
-  height: 56px;
+  height: 75px;
   width: auto;
   object-fit: contain;
   transition: var(--transition);
@@ -410,7 +410,7 @@ h1, h2, h3, h4, h5, h6 {
 .sidebar-overlay {
   display: none;
   position: fixed;
-  top: 70px;
+  top: 90px;
   left: 0;
   right: 0;
   bottom: 0;
