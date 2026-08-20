@@ -80,7 +80,7 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(403).json({ error: 'Access restricted. Please use your @jklu.edu.in email address.' });
     }
 
-    const isAdminEmail = emailLower === 'rudrapalsinghshekhawat@jklu.edu.in';
+    const isAdminEmail = emailLower === 'rudrapalsinghshekhawat@jklu.edu.in' || emailLower === 'amanjhajharia@jklu.edu.in';
 
     let { data: user, error: findError } = await supabase.from('users').select('*').eq('email', emailLower).single();
 
