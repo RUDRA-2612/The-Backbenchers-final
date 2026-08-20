@@ -2,14 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag } from 'lucide-react';
 import { API_URL } from '../config';
 
-const subjectsList = [
-  { code: 'CS1139', name: 'Programming 1 (Python)' },
-  { code: 'EE1118', name: 'Electrical and Electronics Engineering (EEE)' },
-  { code: 'AS1109', name: 'Calculus' },
-  { code: 'AS1108', name: 'Applied Physics' },
-  { code: 'ES1115', name: 'Environmental Science and Sustainability' },
-  { code: 'CC1101', name: 'Fundamental of Communication' }
-];
+import { masterSubjects } from '../data/subjects';
 
 export default function AdminPanel({ onMaterialUploaded }) {
   const [adminTab, setAdminTab] = useState('upload'); // upload, logins, downloads, students
@@ -22,6 +15,8 @@ export default function AdminPanel({ onMaterialUploaded }) {
 
   // Form State
   const [title, setTitle] = useState('');
+  const [selectedYear, setSelectedYear] = useState('year1');
+  const [selectedSemester, setSelectedSemester] = useState('1');
   const [subjectCode, setSubjectCode] = useState('CS1139');
   const [category, setCategory] = useState('notes');
   const [subcategory, setSubcategory] = useState('mid-term');
@@ -62,6 +57,30 @@ export default function AdminPanel({ onMaterialUploaded }) {
   useEffect(() => {
     fetchLogs();
   }, [adminTab]);
+
+  // Synchronize dynamic form dropdowns
+  useEffect(() => {
+    if (masterSubjects[selectedYear]) {
+      const sems = Object.keys(masterSubjects[selectedYear].semesters);
+      if (sems.length > 0 && !sems.includes(selectedSemester)) {
+        setSelectedSemester(sems[0]);
+      }
+    }
+  }, [selectedYear, selectedSemester]);
+
+  useEffect(() => {
+    if (masterSubjects[selectedYear] && masterSubjects[selectedYear].semesters[selectedSemester]) {
+      const subjects = masterSubjects[selectedYear].semesters[selectedSemester];
+      if (subjects.length > 0) {
+        // Only change subject if it's not valid for current semester
+        if (!subjects.some(s => s.code === subjectCode)) {
+          setSubjectCode(subjects[0].code);
+        }
+      } else {
+        setSubjectCode('');
+      }
+    }
+  }, [selectedSemester, selectedYear, subjectCode]);
 
   const handleDeleteMaterial = async (id) => {
     if (!window.confirm("Are you sure you want to delete this material?")) return;
@@ -284,6 +303,37 @@ export default function AdminPanel({ onMaterialUploaded }) {
                 />
               </div>
 
+              <div className="form-group" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 45%' }}>
+                  <label className="form-label" htmlFor="docYearSelect">Year</label>
+                  <select
+                    id="docYearSelect"
+                    className="form-input"
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                  >
+                    {Object.keys(masterSubjects).map(yKey => (
+                      <option key={yKey} value={yKey}>{masterSubjects[yKey].title}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div style={{ flex: '1 1 45%' }}>
+                  <label className="form-label" htmlFor="docSemesterSelect">Semester</label>
+                  <select
+                    id="docSemesterSelect"
+                    className="form-input"
+                    value={selectedSemester}
+                    onChange={(e) => setSelectedSemester(e.target.value)}
+                    disabled={!masterSubjects[selectedYear] || Object.keys(masterSubjects[selectedYear].semesters).length === 0}
+                  >
+                    {masterSubjects[selectedYear] && Object.keys(masterSubjects[selectedYear].semesters).map(sem => (
+                      <option key={sem} value={sem}>Semester {sem}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
               <div className="form-group">
                 <label className="form-label" htmlFor="docSubject">Subject</label>
                 <select
@@ -291,8 +341,9 @@ export default function AdminPanel({ onMaterialUploaded }) {
                   className="form-input"
                   value={subjectCode}
                   onChange={(e) => setSubjectCode(e.target.value)}
+                  disabled={!masterSubjects[selectedYear] || !masterSubjects[selectedYear].semesters[selectedSemester] || masterSubjects[selectedYear].semesters[selectedSemester].length === 0}
                 >
-                  {subjectsList.map(s => (
+                  {masterSubjects[selectedYear] && masterSubjects[selectedYear].semesters[selectedSemester] && masterSubjects[selectedYear].semesters[selectedSemester].map(s => (
                     <option key={s.code} value={s.code}>{s.code} - {s.name}</option>
                   ))}
                 </select>
