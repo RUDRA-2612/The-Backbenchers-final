@@ -1643,13 +1643,11 @@ h1, h2, h3, h4, h5, h6 {
 
 /* YEAR AND SEMESTER CARDS */
 .year-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
   margin-top: 2.5rem;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
 }
 
 .year-card {
