@@ -106,6 +106,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .content-container {
   flex: 1;
+  min-width: 0;
   padding: 2rem;
   background-color: var(--bg-secondary);
   transition: background-color var(--transition-speed) var(--transition-ease);
@@ -442,6 +443,7 @@ h1, h2, h3, h4, h5, h6 {
   top: 86px;
   height: calc(100vh - 86px);
   width: 260px;
+  flex-shrink: 0;
   background-color: var(--bg-primary);
   border-right: 1px solid var(--border);
   padding: 1.5rem 1rem;
