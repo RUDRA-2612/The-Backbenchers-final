@@ -665,63 +665,74 @@ h1, h2, h3, h4, h5, h6 {
 
 /* HERO SECTION */
 /* CONTINUE STUDYING WIDGET */
-.continue-studying-wrapper {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 10;
-}
-
-.continue-studying-card {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background-color: var(--bg-card);
+.continue-studying-banner {
+  margin-top: 3rem;
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s ease;
-}
-
-.continue-studying-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transform: translateY(-2px);
-}
-
-.continue-icon {
-  color: var(--accent);
+  border-radius: 16px;
+  padding: 2rem;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 2rem;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.continue-content {
-  display: flex;
-  flex-direction: column;
+.continue-studying-banner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border-color: var(--accent);
 }
 
-.continue-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
+.continue-banner-title {
+  font-size: 1.25rem;
   font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
 }
 
-.continue-title {
-  font-size: 0.85rem;
+.continue-banner-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.continue-banner-subtitle strong {
+  color: var(--accent);
+}
+
+.continue-banner-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
   font-weight: 600;
-  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.continue-banner-btn:hover {
+  background-color: var(--accent-hover);
+  box-shadow: 0 4px 15px var(--accent-glow);
 }
 
 @media (max-width: 768px) {
-  .continue-studying-wrapper {
-    position: static;
-    margin: 1rem 1rem 0;
-    display: flex;
+  .continue-studying-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .continue-banner-btn {
+    width: 100%;
     justify-content: center;
   }
 }
