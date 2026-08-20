@@ -86,7 +86,7 @@ export default function App() {
       } else if (hash.startsWith('semester-')) {
         setActiveView(hash);
         setActivePdfFile(null);
-      } else if (hash === 'home' || hash === 'admin' || hash === 'downloads' || hash === 'profile') {
+      } else if (hash === 'home' || hash === 'admin' || hash === 'downloads' || hash === 'saved' || hash === 'profile') {
         setActiveView(hash);
         setActivePdfFile(null);
         if (hash === 'home') setSelectedSubject(null);
@@ -238,9 +238,10 @@ export default function App() {
       const updated = [newSaved, ...savedFiles];
       setSavedFiles(updated);
       localStorage.setItem('backbenchers_saved', JSON.stringify(updated));
-      alert('File saved to bookmarks!');
     } else {
-      alert('File is already saved!');
+      const updated = savedFiles.filter(f => f.id !== file.id);
+      setSavedFiles(updated);
+      localStorage.setItem('backbenchers_saved', JSON.stringify(updated));
     }
   };
 
@@ -278,6 +279,7 @@ export default function App() {
           <SubjectDetail 
             subject={selectedSubject} 
             materials={materials} 
+            savedFiles={savedFiles}
             onBack={() => window.history.back()}
             onViewFile={handleViewFile}
             onDownloadFile={handleDownloadFile}

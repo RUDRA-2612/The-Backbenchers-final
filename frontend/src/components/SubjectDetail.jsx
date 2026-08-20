@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, HelpCircle, Flag } from 'lucide-react';
 
-export default function SubjectDetail({ subject, materials, onBack, onViewFile, onDownloadFile, onSaveFile, onReportFile }) {
+export default function SubjectDetail({ subject, materials, savedFiles = [], onBack, onViewFile, onDownloadFile, onSaveFile, onReportFile }) {
   const [activeTab, setActiveTab] = useState('papers'); // papers, notes, exam-questions
   const [activeSubTab, setActiveSubTab] = useState('mid-term'); // mid-term, end-term
   const [activeYear, setActiveYear] = useState('2025');
@@ -149,11 +149,11 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
                 <button 
                   className="btn btn-secondary btn-accent-light" 
                   onClick={() => onSaveFile(file)}
-                  title="Save / Bookmark PDF"
+                  title={savedFiles.some(f => f.id === file.id) ? "Remove from Saved" : "Save / Bookmark PDF"}
                   style={{ padding: '0.5rem', color: 'var(--accent)' }}
                 >
-                  <Bookmark size={18} />
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Save</span>
+                  <Bookmark size={18} fill={savedFiles.some(f => f.id === file.id) ? "var(--accent)" : "transparent"} />
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{savedFiles.some(f => f.id === file.id) ? "Saved" : "Save"}</span>
                 </button>
                 <button 
                   className="btn btn-secondary" 
