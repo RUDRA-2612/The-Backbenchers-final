@@ -1644,10 +1644,19 @@ h1, h2, h3, h4, h5, h6 {
 /* YEAR AND SEMESTER CARDS */
 .year-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
   margin-top: 2.5rem;
   width: 100%;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .year-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .year-card {
