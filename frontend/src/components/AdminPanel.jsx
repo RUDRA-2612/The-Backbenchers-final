@@ -294,8 +294,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                 >
                   <option value="notes">Notes</option>
                   <option value="papers">Previous Year Papers & Solutions</option>
-                  <option value="formulas">Formula Sheets</option>
-                  <option value="topics">Important Topics</option>
+                  <option value="exam-questions">Exam Relevant Questions</option>
                 </select>
               </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark } from 'lucide-react';
+import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, HelpCircle } from 'lucide-react';
 
 export default function SubjectDetail({ subject, materials, onBack, onViewFile, onDownloadFile }) {
   const [activeTab, setActiveTab] = useState('papers'); // papers, notes, formulas, topics
@@ -22,8 +22,7 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
     switch (category) {
       case 'papers': return <Calendar size={22} />;
       case 'notes': return <BookOpen size={22} />;
-      case 'formulas': return <Bookmark size={22} />;
-      case 'topics': return <AlertCircle size={22} />;
+      case 'exam-questions': return <HelpCircle size={22} />;
       default: return <FileText size={22} />;
     }
   };
@@ -56,16 +55,10 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
           Notes
         </button>
         <button 
-          className={`tab-btn ${activeTab === 'formulas' ? 'active' : ''}`}
-          onClick={() => setActiveTab('formulas')}
+          className={`tab-btn ${activeTab === 'exam-questions' ? 'active' : ''}`}
+          onClick={() => setActiveTab('exam-questions')}
         >
-          Formula Sheets
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'topics' ? 'active' : ''}`}
-          onClick={() => setActiveTab('topics')}
-        >
-          Important Topics
+          Exam Relevant Questions
         </button>
       </div>
 

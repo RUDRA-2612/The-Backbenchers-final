@@ -6,7 +6,7 @@ export default function Downloads({ downloadedFiles, onViewFile, onRemoveDownloa
     <div>
       <div className="downloads-header">
         <h2>My Downloaded Documents</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>Access your downloaded notes, PYQs, and formula sheets offline.</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Access your downloaded notes, PYQs, and exam questions offline.</p>
       </div>
 
       {downloadedFiles.length > 0 ? (
