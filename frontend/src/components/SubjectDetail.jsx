@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, HelpCircle, Flag } from 'lucide-react';
+import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, HelpCircle, Flag, Beaker } from 'lucide-react';
 
 export default function SubjectDetail({ subject, materials, savedFiles = [], onBack, onViewFile, onDownloadFile, onSaveFile, onReportFile }) {
-  const [activeTab, setActiveTab] = useState('papers'); // papers, notes, exam-questions
-  const [activeSubTab, setActiveSubTab] = useState('mid-term'); // mid-term, end-term
+  const [activeTab, setActiveTab] = useState('papers'); // papers, notes, exam-questions, labs
+  const [activeSubTab, setActiveSubTab] = useState('mid-term'); // mid-term, end-term, quizzes
   const [activeYear, setActiveYear] = useState('2025');
   const [reportModalFile, setReportModalFile] = useState(null);
   const [reportDescription, setReportDescription] = useState('');
@@ -33,6 +33,7 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
       case 'papers': return <Calendar size={22} />;
       case 'notes': return <BookOpen size={22} />;
       case 'exam-questions': return <HelpCircle size={22} />;
+      case 'labs': return <Beaker size={22} />;
       default: return <FileText size={22} />;
     }
   };
@@ -70,6 +71,12 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
         >
           Exam Relevant Questions
         </button>
+        <button 
+          className={`tab-btn ${activeTab === 'labs' ? 'active' : ''}`}
+          onClick={() => setActiveTab('labs')}
+        >
+          Labs
+        </button>
       </div>
 
       {/* Subtabs for Papers */}
@@ -87,6 +94,12 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
               onClick={() => setActiveSubTab('end-term')}
             >
               End Term
+            </button>
+            <button 
+              className={`subtab-btn ${activeSubTab === 'quizzes' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('quizzes')}
+            >
+              Quizzes
             </button>
           </div>
 

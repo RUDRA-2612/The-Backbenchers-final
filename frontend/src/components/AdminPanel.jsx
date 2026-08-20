@@ -360,6 +360,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                   <option value="notes">Notes</option>
                   <option value="papers">Previous Year Papers & Solutions</option>
                   <option value="exam-questions">Exam Relevant Questions</option>
+                  <option value="labs">Labs</option>
                 </select>
               </div>
 
@@ -375,6 +376,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                     >
                       <option value="mid-term">Mid Term</option>
                       <option value="end-term">End Term</option>
+                      <option value="quizzes">Quizzes</option>
                     </select>
                   </div>
                   
