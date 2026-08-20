@@ -1,7 +1,7 @@
 import React from 'react';
 import { Terminal, Zap, Calculator, Leaf, Radio, Cpu, ArrowRight, Book, Frown, Code, Atom, ArrowLeft } from 'lucide-react';
 
-const subjects = [
+const semester1Subjects = [
   { name: 'Programming 1 (Python)', code: 'CS1139', icon: Terminal, desc: 'Introductory programming, control flow, functions, lists, and file handling.' },
   { name: 'Electrical and Electronics Engineering (EEE)', code: 'EE1118', icon: Cpu, desc: 'DC circuits, KVL/KCL, network theorems, AC circuits, and semiconductor diodes.' },
   { name: 'Calculus', code: 'AS1109', icon: Calculator, desc: 'Limits, continuity, single variable differentiation, integration, and infinite series.' },
@@ -11,9 +11,17 @@ const subjects = [
   { name: 'Introduction to Indian Knowledge System (IKS)', code: 'IL1107', icon: Book, desc: 'Overview of ancient Indian sciences, philosophy, mathematics, and holistic wellness.' }
 ];
 
+const semester2Subjects = [
+  { name: 'Programming 2 (C)', code: 'CS1135', icon: Code, desc: 'Advanced programming in C, pointers, memory management, and data structures.' },
+  { name: 'Digital Electronics', code: 'EE1125', icon: Cpu, desc: 'Logic gates, Boolean algebra, combinational and sequential circuits, and microprocessors.' },
+  { name: 'Linear Algebra and Differential Equations', code: 'AS1114', icon: Calculator, desc: 'Matrices, vector spaces, eigenvalues, and ordinary differential equations.' },
+  { name: 'Critical Thinking and Storytelling', code: 'CC1102', icon: Book, desc: 'Developing critical thinking skills and the art of effective storytelling.' },
+  { name: 'Applied Physics', code: 'AS1108', icon: Zap, desc: 'Wave optics, interference, diffraction, polarization, and quantum mechanics.' },
+  { name: 'Introduction to Indian Knowledge System (IKS)', code: 'IL1107', icon: Book, desc: 'Overview of ancient Indian sciences, philosophy, mathematics, and holistic wellness.' }
+];
+
 export default function SubjectGrid({ activeSemester = 1, onSelectSubject, onBack }) {
-  // Currently we only have data for semester 1
-  const displaySubjects = activeSemester === 1 ? subjects : [];
+  const displaySubjects = activeSemester === 1 ? semester1Subjects : activeSemester === 2 ? semester2Subjects : [];
 
   return (
     <div>
