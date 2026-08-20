@@ -430,6 +430,13 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: auto;
 }
 
+@media (min-width: 768px) {
+  .sidebar-overlay, .sidebar-overlay.active {
+    display: none !important;
+    pointer-events: none !important;
+  }
+}
+
 .sidebar {
   width: 260px;
   background-color: var(--bg-primary);
@@ -461,6 +468,12 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1rem;
 }
 
 .sidebar-link:hover {
