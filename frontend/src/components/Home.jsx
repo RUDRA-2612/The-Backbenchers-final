@@ -37,18 +37,6 @@ const years = [
 ];
 
 export default function Home({ onSelectSubject }) {
-  const [activeSemester, setActiveSemester] = useState(null);
-
-  if (activeSemester) {
-    return (
-      <SubjectGrid 
-        activeSemester={activeSemester} 
-        onSelectSubject={onSelectSubject} 
-        onBack={() => setActiveSemester(null)} 
-      />
-    );
-  }
-
   return (
     <div>
       <div className="hero-section">
@@ -84,7 +72,7 @@ export default function Home({ onSelectSubject }) {
                 <button 
                   key={sem.num} 
                   className="semester-btn"
-                  onClick={() => setActiveSemester(sem.num)}
+                  onClick={() => { window.location.hash = 'semester-' + sem.num; }}
                 >
                   {sem.label}
                 </button>

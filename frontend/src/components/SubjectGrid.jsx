@@ -17,19 +17,19 @@ export default function SubjectGrid({ activeSemester = 1, onSelectSubject, onBac
 
   return (
     <div>
+      {onBack && (
+        <button 
+          onClick={onBack}
+          className="back-btn"
+          style={{ marginBottom: '1rem' }}
+        >
+          <ArrowLeft size={20} /> Back
+        </button>
+      )}
       <div className="hero-section" style={{ position: 'relative' }}>
-        {onBack && (
-          <button 
-            onClick={onBack}
-            className="back-btn"
-            style={{ position: 'absolute', top: 0, left: 0, background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem' }}
-          >
-            <ArrowLeft size={20} /> Back
-          </button>
-        )}
         <h1 className="hero-title" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)', lineHeight: '1' }}>Semester {activeSemester}</span>
-          <span className="hero-brand-name" style={{ fontSize: '1.2em' }}>Subjects</span>
+          <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)', lineHeight: '1' }}>Subjects for</span>
+          <span className="hero-brand-name" style={{ fontSize: '1.2em' }}>Semester {activeSemester}</span>
         </h1>
         <p className="hero-subtitle">Explore notes, PYQs, solutions, and important exam topics for Semester {activeSemester}.</p>
       </div>

@@ -78,6 +78,9 @@ export default function App() {
         // Do nothing on hashchange to pdf-viewer.
         // The PDF modal is opened by handleViewFile setting activePdfFile synchronously.
         // If we check activePdfFile here, it fails due to stale closures.
+      } else if (hash.startsWith('semester-')) {
+        setActiveView(hash);
+        setActivePdfFile(null);
       } else if (hash === 'home' || hash === 'admin' || hash === 'downloads' || hash === 'profile') {
         setActiveView(hash);
         setActivePdfFile(null);
@@ -251,6 +254,16 @@ export default function App() {
       case 'admin':
         return user?.isAdmin ? <AdminPanel onMaterialUploaded={fetchMaterials} /> : <Home onSelectSubject={handleSelectSubject} />;
       default:
+        if (activeView.startsWith('semester-')) {
+          const semNum = parseInt(activeView.split('-')[1]);
+          return (
+            <SubjectGrid 
+              activeSemester={semNum} 
+              onSelectSubject={handleSelectSubject} 
+              onBack={() => { window.location.hash = 'home'; }} 
+            />
+          );
+        }
         return <Home onSelectSubject={handleSelectSubject} />;
     }
   };
