@@ -146,43 +146,47 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
                   <h4 className="resource-title">{file.title}</h4>
                 </div>
               </div>
-              <div className="resource-actions" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                <button 
-                  className="btn btn-secondary btn-accent-light" 
-                  onClick={() => onViewFile(file)}
-                  title="View Document Online"
-                  style={{ padding: '0.5rem' }}
-                >
-                  <Eye size={18} />
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>View Online</span>
-                </button>
-                <button 
-                  className="btn btn-secondary btn-accent-light" 
-                  onClick={() => onDownloadFile(file)}
-                  title="Download PDF"
-                  style={{ padding: '0.5rem' }}
-                >
-                  <Download size={18} />
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Download</span>
-                </button>
-                <button 
-                  className="btn btn-secondary btn-accent-light" 
-                  onClick={() => onSaveFile(file)}
-                  title={savedFiles.some(f => f.id === file.id) ? "Remove from Saved" : "Save / Bookmark PDF"}
-                  style={{ padding: '0.5rem', color: 'var(--accent)' }}
-                >
-                  <Bookmark size={18} fill={savedFiles.some(f => f.id === file.id) ? "var(--accent)" : "transparent"} />
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{savedFiles.some(f => f.id === file.id) ? "Saved" : "Save"}</span>
-                </button>
-                <button 
-                  className="btn btn-secondary" 
-                  onClick={() => setReportModalFile(file)}
-                  title="Report Issue"
-                  style={{ padding: '0.5rem', color: '#ff4d4f', borderColor: 'transparent', backgroundColor: 'rgba(255, 77, 79, 0.1)' }}
-                >
-                  <Flag size={18} />
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Report</span>
-                </button>
+              <div className="resource-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button 
+                    className="btn btn-secondary btn-accent-light" 
+                    onClick={() => onViewFile(file)}
+                    title="View Document Online"
+                    style={{ padding: '0.5rem' }}
+                  >
+                    <Eye size={18} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>View Online</span>
+                  </button>
+                  <button 
+                    className="btn btn-secondary btn-accent-light" 
+                    onClick={() => onDownloadFile(file)}
+                    title="Download PDF"
+                    style={{ padding: '0.5rem' }}
+                  >
+                    <Download size={18} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Download</span>
+                  </button>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button 
+                    className="btn btn-secondary btn-accent-light" 
+                    onClick={() => onSaveFile(file)}
+                    title={savedFiles.some(f => f.id === file.id) ? "Remove from Saved" : "Save / Bookmark PDF"}
+                    style={{ padding: '0.5rem', color: 'var(--accent)' }}
+                  >
+                    <Bookmark size={18} fill={savedFiles.some(f => f.id === file.id) ? "var(--accent)" : "transparent"} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{savedFiles.some(f => f.id === file.id) ? "Saved" : "Save"}</span>
+                  </button>
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={() => setReportModalFile(file)}
+                    title="Report Issue"
+                    style={{ padding: '0.5rem', color: '#ff4d4f', borderColor: 'transparent', backgroundColor: 'rgba(255, 77, 79, 0.1)' }}
+                  >
+                    <Flag size={18} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Report</span>
+                  </button>
+                </div>
               </div>
             </div>
           ))}

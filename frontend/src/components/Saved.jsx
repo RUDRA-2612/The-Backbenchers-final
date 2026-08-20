@@ -24,33 +24,38 @@ export default function Saved({ savedFiles, onViewFile, onDownloadFile, onRemove
                   </span>
                 </div>
               </div>
-              <div className="resource-actions" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                <button 
-                  className="btn btn-secondary btn-accent-light" 
-                  onClick={() => onViewFile(file)}
-                  title="View Document"
-                  style={{ padding: '0.5rem' }}
-                >
-                  <Eye size={18} />
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Open File</span>
-                </button>
-                <button 
-                  className="btn btn-secondary btn-accent-light" 
-                  onClick={() => onDownloadFile(file)}
-                  title="Download PDF"
-                  style={{ padding: '0.5rem' }}
-                >
-                  <Download size={18} />
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Download</span>
-                </button>
-                <button 
-                  className="btn btn-secondary" 
-                  onClick={() => onRemoveSaved(file.id)}
-                  title="Remove from Saved"
-                  style={{ padding: '0.5rem', color: '#ef4444', borderColor: 'var(--border)' }}
-                >
-                  <Trash2 size={18} />
-                </button>
+              <div className="resource-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button 
+                    className="btn btn-secondary btn-accent-light" 
+                    onClick={() => onViewFile(file)}
+                    title="View Document"
+                    style={{ padding: '0.5rem' }}
+                  >
+                    <Eye size={18} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Open File</span>
+                  </button>
+                  <button 
+                    className="btn btn-secondary btn-accent-light" 
+                    onClick={() => onDownloadFile(file)}
+                    title="Download PDF"
+                    style={{ padding: '0.5rem' }}
+                  >
+                    <Download size={18} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Download</span>
+                  </button>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={() => onRemoveSaved(file.id)}
+                    title="Remove from Saved"
+                    style={{ padding: '0.5rem', color: '#ef4444', borderColor: 'var(--border)' }}
+                  >
+                    <Trash2 size={18} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Remove</span>
+                  </button>
+                </div>
               </div>
             </div>
           ))}
