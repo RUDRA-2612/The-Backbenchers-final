@@ -118,6 +118,12 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
               2024
             </button>
             <button 
+              className={`subtab-btn ${activeYear === '2023' ? 'active' : ''}`}
+              onClick={() => setActiveYear('2023')}
+            >
+              2023
+            </button>
+            <button 
               className={`subtab-btn ${activeYear === 'All' ? 'active' : ''}`}
               onClick={() => setActiveYear('All')}
             >
