@@ -5,6 +5,7 @@ const multer = require('multer');
 const { createClient } = require('@supabase/supabase-js');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -12,8 +13,27 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// In-memory reports store
-const inMemoryReports = [];
+// JSON reports store
+const REPORTS_FILE = path.join(__dirname, 'reports.json');
+const getReports = () => {
+  try {
+    if (fs.existsSync(REPORTS_FILE)) {
+      const data = fs.readFileSync(REPORTS_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (e) {
+    console.error('Error reading reports:', e);
+  }
+  return [];
+};
+
+const saveReports = (reports) => {
+  try {
+    fs.writeFileSync(REPORTS_FILE, JSON.stringify(reports, null, 2));
+  } catch (e) {
+    console.error('Error saving reports:', e);
+  }
+};
 
 // --- SUPABASE INITIALIZATION ---
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
@@ -188,8 +208,9 @@ app.get('/api/admin/users', async (req, res) => {
 });
 
 app.get('/api/admin/reports', (req, res) => {
+  const reports = getReports();
   // Sort descending by timestamp
-  res.json([...inMemoryReports].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
+  res.json([...reports].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
 });
 
 app.get('/api/materials', async (req, res) => {
@@ -378,7 +399,7 @@ app.post('/api/report', async (req, res) => {
     console.log(`Issue: ${description}`);
     console.log(`===========================\n`);
     
-    // Store report in memory
+    // Store report in JSON file
     const newReport = {
       id: uuidv4(),
       materialId,
@@ -388,7 +409,9 @@ app.post('/api/report', async (req, res) => {
       userName: userName || 'Unknown',
       timestamp: new Date().toISOString()
     };
-    inMemoryReports.push(newReport);
+    const currentReports = getReports();
+    currentReports.push(newReport);
+    saveReports(currentReports);
     
     // For now, we mock success as requested
     res.status(200).json({ success: true, message: 'Report received successfully', report: newReport });
