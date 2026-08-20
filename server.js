@@ -12,6 +12,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// In-memory reports store
+const inMemoryReports = [];
+
 // --- SUPABASE INITIALIZATION ---
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
   console.warn("WARNING: Supabase URL or Anon Key is missing in .env");
@@ -182,6 +185,11 @@ app.get('/api/admin/users', async (req, res) => {
     if (error) throw error;
     res.json(users);
   } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/admin/reports', (req, res) => {
+  // Sort descending by timestamp
+  res.json([...inMemoryReports].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
 });
 
 app.get('/api/materials', async (req, res) => {
@@ -370,9 +378,20 @@ app.post('/api/report', async (req, res) => {
     console.log(`Issue: ${description}`);
     console.log(`===========================\n`);
     
-    // In a full production environment, this would insert into a 'reports' Supabase table
-    // For now, we just mock success as requested
-    res.status(200).json({ success: true, message: 'Report received successfully' });
+    // Store report in memory
+    const newReport = {
+      id: uuidv4(),
+      materialId,
+      title,
+      description,
+      userEmail: userEmail || 'Unknown',
+      userName: userName || 'Unknown',
+      timestamp: new Date().toISOString()
+    };
+    inMemoryReports.push(newReport);
+    
+    // For now, we mock success as requested
+    res.status(200).json({ success: true, message: 'Report received successfully', report: newReport });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2 } from 'lucide-react';
+import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag } from 'lucide-react';
 import { API_URL } from '../config';
 
 const subjectsList = [
@@ -17,6 +17,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const [downloads, setDownloads] = useState([]);
   const [students, setStudents] = useState([]);
   const [materials, setMaterials] = useState([]);
+  const [reports, setReports] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
 
   // Form State
@@ -47,6 +48,12 @@ export default function AdminPanel({ onMaterialUploaded }) {
       const materialRes = await fetch(`${API_URL}/api/materials`);
       const materialData = await materialRes.json();
       setMaterials(materialData);
+
+      const reportRes = await fetch(`${API_URL}/api/admin/reports`);
+      if (reportRes.ok) {
+        const reportData = await reportRes.json();
+        setReports(reportData);
+      }
     } catch (err) {
       console.error('Error fetching admin details:', err);
     }
@@ -232,6 +239,13 @@ export default function AdminPanel({ onMaterialUploaded }) {
         >
           <Users size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Registered Students
+        </button>
+        <button
+          className={`tab-btn ${adminTab === 'reports' ? 'active' : ''}`}
+          onClick={() => setAdminTab('reports')}
+        >
+          <Flag size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
+          User Reports
         </button>
       </div>
 
@@ -546,6 +560,47 @@ export default function AdminPanel({ onMaterialUploaded }) {
               <div className="empty-state" style={{ padding: '2rem' }}>
                 <FileText size={32} />
                 <p>No study materials uploaded yet.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 6: REPORTS */}
+        {adminTab === 'reports' && (
+          <div className="admin-card">
+            <h3 className="admin-title">
+              <Flag size={20} style={{ color: '#ff4d4f' }} />
+              User Reports
+            </h3>
+            {reports.length > 0 ? (
+              <div className="admin-table-container">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>User</th>
+                      <th>Email</th>
+                      <th>Material Title</th>
+                      <th>Issue Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reports.map((r, idx) => (
+                      <tr key={r.id || idx}>
+                        <td style={{ whiteSpace: 'nowrap' }}>{new Date(r.timestamp).toLocaleString()}</td>
+                        <td style={{ fontWeight: '600' }}>{r.userName}</td>
+                        <td>{r.userEmail}</td>
+                        <td style={{ color: 'var(--accent)', fontWeight: '500' }}>{r.title}</td>
+                        <td style={{ maxWidth: '300px', whiteSpace: 'normal', wordBreak: 'break-word' }}>{r.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="empty-state" style={{ padding: '2rem' }}>
+                <CheckCircle size={32} style={{ color: '#22c55e' }} />
+                <p>No reports found. Everything is looking good!</p>
               </div>
             )}
           </div>
