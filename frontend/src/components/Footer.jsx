@@ -9,7 +9,7 @@ export default function Footer() {
       </div>
       <div className="footer-admins">
         <span className="footer-admins-title">Website Crafted with <Heart size={14} fill="var(--accent)" color="var(--accent)" style={{ display: 'inline', verticalAlign: 'middle' }} /> by:</span>
-        <ul className="footer-admins-list" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <ul className="footer-admins-list" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
           <li style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
             <span>Aman Jhajharia <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>(Final Year)</span></span>
             <a href="https://www.linkedin.com/in/aman-jhajharia/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: 'var(--accent)', textDecoration: 'none', background: 'var(--accent-soft)', padding: '2px 8px', borderRadius: '12px' }}>
