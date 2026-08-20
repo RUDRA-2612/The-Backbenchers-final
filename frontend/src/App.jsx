@@ -3,6 +3,7 @@ import { useMsal } from '@azure/msal-react';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Auth from './components/Auth';
+import Home from './components/Home';
 import SubjectGrid from './components/SubjectGrid';
 import SubjectDetail from './components/SubjectDetail';
 import Downloads from './components/Downloads';
@@ -226,7 +227,7 @@ export default function App() {
   const renderMainContent = () => {
     switch (activeView) {
       case 'home':
-        return <SubjectGrid onSelectSubject={handleSelectSubject} />;
+        return <Home onSelectSubject={handleSelectSubject} />;
       case 'subject-detail':
         return (
           <SubjectDetail 
@@ -248,9 +249,9 @@ export default function App() {
       case 'profile':
         return <Profile user={user} />;
       case 'admin':
-        return user?.isAdmin ? <AdminPanel onMaterialUploaded={fetchMaterials} /> : <SubjectGrid onSelectSubject={handleSelectSubject} />;
+        return user?.isAdmin ? <AdminPanel onMaterialUploaded={fetchMaterials} /> : <Home onSelectSubject={handleSelectSubject} />;
       default:
-        return <SubjectGrid onSelectSubject={handleSelectSubject} />;
+        return <Home onSelectSubject={handleSelectSubject} />;
     }
   };
 
