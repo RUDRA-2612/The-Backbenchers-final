@@ -14,11 +14,11 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
   const handleReportSubmit = () => {
     if (reportDescription.trim() === '') return;
     if (onReportFile) {
-      onReportFile({ id: 'GENERAL', title: 'General Site Feedback' }, reportDescription);
+      onReportFile({ id: null, title: 'GENERAL' }, reportDescription);
     }
     setShowReportModal(false);
     setReportDescription('');
-    alert('Report submitted successfully. Thank you for your feedback!');
+    alert('Report submitted successfully. Thank you!');
   };
 
   // Close dropdown if clicked outside
@@ -179,11 +179,11 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
           <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
             <h3 style={{ marginBottom: '1rem' }}>Report Issue</h3>
             <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-              Reporting: <strong>General Site Feedback</strong>
+              Reporting: <strong>General Website Issue</strong>
             </p>
             <textarea 
               style={{ width: '100%', height: '100px', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', marginBottom: '1rem', fontFamily: 'inherit', resize: 'vertical' }}
-              placeholder="Describe the issue you found on the website or suggest an improvement..."
+              placeholder="Describe the issue you found on the website (e.g. broken link, display issue, bug)..."
               value={reportDescription}
               onChange={e => setReportDescription(e.target.value)}
             />
