@@ -23,7 +23,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const [title, setTitle] = useState('');
   const [subjectCode, setSubjectCode] = useState('CS1139');
   const [category, setCategory] = useState('notes');
-  const [subcategory, setSubcategory] = useState('mid-term-1');
+  const [subcategory, setSubcategory] = useState('mid-term');
   const [year, setYear] = useState('2025');
   const [file, setFile] = useState(null);
   const [uploadMessage, setUploadMessage] = useState({ type: '', text: '' });
@@ -308,8 +308,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                       value={subcategory}
                       onChange={(e) => setSubcategory(e.target.value)}
                     >
-                      <option value="mid-term-1">Mid Term 1</option>
-                      <option value="mid-term-2">Mid Term 2</option>
+                      <option value="mid-term">Mid Term</option>
                       <option value="end-term">End Term</option>
                     </select>
                   </div>

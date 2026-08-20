@@ -3,7 +3,7 @@ import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bo
 
 export default function SubjectDetail({ subject, materials, onBack, onViewFile, onDownloadFile }) {
   const [activeTab, setActiveTab] = useState('papers'); // papers, notes, formulas, topics
-  const [activeSubTab, setActiveSubTab] = useState('mid-term-1'); // mid-term-1, mid-term-2, end-term
+  const [activeSubTab, setActiveSubTab] = useState('mid-term'); // mid-term, end-term
   const [activeYear, setActiveYear] = useState('2025');
 
   // Filter materials based on current subject and active tab
@@ -67,16 +67,10 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
         <>
           <div className="subtabs-container">
             <button 
-              className={`subtab-btn ${activeSubTab === 'mid-term-1' ? 'active' : ''}`}
-              onClick={() => setActiveSubTab('mid-term-1')}
+              className={`subtab-btn ${activeSubTab === 'mid-term' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('mid-term')}
             >
-              Mid Term 1
-            </button>
-            <button 
-              className={`subtab-btn ${activeSubTab === 'mid-term-2' ? 'active' : ''}`}
-              onClick={() => setActiveSubTab('mid-term-2')}
-            >
-              Mid Term 2
+              Mid Term
             </button>
             <button 
               className={`subtab-btn ${activeSubTab === 'end-term' ? 'active' : ''}`}
