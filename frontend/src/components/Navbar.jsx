@@ -1,13 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText } from 'lucide-react';
+import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText, Flag } from 'lucide-react';
 
-export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSidebar, materials = [], onViewFile }) {
+export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSidebar, materials = [], onViewFile, onReportFile }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfileDetails, setShowProfileDetails] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportDescription, setReportDescription] = useState('');
   const dropdownRef = useRef(null);
   const searchRef = useRef(null);
+
+  const handleReportSubmit = () => {
+    if (reportDescription.trim() === '') return;
+    if (onReportFile) {
+      onReportFile({ id: 'GENERAL', title: 'General Site Feedback' }, reportDescription);
+    }
+    setShowReportModal(false);
+    setReportDescription('');
+    alert('Report submitted successfully. Thank you for your feedback!');
+  };
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -126,8 +138,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
             {showDropdown && (
               <div className="profile-dropdown">
                 <button 
-                  className="dropdown-logout" 
-                  style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border)', borderRadius: '8px 8px 0 0', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }} 
+                  className="dropdown-item" 
                   onClick={() => {
                     setShowDropdown(false);
                     window.location.hash = 'profile';
@@ -137,8 +148,17 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
                   <span>Profile</span>
                 </button>
                 <button 
-                  className="dropdown-logout" 
-                  style={{ borderTop: 'none', borderRadius: '0 0 8px 8px' }}
+                  className="dropdown-item" 
+                  onClick={() => {
+                    setShowDropdown(false);
+                    setShowReportModal(true);
+                  }}
+                >
+                  <Flag size={16} />
+                  <span>Report Issue</span>
+                </button>
+                <button 
+                  className="dropdown-item danger" 
                   onClick={() => {
                     setShowDropdown(false);
                     onLogout();
@@ -152,6 +172,28 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
           </div>
         )}
       </div>
+
+      {/* General Report Modal */}
+      {showReportModal && (
+        <div className="modal-overlay" onClick={() => setShowReportModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+            <h3 style={{ marginBottom: '1rem' }}>Report Issue</h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+              Reporting: <strong>General Site Feedback</strong>
+            </p>
+            <textarea 
+              style={{ width: '100%', height: '100px', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', marginBottom: '1rem', fontFamily: 'inherit', resize: 'vertical' }}
+              placeholder="Describe the issue you found on the website or suggest an improvement..."
+              value={reportDescription}
+              onChange={e => setReportDescription(e.target.value)}
+            />
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+              <button className="btn btn-secondary" onClick={() => setShowReportModal(false)}>Cancel</button>
+              <button className="btn btn-primary" style={{ backgroundColor: '#ff4d4f', color: '#fff' }} onClick={handleReportSubmit}>Submit Report</button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

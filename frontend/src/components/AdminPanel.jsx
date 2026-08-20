@@ -641,7 +641,15 @@ export default function AdminPanel({ onMaterialUploaded }) {
                         <td style={{ whiteSpace: 'nowrap' }}>{new Date(r.timestamp).toLocaleString()}</td>
                         <td style={{ fontWeight: '600' }}>{r.userName}</td>
                         <td>{r.userEmail}</td>
-                        <td style={{ color: 'var(--accent)', fontWeight: '500' }}>{r.title}</td>
+                        <td style={{ color: 'var(--accent)', fontWeight: '500' }}>
+                          {r.materialId === 'GENERAL' ? (
+                            <span style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600 }}>
+                              General Site Feedback
+                            </span>
+                          ) : (
+                            r.title
+                          )}
+                        </td>
                         <td style={{ maxWidth: '300px', whiteSpace: 'normal', wordBreak: 'break-word' }}>{r.description}</td>
                       </tr>
                     ))}

@@ -350,6 +350,7 @@ export default function App() {
         toggleSidebar={toggleSidebar}
         materials={materials}
         onViewFile={handleViewFile}
+        onReportFile={handleReportFile}
       />
       
       <div className="main-wrapper">
