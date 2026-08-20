@@ -13,27 +13,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// JSON reports store
-const REPORTS_FILE = path.join(__dirname, 'reports.json');
-const getReports = () => {
-  try {
-    if (fs.existsSync(REPORTS_FILE)) {
-      const data = fs.readFileSync(REPORTS_FILE, 'utf8');
-      return JSON.parse(data);
-    }
-  } catch (e) {
-    console.error('Error reading reports:', e);
-  }
-  return [];
-};
-
-const saveReports = (reports) => {
-  try {
-    fs.writeFileSync(REPORTS_FILE, JSON.stringify(reports, null, 2));
-  } catch (e) {
-    console.error('Error saving reports:', e);
-  }
-};
+// Reports are now stored in Supabase 'reports' table
 
 // --- SUPABASE INITIALIZATION ---
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
@@ -207,10 +187,14 @@ app.get('/api/admin/users', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/admin/reports', (req, res) => {
-  const reports = getReports();
-  // Sort descending by timestamp
-  res.json([...reports].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
+app.get('/api/admin/reports', async (req, res) => {
+  try {
+    const { data: reports, error } = await supabase.from('reports').select('*').order('timestamp', { ascending: false });
+    if (error) throw error;
+    res.json(reports);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get('/api/materials', async (req, res) => {
@@ -399,24 +383,24 @@ app.post('/api/report', async (req, res) => {
     console.log(`Issue: ${description}`);
     console.log(`===========================\n`);
     
-    // Store report in JSON file
+    // Store report in Supabase
     const newReport = {
       id: uuidv4(),
       materialId,
       title,
       description,
-      userEmail: userEmail || 'Unknown',
-      userName: userName || 'Unknown',
+      userEmail,
+      userName,
       timestamp: new Date().toISOString()
     };
-    const currentReports = getReports();
-    currentReports.push(newReport);
-    saveReports(currentReports);
     
-    // For now, we mock success as requested
+    const { error } = await supabase.from('reports').insert(newReport);
+    if (error) throw error;
+    
     res.status(200).json({ success: true, message: 'Report received successfully', report: newReport });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error saving report:', err);
+    res.status(500).json({ error: 'Failed to submit report' });
   }
 });
 
