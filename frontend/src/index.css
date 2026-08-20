@@ -682,16 +682,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .continue-studying-banner:hover {
-  transform: none;
-  box-shadow: none;
-  border-color: var(--text-muted);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
   opacity: 1;
 }
 
 .continue-banner-title {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--accent);
   margin-bottom: 0.25rem;
 }
 
