@@ -4,6 +4,7 @@ import SubjectGrid from './SubjectGrid';
 const years = [
   {
     title: 'First Year',
+    subtitle: 'The Foundation: Start your engineering journey with core concepts and basic sciences.',
     semesters: [
       { num: 1, label: 'Semester 1' },
       { num: 2, label: 'Semester 2' }
@@ -11,6 +12,7 @@ const years = [
   },
   {
     title: 'Second Year',
+    subtitle: 'The Core: Dive deeper into your specialization with fundamental engineering subjects.',
     semesters: [
       { num: 3, label: 'Semester 3' },
       { num: 4, label: 'Semester 4' }
@@ -18,6 +20,7 @@ const years = [
   },
   {
     title: 'Third Year',
+    subtitle: 'The Advancement: Master complex topics and start applying your knowledge to real-world problems.',
     semesters: [
       { num: 5, label: 'Semester 5' },
       { num: 6, label: 'Semester 6' }
@@ -25,6 +28,7 @@ const years = [
   },
   {
     title: 'Fourth Year',
+    subtitle: 'The Finale: Focus on major projects, advanced electives, and preparing for the industry.',
     semesters: [
       { num: 7, label: 'Semester 7' },
       { num: 8, label: 'Semester 8' }
@@ -71,7 +75,10 @@ export default function Home({ onSelectSubject }) {
       <div className="year-grid">
         {years.map((year, idx) => (
           <div key={idx} className="year-card">
-            <h2 className="year-title">{year.title}</h2>
+            <div className="year-header">
+              <h2 className="year-title">{year.title}</h2>
+              <p className="year-subtitle">{year.subtitle}</p>
+            </div>
             <div className="semester-buttons">
               {year.semesters.map((sem) => (
                 <button 
