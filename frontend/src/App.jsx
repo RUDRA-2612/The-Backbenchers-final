@@ -188,8 +188,9 @@ export default function App() {
 
   const handleViewFile = (file) => {
     setActivePdfFile(file);
-    setLastOpenedFile(file);
-    localStorage.setItem('backbenchers_last_opened', JSON.stringify(file));
+    const fileWithTime = { ...file, lastOpenedAt: new Date().toISOString() };
+    setLastOpenedFile(fileWithTime);
+    localStorage.setItem('backbenchers_last_opened', JSON.stringify(fileWithTime));
     window.location.hash = 'pdf-viewer';
   };
 

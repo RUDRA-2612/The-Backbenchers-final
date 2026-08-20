@@ -86,17 +86,22 @@ export default function Home({ onSelectSubject, lastOpenedFile, onViewFile }) {
       {lastOpenedFile && (
         <div className="continue-studying-banner">
           <div className="continue-studying-info">
-            <h3 className="continue-banner-title">Pick up where you left off</h3>
+            <h3 className="continue-banner-title">Continue Studying</h3>
             <p className="continue-banner-subtitle">
-              You were recently studying <strong>{lastOpenedFile.title}</strong>. Ready to dive back in?
+              <strong>{lastOpenedFile.title}</strong>
+              {lastOpenedFile.lastOpenedAt && (
+                <span className="continue-date">
+                  Last opened: {new Date(lastOpenedFile.lastOpenedAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                </span>
+              )}
             </p>
           </div>
           <button 
             className="continue-banner-btn"
             onClick={() => onViewFile(lastOpenedFile)}
           >
-            <Clock size={18} />
-            Continue Studying
+            <Clock size={16} />
+            Open
           </button>
         </div>
       )}
