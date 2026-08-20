@@ -336,6 +336,8 @@ export default function App() {
         theme={theme} 
         toggleTheme={toggleTheme} 
         toggleSidebar={toggleSidebar}
+        materials={materials}
+        onViewFile={handleViewFile}
       />
       
       <div className="main-wrapper">

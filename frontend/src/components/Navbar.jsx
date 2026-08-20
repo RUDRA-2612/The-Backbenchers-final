@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key } from 'lucide-react';
+import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText } from 'lucide-react';
 
-export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSidebar }) {
+export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSidebar, materials = [], onViewFile }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfileDetails, setShowProfileDetails] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef(null);
+  const searchRef = useRef(null);
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -12,6 +15,9 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
         setShowProfileDetails(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearch(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -21,6 +27,17 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
   const getInitials = (name) => {
     if (!name) return 'S';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  const searchResults = searchQuery.trim() ? materials.filter(m => 
+    m.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (m.subjectCode && m.subjectCode.toLowerCase().includes(searchQuery.toLowerCase()))
+  ).slice(0, 6) : [];
+
+  const handleSelectResult = (file) => {
+    setShowSearch(false);
+    setSearchQuery('');
+    if (onViewFile) onViewFile(file);
   };
 
   return (
@@ -35,6 +52,45 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
       </div>
 
       <div className="nav-right">
+        {user && (
+          <div className={`global-search-container ${showSearch ? 'active' : ''}`} ref={searchRef}>
+            <button 
+              className="search-toggle-btn"
+              onClick={() => setShowSearch(true)}
+              aria-label="Search Materials"
+            >
+              <Search size={18} />
+            </button>
+            <div className="search-input-wrapper">
+              <input 
+                type="text" 
+                className="global-search-input" 
+                placeholder="Search by subject or code..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus={showSearch}
+              />
+              {showSearch && searchQuery.trim() && (
+                <div className="search-results-dropdown">
+                  {searchResults.length > 0 ? (
+                    searchResults.map(file => (
+                      <div key={file.id} className="search-result-item" onClick={() => handleSelectResult(file)}>
+                        <FileText size={16} className="result-icon" />
+                        <div className="result-text">
+                          <div className="result-title">{file.title}</div>
+                          <div className="result-code">{file.subjectCode}</div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="search-result-empty">No PDFs found.</div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         <button 
           className="theme-toggle" 
           onClick={toggleTheme}
