@@ -1822,8 +1822,13 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid transparent;
   border-radius: 24px;
   height: 40px;
+  width: 40px;
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   overflow: visible;
+}
+
+.global-search-container:not(.active):hover {
+  background-color: var(--accent-soft);
 }
 
 .global-search-container.active {
@@ -1954,14 +1959,32 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 768px) {
-  .global-search-container.active {
-    width: 200px;
+  .global-search-container {
+    width: 40px;
+  }
+  .search-input-wrapper {
     position: absolute;
-    right: 60px;
-    z-index: 100;
+    right: 0;
+    top: 0;
+    height: 40px;
+    border-radius: 20px;
+    box-sizing: border-box;
+    background-color: var(--bg-card);
+    border: 1px solid transparent;
+    z-index: 1;
+    padding-left: 15px;
+    padding-right: 40px;
+  }
+  .global-search-container.active {
+    width: 40px;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
   }
   .global-search-container.active .search-input-wrapper {
-    width: 150px;
+    width: 240px;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
   }
   .search-results-dropdown {
     width: 250px;
