@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, ArrowLeft, Frown } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Frown, Book } from 'lucide-react';
 import { masterSubjects } from '../data/subjects';
 
 export default function SubjectGrid({ activeSemester = 1, onSelectSubject, onBack }) {
