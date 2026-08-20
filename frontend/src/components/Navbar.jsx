@@ -20,8 +20,20 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
         setShowSearch(false);
       }
     }
+
+    function handleScroll() {
+      setShowDropdown(false);
+      setShowProfileDetails(false);
+      setShowSearch(false);
+    }
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const getInitials = (name) => {

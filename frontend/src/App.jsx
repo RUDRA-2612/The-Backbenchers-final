@@ -126,9 +126,21 @@ export default function App() {
         setSidebarCollapsed(true);
       }
     };
+    
+    const handleScroll = () => {
+      if (window.innerWidth < 768 && !sidebarCollapsed) {
+        setSidebarCollapsed(true);
+      }
+    };
+    
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [sidebarCollapsed]);
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
