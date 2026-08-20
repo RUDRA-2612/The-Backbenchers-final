@@ -36,7 +36,6 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
     function handleScroll() {
       setShowDropdown(false);
       setShowProfileDetails(false);
-      setShowSearch(false);
     }
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -47,6 +46,28 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  // Handle mobile back button to close search
+  useEffect(() => {
+    const handlePopState = () => {
+      if (showSearch) {
+        setShowSearch(false);
+      }
+    };
+
+    if (showSearch) {
+      window.history.pushState({ searchOpen: true }, '');
+      window.addEventListener('popstate', handlePopState);
+    } else {
+      if (window.history.state && window.history.state.searchOpen) {
+        window.history.back();
+      }
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [showSearch]);
 
   const getInitials = (name) => {
     if (!name) return 'S';
