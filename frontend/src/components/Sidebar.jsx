@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Download, ShieldAlert } from 'lucide-react';
+import { Home, Download, ShieldAlert, Bookmark } from 'lucide-react';
 
 export default function Sidebar({ activeView, setActiveView, isCollapsed, isAdmin }) {
   return (
@@ -18,6 +18,14 @@ export default function Sidebar({ activeView, setActiveView, isCollapsed, isAdmi
       >
         <Download size={20} />
         <span>My Downloads</span>
+      </button>
+
+      <button 
+        className={`sidebar-link ${activeView === 'saved' ? 'active' : ''}`}
+        onClick={() => setActiveView('saved')}
+      >
+        <Bookmark size={20} />
+        <span>Saved Documents</span>
       </button>
 
       {isAdmin && (

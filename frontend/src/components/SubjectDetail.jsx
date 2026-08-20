@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, HelpCircle, Flag } from 'lucide-react';
 
-export default function SubjectDetail({ subject, materials, onBack, onViewFile, onDownloadFile }) {
-  const [activeTab, setActiveTab] = useState('papers'); // papers, notes, formulas, topics
+export default function SubjectDetail({ subject, materials, onBack, onViewFile, onDownloadFile, onSaveFile, onReportFile }) {
+  const [activeTab, setActiveTab] = useState('papers'); // papers, notes, exam-questions
   const [activeSubTab, setActiveSubTab] = useState('mid-term'); // mid-term, end-term
   const [activeYear, setActiveYear] = useState('2025');
+  const [reportModalFile, setReportModalFile] = useState(null);
+  const [reportDescription, setReportDescription] = useState('');
+
+  const handleReportSubmit = () => {
+    if (reportDescription.trim() === '') return;
+    onReportFile(reportModalFile, reportDescription);
+    setReportModalFile(null);
+    setReportDescription('');
+    alert('Report submitted successfully. Thank you for your feedback!');
+  };
 
   // Filter materials based on current subject and active tab
   const filteredMaterials = materials.filter(item => {
@@ -115,13 +125,9 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
                 </div>
                 <div className="resource-text">
                   <h4 className="resource-title">{file.title}</h4>
-                  <span className="resource-meta">
-                    Added: {new Date(file.uploadedAt).toLocaleDateString()}
-                    {file.year && <span style={{ marginLeft: '10px', color: 'var(--accent)' }}>Year: {file.year}</span>}
-                  </span>
                 </div>
               </div>
-              <div className="resource-actions">
+              <div className="resource-actions" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <button 
                   className="btn btn-secondary btn-accent-light" 
                   onClick={() => onViewFile(file)}
@@ -140,6 +146,24 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
                   <Download size={18} />
                   <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Download</span>
                 </button>
+                <button 
+                  className="btn btn-secondary btn-accent-light" 
+                  onClick={() => onSaveFile(file)}
+                  title="Save / Bookmark PDF"
+                  style={{ padding: '0.5rem', color: 'var(--accent)' }}
+                >
+                  <Bookmark size={18} />
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Save</span>
+                </button>
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={() => setReportModalFile(file)}
+                  title="Report Issue"
+                  style={{ padding: '0.5rem', color: '#ff4d4f', borderColor: 'transparent', backgroundColor: 'rgba(255, 77, 79, 0.1)' }}
+                >
+                  <Flag size={18} />
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Report</span>
+                </button>
               </div>
             </div>
           ))}
@@ -149,6 +173,28 @@ export default function SubjectDetail({ subject, materials, onBack, onViewFile, 
           <FileText size={48} />
           <h3>No study materials uploaded yet</h3>
           <p>Go to the Admin Panel if you want to upload notes or papers for this subject.</p>
+        </div>
+      )}
+
+      {/* Report Modal */}
+      {reportModalFile && (
+        <div className="modal-overlay" onClick={() => setReportModalFile(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+            <h3 style={{ marginBottom: '1rem' }}>Report Issue</h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+              Reporting: <strong>{reportModalFile.title}</strong>
+            </p>
+            <textarea 
+              style={{ width: '100%', height: '100px', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', marginBottom: '1rem', fontFamily: 'inherit', resize: 'vertical' }}
+              placeholder="Please describe the issue (e.g. incorrect content, wrong year, unreadable pages)..."
+              value={reportDescription}
+              onChange={e => setReportDescription(e.target.value)}
+            />
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+              <button className="btn btn-secondary" onClick={() => setReportModalFile(null)}>Cancel</button>
+              <button className="btn btn-primary" style={{ backgroundColor: '#ff4d4f', color: '#fff' }} onClick={handleReportSubmit}>Submit Report</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

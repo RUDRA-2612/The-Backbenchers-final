@@ -361,6 +361,23 @@ app.post('/api/downloads', async (req, res) => {
   }
 });
 
+app.post('/api/report', async (req, res) => {
+  try {
+    const { materialId, title, description, userEmail, userName } = req.body;
+    console.log(`\n=== NEW REPORT RECEIVED ===`);
+    console.log(`Material: ${title} (${materialId})`);
+    console.log(`From: ${userName || 'Unknown'} (${userEmail || 'Unknown'})`);
+    console.log(`Issue: ${description}`);
+    console.log(`===========================\n`);
+    
+    // In a full production environment, this would insert into a 'reports' Supabase table
+    // For now, we just mock success as requested
+    res.status(200).json({ success: true, message: 'Report received successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 if (require.main === module) {
   app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 }

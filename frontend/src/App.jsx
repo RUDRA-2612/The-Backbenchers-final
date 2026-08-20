@@ -7,6 +7,7 @@ import Home from './components/Home';
 import SubjectGrid from './components/SubjectGrid';
 import SubjectDetail from './components/SubjectDetail';
 import Downloads from './components/Downloads';
+import Saved from './components/Saved';
 import AdminPanel from './components/AdminPanel';
 import Profile from './components/Profile';
 import MockPdfViewer from './components/MockPdfViewer';
@@ -33,6 +34,10 @@ export default function App() {
   const [materials, setMaterials] = useState([]);
   const [downloadedFiles, setDownloadedFiles] = useState(() => {
     const saved = localStorage.getItem('backbenchers_downloads');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [savedFiles, setSavedFiles] = useState(() => {
+    const saved = localStorage.getItem('backbenchers_saved');
     return saved ? JSON.parse(saved) : [];
   });
   const [activePdfFile, setActivePdfFile] = useState(null);
@@ -226,6 +231,43 @@ export default function App() {
     localStorage.setItem('backbenchers_downloads', JSON.stringify(updated));
   };
 
+  const handleSaveFile = (file) => {
+    const isExist = savedFiles.some(f => f.id === file.id);
+    if (!isExist) {
+      const newSaved = { ...file, savedAt: new Date().toISOString() };
+      const updated = [newSaved, ...savedFiles];
+      setSavedFiles(updated);
+      localStorage.setItem('backbenchers_saved', JSON.stringify(updated));
+      alert('File saved to bookmarks!');
+    } else {
+      alert('File is already saved!');
+    }
+  };
+
+  const handleRemoveSaved = (fileId) => {
+    const updated = savedFiles.filter(f => f.id !== fileId);
+    setSavedFiles(updated);
+    localStorage.setItem('backbenchers_saved', JSON.stringify(updated));
+  };
+
+  const handleReportFile = async (file, description) => {
+    try {
+      await fetch(`${API_URL}/api/report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          materialId: file.id,
+          title: file.title,
+          description,
+          userEmail: user?.email,
+          userName: user?.name
+        })
+      });
+    } catch (err) {
+      console.error('Error reporting file:', err);
+    }
+  };
+
   // Render core views
   const renderMainContent = () => {
     switch (activeView) {
@@ -239,6 +281,8 @@ export default function App() {
             onBack={() => window.history.back()}
             onViewFile={handleViewFile}
             onDownloadFile={handleDownloadFile}
+            onSaveFile={handleSaveFile}
+            onReportFile={handleReportFile}
           />
         );
       case 'downloads':
@@ -247,6 +291,15 @@ export default function App() {
             downloadedFiles={downloadedFiles} 
             onViewFile={handleViewFile}
             onRemoveDownload={handleRemoveDownload}
+          />
+        );
+      case 'saved':
+        return (
+          <Saved 
+            savedFiles={savedFiles} 
+            onViewFile={handleViewFile}
+            onDownloadFile={handleDownloadFile}
+            onRemoveSaved={handleRemoveSaved}
           />
         );
       case 'profile':
