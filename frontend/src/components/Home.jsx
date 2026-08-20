@@ -65,7 +65,7 @@ export default function Home({ onSelectSubject }) {
             ))}
           </span>
         </h1>
-        <p className="hero-subtitle">Select your year and semester to find notes, PYQs, solutions, formula sheets, and important exam topics.</p>
+        <p className="hero-subtitle">Your ultimate B.Tech companion. Find notes, PYQs, solutions, and exam topics for all 4 years of your engineering journey.</p>
       </div>
 
       <div className="year-grid">
