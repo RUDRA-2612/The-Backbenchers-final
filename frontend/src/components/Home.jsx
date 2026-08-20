@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import SubjectGrid from './SubjectGrid';
+import { Clock } from 'lucide-react';
 
 const years = [
   {
@@ -36,9 +37,29 @@ const years = [
   }
 ];
 
-export default function Home({ onSelectSubject }) {
+export default function Home({ onSelectSubject, lastOpenedFile, onViewFile }) {
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
+      {lastOpenedFile && (
+        <div className="continue-studying-wrapper">
+          <div 
+            className="continue-studying-card"
+            onClick={() => onViewFile(lastOpenedFile)}
+            title="Continue your last session"
+          >
+            <div className="continue-icon">
+              <Clock size={18} />
+            </div>
+            <div className="continue-content">
+              <span className="continue-label">Continue Studying</span>
+              <span className="continue-title" style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {lastOpenedFile.title}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="hero-section">
         <h1 className="hero-title" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
           <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)', lineHeight: '1' }}>Welcome to</span>

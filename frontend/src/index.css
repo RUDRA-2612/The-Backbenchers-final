@@ -664,6 +664,68 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* HERO SECTION */
+/* CONTINUE STUDYING WIDGET */
+.continue-studying-wrapper {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+}
+
+.continue-studying-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.continue-studying-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.continue-icon {
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.continue-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.continue-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.continue-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .continue-studying-wrapper {
+    position: static;
+    margin: 1rem 1rem 0;
+    display: flex;
+    justify-content: center;
+  }
+}
+
 .hero-section {
   text-align: center;
   padding: 2rem 0;

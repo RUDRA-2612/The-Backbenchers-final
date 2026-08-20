@@ -42,6 +42,11 @@ export default function App() {
   });
   const [activePdfFile, setActivePdfFile] = useState(null);
 
+  const [lastOpenedFile, setLastOpenedFile] = useState(() => {
+    const saved = localStorage.getItem('backbenchers_last_opened');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   // Fetch materials from API
   const fetchMaterials = async () => {
     try {
@@ -183,6 +188,8 @@ export default function App() {
 
   const handleViewFile = (file) => {
     setActivePdfFile(file);
+    setLastOpenedFile(file);
+    localStorage.setItem('backbenchers_last_opened', JSON.stringify(file));
     window.location.hash = 'pdf-viewer';
   };
 
@@ -285,7 +292,7 @@ export default function App() {
   const renderMainContent = () => {
     switch (activeView) {
       case 'home':
-        return <Home onSelectSubject={handleSelectSubject} />;
+        return <Home onSelectSubject={handleSelectSubject} lastOpenedFile={lastOpenedFile} onViewFile={handleViewFile} />;
       case 'subject-detail':
         return (
           <SubjectDetail 
@@ -319,7 +326,7 @@ export default function App() {
       case 'profile':
         return <Profile user={user} />;
       case 'admin':
-        return user?.isAdmin ? <AdminPanel onMaterialUploaded={fetchMaterials} /> : <Home onSelectSubject={handleSelectSubject} />;
+        return user?.isAdmin ? <AdminPanel onMaterialUploaded={fetchMaterials} /> : <Home onSelectSubject={handleSelectSubject} lastOpenedFile={lastOpenedFile} onViewFile={handleViewFile} />;
       default:
         if (activeView.startsWith('semester-')) {
           const semNum = parseInt(activeView.split('-')[1]);
@@ -331,7 +338,7 @@ export default function App() {
             />
           );
         }
-        return <Home onSelectSubject={handleSelectSubject} />;
+        return <Home onSelectSubject={handleSelectSubject} lastOpenedFile={lastOpenedFile} onViewFile={handleViewFile} />;
     }
   };
 
