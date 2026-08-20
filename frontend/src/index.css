@@ -444,7 +444,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0;
   transition: var(--transition), width var(--transition-speed) var(--transition-ease);
   overflow-y: auto;
   z-index: 90;
@@ -461,8 +461,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  padding: 0.8rem 1rem;
-  border-radius: 8px;
+  padding: 1rem 1rem;
   color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
@@ -470,21 +469,28 @@ h1, h2, h3, h4, h5, h6 {
   transition: var(--transition);
   background: transparent;
   border: none;
+  border-bottom: 1px solid var(--border);
   width: 100%;
   text-align: left;
   font-family: inherit;
   font-size: 1rem;
 }
 
+.sidebar-link:last-child {
+  border-bottom: none;
+}
+
 .sidebar-link:hover {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  background-color: var(--accent-soft);
+  color: var(--accent);
 }
 
 .sidebar-link.active {
   background-color: var(--accent-soft);
   color: var(--accent);
   font-weight: 600;
+  border-left: 4px solid var(--accent);
+  padding-left: calc(1rem - 4px);
 }
 
 /* AUTH COMPONENT */
