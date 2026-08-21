@@ -325,22 +325,22 @@ app.delete('/api/materials/:id', async (req, res) => {
 app.put('/api/materials/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { filename, filepath } = req.body;
-    if (!filename || !filepath) return res.status(400).json({ error: 'Missing filename or filepath' });
+    const { filename, filepath, title } = req.body;
+    if (!filename && !filepath && !title) return res.status(400).json({ error: 'No fields to update' });
 
     // 1. Get the old material to find the old filepath
     const { data: oldMaterial } = await supabase.from('materials').select('filepath').eq('id', id).single();
     
-    // 2. Delete the old file from storage to prevent orphans
-    if (oldMaterial && oldMaterial.filepath && oldMaterial.filepath !== filepath) {
+    // 2. Delete the old file from storage to prevent orphans (if filepath is being updated)
+    if (filepath && oldMaterial && oldMaterial.filepath && oldMaterial.filepath !== filepath) {
       const oldFilename = oldMaterial.filepath.split('/').pop().split('?')[0];
       await supabase.storage.from('materials').remove([oldFilename]).catch(e => console.error("Storage cleanup error:", e));
     }
 
-    const updateData = {
-      filename,
-      filepath
-    };
+    const updateData = {};
+    if (filename) updateData.filename = filename;
+    if (filepath) updateData.filepath = filepath;
+    if (title) updateData.title = title;
 
     const { data, error } = await supabase.from('materials').update(updateData).eq('id', id).select();
     if (error) throw error;

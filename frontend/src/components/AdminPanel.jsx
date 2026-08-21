@@ -82,6 +82,15 @@ export default function AdminPanel({ onMaterialUploaded }) {
     }
   }, [selectedSemester, selectedYear, subjectCode]);
 
+  const currentSubjectObj = masterSubjects[selectedYear]?.semesters[selectedSemester]?.find(s => s.code === subjectCode);
+  const currentSubjectHasLab = currentSubjectObj ? currentSubjectObj.hasLab : false;
+
+  useEffect(() => {
+    if (category === 'labs' && !currentSubjectHasLab) {
+      setCategory('notes');
+    }
+  }, [currentSubjectHasLab, category]);
+
   const handleDeleteMaterial = async (id) => {
     if (!window.confirm("Are you sure you want to delete this material?")) return;
     try {
@@ -92,6 +101,30 @@ export default function AdminPanel({ onMaterialUploaded }) {
       }
     } catch (e) {
       console.error("Error deleting material", e);
+    }
+  };
+
+  const handleRenameTitle = async (id, currentTitle) => {
+    const newTitle = window.prompt("Enter new title for this material:", currentTitle);
+    if (!newTitle || newTitle.trim() === '' || newTitle === currentTitle) return;
+
+    try {
+      const res = await fetch(`${API_URL}/api/materials/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newTitle.trim() })
+      });
+      
+      if (res.ok) {
+        alert('Title updated successfully!');
+        fetchLogs();
+      } else {
+        const errorData = await res.json();
+        alert('Failed to update title: ' + (errorData.error || 'Unknown error'));
+      }
+    } catch (e) {
+      console.error("Error updating title", e);
+      alert('Error updating title: ' + e.message);
     }
   };
 
@@ -360,7 +393,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                   <option value="notes">Notes</option>
                   <option value="papers">Previous Year Papers & Solutions</option>
                   <option value="exam-questions">Exam Relevant Questions</option>
-                  <option value="labs">Labs</option>
+                  {currentSubjectHasLab && <option value="labs">Labs</option>}
                 </select>
               </div>
 
@@ -588,12 +621,20 @@ export default function AdminPanel({ onMaterialUploaded }) {
                             />
                             <button 
                               className="btn btn-secondary" 
+                              style={{ padding: '0.4rem', color: 'var(--text-primary)' }} 
+                              onClick={() => handleRenameTitle(m.id, m.title)} 
+                              title="Edit Title"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button 
+                              className="btn btn-secondary" 
                               style={{ padding: '0.4rem', color: 'var(--accent)' }} 
                               onClick={() => document.getElementById(`update-file-${m.id}`).click()} 
                               title="Replace PDF"
                               disabled={updatingId === m.id}
                             >
-                              {updatingId === m.id ? '...' : <Edit2 size={16} />}
+                              {updatingId === m.id ? '...' : <FileText size={16} />}
                             </button>
                           </div>
                           <button 

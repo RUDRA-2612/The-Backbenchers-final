@@ -71,12 +71,14 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
         >
           Exam Relevant Questions
         </button>
-        <button 
-          className={`tab-btn ${activeTab === 'labs' ? 'active' : ''}`}
-          onClick={() => setActiveTab('labs')}
-        >
-          Labs
-        </button>
+        {subject.hasLab && (
+          <button 
+            className={`tab-btn ${activeTab === 'labs' ? 'active' : ''}`}
+            onClick={() => setActiveTab('labs')}
+          >
+            Labs
+          </button>
+        )}
       </div>
 
       {/* Subtabs for Papers */}
