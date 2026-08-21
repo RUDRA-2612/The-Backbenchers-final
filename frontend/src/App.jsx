@@ -69,11 +69,19 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const rawHash = window.location.hash;
+      
       // Let MSAL process its own authentication hashes (code, state, error) in the popup/redirect
       if (rawHash.includes('code=') || rawHash.includes('state=') || rawHash.includes('error=')) {
         return; 
       }
       
+      if (!rawHash || rawHash === '') {
+        // History Trap: if user presses back from #home, they hit the root URL '/'
+        // We push them forward again so they don't fall back into the Microsoft login URL
+        window.history.forward();
+        return;
+      }
+
       const hash = rawHash.replace('#', '');
       
       if (hash === 'subject-detail') {
@@ -111,7 +119,7 @@ export default function App() {
     
     // Initialize hash on load
     if (!window.location.hash) {
-      window.location.replace('#home');
+      window.location.hash = 'home'; // Push instead of replace so we have a buffer (the root '/') before Microsoft
     } else {
       handleHashChange();
     }
