@@ -66,24 +66,14 @@ export default function Auth({ onLoginSuccess }) {
   }, [inProgress, accounts, instance, onLoginSuccess]);
 
   const handleMicrosoftLogin = async () => {
-    // If MSAL is already busy, don't trigger another interaction
-    if (inProgress !== 'none') {
-      return;
-    }
-
     setError('');
     setLoading(true);
     try {
-      // Use popup instead of redirect to avoid history loops and interaction_in_progress locks
-      await instance.loginPopup(loginRequest);
+      // Use redirect instead of popup to avoid browser blocks
+      await instance.loginRedirect(loginRequest);
     } catch (err) {
       console.error("Login Error:", err);
-      // If there's an interaction in progress, we can just clear it and try again next time, or ignore
-      if (err.errorCode === 'interaction_in_progress') {
-        setError('A login is already in progress. Please wait or refresh the page.');
-      } else {
-        setError(err.message || 'An error occurred starting login.');
-      }
+      setError(err.message || 'An error occurred starting login.');
       setLoading(false);
     }
   };
