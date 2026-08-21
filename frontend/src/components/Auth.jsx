@@ -4,7 +4,7 @@ import { loginRequest } from '../auth/authConfig';
 import { API_URL } from '../config';
 
 export default function Auth({ onLoginSuccess }) {
-  const { instance, inProgress } = useMsal();
+  const { instance, inProgress, accounts } = useMsal();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -18,20 +18,19 @@ export default function Auth({ onLoginSuccess }) {
   }, [inProgress]);
 
   useEffect(() => {
-    const checkRedirect = async () => {
-      try {
-        // This will process the hash if we just returned from Microsoft
-        const loginResponse = await instance.handleRedirectPromise();
-        
-        if (loginResponse && loginResponse.account) {
-          const account = loginResponse.account;
+    const processBackendLogin = async () => {
+      // If MSAL has finished its work and we have a logged-in account, proceed with our backend auth
+      if (inProgress === 'none' && accounts.length > 0) {
+        setLoading(true);
+        try {
+          const account = accounts[0];
           const email = account.username || '';
           const name = account.name || 'JKLU Student';
           const microsoftAccountId = account.localAccountId;
 
           // Validate domain
           if (!email.toLowerCase().endsWith('@jklu.edu.in')) {
-            await instance.logoutRedirect({ account });
+            await instance.logoutRedirect({ account, postLogoutRedirectUri: window.location.origin });
             throw new Error('Access restricted to @jklu.edu.in accounts only.');
           }
 
@@ -54,16 +53,21 @@ export default function Auth({ onLoginSuccess }) {
           }
 
           onLoginSuccess(data.user);
+        } catch (err) {
+          console.error("Backend Login Error:", err);
+          setError(err.message || 'An error occurred during login. Please try again.');
+          // If our backend rejects them, ensure we also sign them out of MSAL locally
+          if (accounts.length > 0) {
+             instance.logoutRedirect({ postLogoutRedirectUri: window.location.origin });
+          }
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error("Redirect Login Error:", err);
-        setError(err.message || 'An error occurred during login. Please try again.');
-        setLoading(false);
       }
     };
 
-    checkRedirect();
-  }, [instance, onLoginSuccess]);
+    processBackendLogin();
+  }, [inProgress, accounts, instance, onLoginSuccess]);
 
   const handleMicrosoftLogin = async () => {
     setError('');
