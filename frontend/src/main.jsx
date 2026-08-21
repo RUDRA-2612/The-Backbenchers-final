@@ -4,6 +4,7 @@ import App from './App.jsx'
 import './index.css'
 import { MsalProvider } from '@azure/msal-react'
 import { msalInstance } from './auth/authConfig'
+import { Analytics } from '@vercel/analytics/react'
 
 // Initialize MSAL outside of the React tree
 msalInstance.initialize().then(() => {
@@ -12,6 +13,7 @@ msalInstance.initialize().then(() => {
       <MsalProvider instance={msalInstance}>
         <App />
       </MsalProvider>
+      <Analytics />
     </React.StrictMode>,
   )
 }).catch((error) => {
