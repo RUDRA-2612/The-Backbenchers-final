@@ -69,3 +69,14 @@ export const getAllSubjects = () => {
   });
   return all;
 };
+
+export const getSemesterForSubject = (subjectCode) => {
+  for (const year of Object.values(masterSubjects)) {
+    for (const [semNum, subjects] of Object.entries(year.semesters)) {
+      if (subjects.some(s => s.code === subjectCode)) {
+        return semNum;
+      }
+    }
+  }
+  return null;
+};

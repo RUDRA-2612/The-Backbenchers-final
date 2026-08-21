@@ -12,6 +12,7 @@ import AdminPanel from './components/AdminPanel';
 import Profile from './components/Profile';
 import MockPdfViewer from './components/MockPdfViewer';
 import Footer from './components/Footer';
+import { getSemesterForSubject } from './data/subjects';
 import { API_URL } from './config';
 
 export default function App() {
@@ -185,7 +186,7 @@ export default function App() {
   const handleSelectSubject = (subject) => {
     setSelectedSubject(subject);
     setActiveView('subject-detail');
-    window.location.hash = 'subject-detail';
+    window.location.hash = 'subject-detail'; // Downward navigation pushes to history
   };
 
   const handleViewFile = (file) => {
@@ -302,7 +303,14 @@ export default function App() {
             subject={selectedSubject} 
             materials={materials} 
             savedFiles={savedFiles}
-            onBack={() => window.history.back()}
+            onBack={() => {
+              const semNum = selectedSubject ? getSemesterForSubject(selectedSubject.code) : null;
+              if (semNum) {
+                window.location.replace(`#semester-${semNum}`);
+              } else {
+                window.location.replace('#home');
+              }
+            }}
             onViewFile={handleViewFile}
             onDownloadFile={handleDownloadFile}
             onSaveFile={handleSaveFile}
@@ -337,7 +345,7 @@ export default function App() {
             <SubjectGrid 
               activeSemester={semNum} 
               onSelectSubject={handleSelectSubject} 
-              onBack={() => { window.location.hash = 'home'; }} 
+              onBack={() => { window.location.replace('#home'); }} 
             />
           );
         }
@@ -377,7 +385,7 @@ export default function App() {
             }
             setActiveView(view);
             if (view === 'home') setSelectedSubject(null);
-            window.location.hash = view;
+            window.location.replace(`#${view}`);
             setSidebarCollapsed(true);
           }}
           isCollapsed={sidebarCollapsed}
