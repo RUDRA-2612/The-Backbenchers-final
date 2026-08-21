@@ -91,7 +91,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
         <button className="menu-toggle" onClick={toggleSidebar} aria-label="Toggle Sidebar">
           <Menu size={22} />
         </button>
-        <div className="logo" onClick={() => window.location.hash = 'home'}>
+        <div className="logo" onClick={() => window.location.replace('#home')}>
           <img src="/logo.png" alt="Logo" className="nav-logo-img" />
         </div>
       </div>
@@ -162,7 +162,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
                   className="dropdown-item" 
                   onClick={() => {
                     setShowDropdown(false);
-                    window.location.hash = 'profile';
+                    window.location.replace('#profile');
                   }}
                 >
                   <User size={16} />

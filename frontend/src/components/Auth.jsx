@@ -30,7 +30,6 @@ export default function Auth({ onLoginSuccess }) {
 
           // Validate domain
           if (!email.toLowerCase().endsWith('@jklu.edu.in')) {
-            await instance.logoutRedirect({ account, postLogoutRedirectUri: window.location.origin });
             throw new Error('Access restricted to @jklu.edu.in accounts only.');
           }
 
@@ -56,10 +55,7 @@ export default function Auth({ onLoginSuccess }) {
         } catch (err) {
           console.error("Backend Login Error:", err);
           setError(err.message || 'An error occurred during login. Please try again.');
-          // If our backend rejects them, ensure we also sign them out of MSAL locally
-          if (accounts.length > 0) {
-             instance.logoutRedirect({ postLogoutRedirectUri: window.location.origin });
-          }
+          // Removed automatic logoutRedirect here so the user can actually read the error message.
         } finally {
           setLoading(false);
         }
