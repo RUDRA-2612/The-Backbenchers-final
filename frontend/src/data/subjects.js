@@ -18,8 +18,8 @@ export const masterSubjects = {
         { code: 'EE1125', name: 'Digital Electronics', icon: Cpu, desc: 'Logic gates, Boolean algebra, combinational and sequential circuits, and microprocessors.' },
         { code: 'AS1114', name: 'Linear Algebra and differential Equations', icon: Calculator, desc: 'Matrices, vector spaces, eigenvalues, and ordinary differential equations.' },
         { code: 'CC1102', name: 'Critical thinking and Storytelling', icon: Book, desc: 'Developing critical thinking skills and the art of effective storytelling.' },
-        { code: 'AS1108_2', name: 'Applied Physics', icon: Zap, desc: 'Wave optics, interference, diffraction, polarization, and quantum mechanics.' },
-        { code: 'IL1107_2', name: 'Introduction to Indian Knowledge System (IKS)', icon: Book, desc: 'Overview of ancient Indian sciences, philosophy, mathematics, and holistic wellness.' }
+        { code: 'AS1108', name: 'Applied Physics', icon: Zap, desc: 'Wave optics, interference, diffraction, polarization, and quantum mechanics.' },
+        { code: 'IL1107', name: 'Introduction to Indian Knowledge System (IKS)', icon: Book, desc: 'Overview of ancient Indian sciences, philosophy, mathematics, and holistic wellness.' }
       ]
     }
   },

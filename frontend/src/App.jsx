@@ -310,7 +310,7 @@ export default function App() {
             materials={materials} 
             savedFiles={savedFiles}
             onBack={() => {
-              const semNum = selectedSubject ? getSemesterForSubject(selectedSubject.code) : null;
+              const semNum = selectedSubject?.semester || (selectedSubject ? getSemesterForSubject(selectedSubject.code) : null);
               if (semNum) {
                 window.location.replace(`#semester-${semNum}`);
               } else {

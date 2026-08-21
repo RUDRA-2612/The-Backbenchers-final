@@ -39,7 +39,7 @@ export default function SubjectGrid({ activeSemester = 1, onSelectSubject, onBac
             <div 
               key={sub.code} 
               className="subject-card"
-              onClick={() => onSelectSubject(sub)}
+              onClick={() => onSelectSubject({ ...sub, semester: activeSemester })}
             >
               <div className="subject-card-header">
                 <span className="subject-code">{sub.code}</span>
