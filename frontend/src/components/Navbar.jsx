@@ -92,7 +92,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
           <Menu size={22} />
         </button>
         <div className="logo" onClick={() => window.location.replace('#home')}>
-          <img src="/logo.png" alt="Logo" className="nav-logo-img" />
+          <img src="/logo.png" alt="Logo" className="nav-logo-img smart-logo" />
         </div>
       </div>
 
