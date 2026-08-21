@@ -404,6 +404,54 @@ app.post('/api/report', async (req, res) => {
   }
 });
 
+app.get('/api/user/activity/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    const { data, error } = await supabase.from('user_activity').select('*').eq('email', email.toLowerCase()).single();
+    
+    // If no data exists yet for this user, just return empty arrays
+    if (error && error.code === 'PGRST116') {
+      return res.json({ savedFiles: [], downloadedFiles: [], lastOpenedFile: null });
+    }
+    
+    if (error) throw error;
+    
+    res.json({
+      savedFiles: data.saved_files || [],
+      downloadedFiles: data.downloaded_files || [],
+      lastOpenedFile: data.last_opened_file || null
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/user/activity', async (req, res) => {
+  try {
+    const { email, savedFiles, downloadedFiles, lastOpenedFile } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    const payload = {
+      email: email.toLowerCase(),
+      updated_at: new Date().toISOString()
+    };
+    
+    if (savedFiles !== undefined) payload.saved_files = savedFiles;
+    if (downloadedFiles !== undefined) payload.downloaded_files = downloadedFiles;
+    if (lastOpenedFile !== undefined) payload.last_opened_file = lastOpenedFile;
+
+    const { error } = await supabase.from('user_activity').upsert(payload, { onConflict: 'email' });
+    if (error) throw error;
+
+    res.json({ success: true, message: 'Activity synced successfully' });
+  } catch (err) {
+    console.error('Activity sync error:', err);
+    res.status(500).json({ error: 'Failed to sync activity' });
+  }
+});
+
 if (require.main === module) {
   app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 }

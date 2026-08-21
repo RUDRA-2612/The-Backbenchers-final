@@ -48,7 +48,6 @@ export default function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
-  // Fetch materials from API
   const fetchMaterials = async () => {
     try {
       const response = await fetch(`${API_URL}/api/materials`);
@@ -61,8 +60,47 @@ export default function App() {
     }
   };
 
+  const syncActivityToCloud = async (payload) => {
+    if (!user || !user.email) return;
+    try {
+      await fetch(`${API_URL}/api/user/activity`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email, ...payload })
+      });
+    } catch (err) {
+      console.error('Error syncing activity:', err);
+    }
+  };
+
+  const loadUserActivity = async (email) => {
+    try {
+      const response = await fetch(`${API_URL}/api/user/activity/${encodeURIComponent(email)}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.savedFiles) {
+          setSavedFiles(data.savedFiles);
+          localStorage.setItem('backbenchers_saved', JSON.stringify(data.savedFiles));
+        }
+        if (data.downloadedFiles) {
+          setDownloadedFiles(data.downloadedFiles);
+          localStorage.setItem('backbenchers_downloads', JSON.stringify(data.downloadedFiles));
+        }
+        if (data.lastOpenedFile !== undefined) { // can be null
+          setLastOpenedFile(data.lastOpenedFile);
+          localStorage.setItem('backbenchers_last_opened', JSON.stringify(data.lastOpenedFile));
+        }
+      }
+    } catch (err) {
+      console.error('Error loading user activity:', err);
+    }
+  };
+
   useEffect(() => {
     fetchMaterials();
+    if (user && user.email) {
+      loadUserActivity(user.email);
+    }
   }, []);
 
   // Handle browser back button via Native Hash Routing (100% reliable on mobile)
@@ -160,8 +198,10 @@ export default function App() {
   const handleLoginSuccess = (userData) => {
     setUser(userData);
     localStorage.setItem('backbenchers_user', JSON.stringify(userData));
-    // Fetch materials upon login to make sure we're sync'd
+    // Fetch materials and sync cloud activity upon login
     fetchMaterials();
+    loadUserActivity(userData.email);
+    
     const nextView = userData.isAdmin ? 'admin' : 'home';
     setActiveView(nextView);
     window.location.hash = nextView;
@@ -201,6 +241,7 @@ export default function App() {
     const fileWithTime = { ...file, lastOpenedAt: new Date().toISOString() };
     setLastOpenedFile(fileWithTime);
     localStorage.setItem('backbenchers_last_opened', JSON.stringify(fileWithTime));
+    syncActivityToCloud({ lastOpenedFile: fileWithTime });
     window.location.hash = 'pdf-viewer';
   };
 
@@ -249,6 +290,7 @@ export default function App() {
         const updated = [newDownload, ...downloadedFiles];
         setDownloadedFiles(updated);
         localStorage.setItem('backbenchers_downloads', JSON.stringify(updated));
+        syncActivityToCloud({ downloadedFiles: updated });
       }
     } catch (err) {
       console.error('Download processing failed:', err);
@@ -259,6 +301,7 @@ export default function App() {
     const updated = downloadedFiles.filter(f => f.id !== fileId);
     setDownloadedFiles(updated);
     localStorage.setItem('backbenchers_downloads', JSON.stringify(updated));
+    syncActivityToCloud({ downloadedFiles: updated });
   };
 
   const handleSaveFile = (file) => {
@@ -268,10 +311,12 @@ export default function App() {
       const updated = [newSaved, ...savedFiles];
       setSavedFiles(updated);
       localStorage.setItem('backbenchers_saved', JSON.stringify(updated));
+      syncActivityToCloud({ savedFiles: updated });
     } else {
       const updated = savedFiles.filter(f => f.id !== file.id);
       setSavedFiles(updated);
       localStorage.setItem('backbenchers_saved', JSON.stringify(updated));
+      syncActivityToCloud({ savedFiles: updated });
     }
   };
 
@@ -279,6 +324,7 @@ export default function App() {
     const updated = savedFiles.filter(f => f.id !== fileId);
     setSavedFiles(updated);
     localStorage.setItem('backbenchers_saved', JSON.stringify(updated));
+    syncActivityToCloud({ savedFiles: updated });
   };
 
   const handleReportFile = async (file, description) => {
