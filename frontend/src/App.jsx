@@ -75,8 +75,8 @@ export default function App() {
         return; 
       }
       
-      if (!rawHash || rawHash === '') {
-        // History Trap: if user presses back from #home, they hit the root URL '/'
+      if (!rawHash || rawHash === '' || rawHash === '#buffer') {
+        // History Trap: if user presses back from #home, they hit the buffer or root.
         // We push them forward again so they don't fall back into the Microsoft login URL
         window.history.forward();
         return;
@@ -119,7 +119,8 @@ export default function App() {
     
     // Initialize hash on load
     if (!window.location.hash) {
-      window.location.hash = 'home'; // Push instead of replace so we have a buffer (the root '/') before Microsoft
+      window.history.pushState(null, '', '#buffer'); // Extra buffer layer
+      window.location.hash = 'home'; // Push instead of replace
     } else {
       handleHashChange();
     }
