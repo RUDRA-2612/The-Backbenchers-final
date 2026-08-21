@@ -167,9 +167,7 @@ export default function App() {
 
     // 2. Then redirect to Microsoft to kill the MSAL session
     try {
-      await instance.logoutPopup({
-        postLogoutRedirectUri: window.location.origin
-      });
+      await instance.logoutRedirect();
     } catch (e) {
       console.error("MSAL logout error:", e);
     }
