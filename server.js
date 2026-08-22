@@ -202,9 +202,10 @@ app.get('/api/admin/users', async (req, res) => {
 
 app.get('/api/admin/blocked-emails', async (req, res) => {
   try {
-    const { data: blocked, error } = await supabase.from('blocked_emails').select('*').order('created_at', { ascending: false });
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    const { data, error } = await supabase.from('blocked_emails').select('*').order('created_at', { ascending: false });
     if (error) throw error;
-    res.json(blocked);
+    res.json(data);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -258,6 +259,7 @@ app.get('/api/user/status/:email', async (req, res) => {
       }
     }
     
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.json({ isBlocked: !!blockedUser, isSessionValid });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
