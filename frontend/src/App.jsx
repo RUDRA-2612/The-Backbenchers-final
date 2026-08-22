@@ -226,7 +226,9 @@ export default function App() {
     if (user && user.email) {
       const checkBlockStatus = async () => {
         try {
-          const res = await fetch(`${API_URL}/api/user/status/${encodeURIComponent(user.email)}`);
+          const res = await fetch(`${API_URL}/api/user/status/${encodeURIComponent(user.email)}`, {
+            cache: 'no-store' // Fix: prevent browser from caching this GET request
+          });
           if (res.ok) {
             const data = await res.json();
             if (data.isBlocked) {
