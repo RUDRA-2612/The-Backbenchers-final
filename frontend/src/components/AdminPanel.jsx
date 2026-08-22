@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag } from 'lucide-react';
+import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag, Ban } from 'lucide-react';
 import { API_URL } from '../config';
 
 import { masterSubjects } from '../data/subjects';
@@ -9,6 +9,8 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const [logins, setLogins] = useState([]);
   const [downloads, setDownloads] = useState([]);
   const [students, setStudents] = useState([]);
+  const [blockedEmails, setBlockedEmails] = useState([]);
+  const [newBlockedEmail, setNewBlockedEmail] = useState('');
   const [materials, setMaterials] = useState([]);
   const [reports, setReports] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
@@ -40,6 +42,10 @@ export default function AdminPanel({ onMaterialUploaded }) {
       const studentData = await studentRes.json();
       setStudents(studentData);
 
+      const blockedRes = await fetch(`${API_URL}/api/admin/blocked-emails`);
+      const blockedData = await blockedRes.json();
+      setBlockedEmails(blockedData);
+
       const materialRes = await fetch(`${API_URL}/api/materials`);
       const materialData = await materialRes.json();
       setMaterials(materialData);
@@ -57,6 +63,48 @@ export default function AdminPanel({ onMaterialUploaded }) {
   useEffect(() => {
     fetchLogs();
   }, [adminTab]);
+
+  const handleBlockEmail = async (e) => {
+    e.preventDefault();
+    if (!newBlockedEmail) return;
+    try {
+      const res = await fetch(`${API_URL}/api/admin/block-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newBlockedEmail })
+      });
+      if (res.ok) {
+        setNewBlockedEmail('');
+        fetchLogs();
+        alert('Email blocked successfully!');
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to block email');
+      }
+    } catch (err) {
+      alert('Error blocking email');
+    }
+  };
+
+  const handleUnblockEmail = async (email) => {
+    if (!window.confirm(`Are you sure you want to unblock ${email}?`)) return;
+    try {
+      const res = await fetch(`${API_URL}/api/admin/unblock-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (res.ok) {
+        fetchLogs();
+        alert('Email unblocked successfully!');
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to unblock email');
+      }
+    } catch (err) {
+      alert('Error unblocking email');
+    }
+  };
 
   // Synchronize dynamic form dropdowns
   useEffect(() => {
@@ -291,6 +339,13 @@ export default function AdminPanel({ onMaterialUploaded }) {
         >
           <Users size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Registered Students
+        </button>
+        <button
+          className={`tab-btn ${adminTab === 'blocked' ? 'active' : ''}`}
+          onClick={() => setAdminTab('blocked')}
+        >
+          <Ban size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
+          Blocked Students
         </button>
         <button
           className={`tab-btn ${adminTab === 'reports' ? 'active' : ''}`}
@@ -575,6 +630,72 @@ export default function AdminPanel({ onMaterialUploaded }) {
               <div className="empty-state" style={{ padding: '2rem' }}>
                 <Users size={32} />
                 <p>No student accounts created yet.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 4.5: BLOCKED STUDENTS */}
+        {adminTab === 'blocked' && (
+          <div className="admin-card">
+            <h3 className="admin-title">
+              <Ban size={20} style={{ color: '#ff4d4f' }} />
+              Blocked Students
+            </h3>
+
+            <div className="admin-upload-form" style={{ maxWidth: '500px', marginBottom: '2rem', padding: '1.5rem', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '8px' }}>
+              <form onSubmit={handleBlockEmail} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
+                <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                  <label className="form-label" htmlFor="blockEmail">Block an Email Address</label>
+                  <input
+                    id="blockEmail"
+                    type="email"
+                    className="form-input"
+                    placeholder="student@jklu.edu.in"
+                    value={newBlockedEmail}
+                    onChange={(e) => setNewBlockedEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <button type="submit" className="btn" style={{ backgroundColor: '#ff4d4f', color: '#fff', border: 'none' }}>
+                  Block User
+                </button>
+              </form>
+            </div>
+
+            {blockedEmails.length > 0 ? (
+              <div className="admin-table-container">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Blocked Date</th>
+                      <th>Email Address</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {blockedEmails.map(b => (
+                      <tr key={b.id}>
+                        <td>{new Date(b.created_at).toLocaleDateString()}</td>
+                        <td style={{ fontWeight: '600' }}>{b.email}</td>
+                        <td>
+                          <button 
+                            className="btn btn-secondary" 
+                            style={{ padding: '0.4rem 1rem', color: '#22c55e', borderColor: '#22c55e' }} 
+                            onClick={() => handleUnblockEmail(b.email)}
+                          >
+                            Unblock
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="empty-state" style={{ padding: '2rem' }}>
+                <CheckCircle size={32} style={{ color: '#22c55e' }} />
+                <p>No students are currently blocked.</p>
               </div>
             )}
           </div>

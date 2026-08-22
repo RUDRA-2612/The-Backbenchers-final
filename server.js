@@ -83,6 +83,12 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(403).json({ error: 'Access restricted. Please use your @jklu.edu.in email address.' });
     }
 
+    // Check if user is blocked
+    const { data: blockedUser } = await supabase.from('blocked_emails').select('id').eq('email', emailLower).single();
+    if (blockedUser) {
+      return res.status(403).json({ error: "Access denied. Your account has been blocked by the administrator." });
+    }
+
     const isAdminEmail = emailLower === 'rudrapalsinghshekhawat@jklu.edu.in' || emailLower === 'amanjhajharia@jklu.edu.in';
 
     let { data: user, error: findError } = await supabase.from('users').select('*').eq('email', emailLower).single();
@@ -184,6 +190,59 @@ app.get('/api/admin/users', async (req, res) => {
     const { data: users, error } = await supabase.from('users').select('id, name, email, isGoogle, createdAt').order('createdAt', { ascending: false });
     if (error) throw error;
     res.json(users);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/admin/blocked-emails', async (req, res) => {
+  try {
+    const { data: blocked, error } = await supabase.from('blocked_emails').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json(blocked);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/admin/block-email', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+    const emailLower = email.toLowerCase();
+    
+    // Check if already blocked
+    const { data: existing } = await supabase.from('blocked_emails').select('*').eq('email', emailLower).single();
+    if (existing) return res.status(400).json({ error: 'Email is already blocked' });
+
+    const { error } = await supabase.from('blocked_emails').insert({ email: emailLower });
+    if (error) throw error;
+    res.json({ message: 'Email blocked successfully' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/admin/unblock-email', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+    const emailLower = email.toLowerCase();
+
+    const { error } = await supabase.from('blocked_emails').delete().eq('email', emailLower);
+    if (error) throw error;
+    res.json({ message: 'Email unblocked successfully' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/user/status/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+    const emailLower = email.toLowerCase();
+    
+    const { data: blockedUser, error } = await supabase.from('blocked_emails').select('id').eq('email', emailLower).single();
+    
+    // PGRST116 means zero rows returned from .single(), which means they are not blocked.
+    if (error && error.code !== 'PGRST116') {
+      throw error;
+    }
+    
+    res.json({ isBlocked: !!blockedUser });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 

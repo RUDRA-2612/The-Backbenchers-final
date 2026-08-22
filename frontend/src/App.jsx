@@ -222,6 +222,27 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    if (user && user.email) {
+      const checkBlockStatus = async () => {
+        try {
+          const res = await fetch(`${API_URL}/api/user/status/${encodeURIComponent(user.email)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.isBlocked) {
+              alert("Access denied. Your account has been blocked by the administrator.");
+              handleLogout();
+            }
+          }
+        } catch (err) {
+          console.error("Error checking block status:", err);
+        }
+      };
+      
+      checkBlockStatus();
+    }
+  }, [user]);
+
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
