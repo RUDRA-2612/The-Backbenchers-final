@@ -141,7 +141,14 @@ app.post('/api/auth/login', async (req, res) => {
       method: provider ? `${provider} OAuth` : (isGoogleLogin ? 'Google OAuth' : 'Email/Password')
     });
 
-    res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email, isAdmin: isAdminEmail } });
+    // Create session for Single Device Login
+    const sessionId = uuidv4();
+    await supabase.from('active_sessions').upsert({
+      email: emailLower,
+      session_id: sessionId
+    }, { onConflict: 'email' });
+
+    res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email, isAdmin: isAdminEmail, sessionId } });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -232,6 +239,7 @@ app.post('/api/admin/unblock-email', async (req, res) => {
 app.get('/api/user/status/:email', async (req, res) => {
   try {
     const { email } = req.params;
+    const { sessionId } = req.query;
     if (!email) return res.status(400).json({ error: 'Email is required' });
     const emailLower = email.toLowerCase();
     
@@ -241,8 +249,16 @@ app.get('/api/user/status/:email', async (req, res) => {
     if (error && error.code !== 'PGRST116') {
       throw error;
     }
+
+    let isSessionValid = true;
+    if (sessionId) {
+      const { data: activeSession } = await supabase.from('active_sessions').select('session_id').eq('email', emailLower).single();
+      if (activeSession && activeSession.session_id !== sessionId) {
+        isSessionValid = false;
+      }
+    }
     
-    res.json({ isBlocked: !!blockedUser });
+    res.json({ isBlocked: !!blockedUser, isSessionValid });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 

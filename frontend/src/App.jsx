@@ -226,13 +226,17 @@ export default function App() {
     if (user && user.email) {
       const checkBlockStatus = async () => {
         try {
-          const res = await fetch(`${API_URL}/api/user/status/${encodeURIComponent(user.email)}`, {
+          const query = user.sessionId ? `?sessionId=${user.sessionId}` : '';
+          const res = await fetch(`${API_URL}/api/user/status/${encodeURIComponent(user.email)}${query}`, {
             cache: 'no-store' // Fix: prevent browser from caching this GET request
           });
           if (res.ok) {
             const data = await res.json();
             if (data.isBlocked) {
               alert("Your account access has been paused. Please contact the administrator for assistance.");
+              handleLogout();
+            } else if (data.isSessionValid === false) {
+              alert("You have been logged out because your account was accessed from another device.");
               handleLogout();
             }
           }
