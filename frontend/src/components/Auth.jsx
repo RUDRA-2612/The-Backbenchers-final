@@ -7,6 +7,7 @@ export default function Auth({ onLoginSuccess }) {
   const { instance, inProgress, accounts } = useMsal();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const loginInProgressRef = React.useRef(false);
 
   // If MSAL is already processing a login (e.g. returning from redirect), show loading state
   useEffect(() => {
@@ -20,7 +21,8 @@ export default function Auth({ onLoginSuccess }) {
   useEffect(() => {
     const processBackendLogin = async () => {
       // If MSAL has finished its work and we have a logged-in account, proceed with our backend auth
-      if (inProgress === 'none' && accounts.length > 0) {
+      if (inProgress === 'none' && accounts.length > 0 && !loginInProgressRef.current) {
+        loginInProgressRef.current = true;
         setLoading(true);
         try {
           const account = accounts[0];
@@ -58,6 +60,11 @@ export default function Auth({ onLoginSuccess }) {
           // Removed automatic logoutRedirect here so the user can actually read the error message.
         } finally {
           setLoading(false);
+          // We do NOT reset loginInProgressRef.current here because if it succeeds, Auth unmounts.
+          // If it fails, we might want to let them try again by clicking, but for now we just prevent the loop.
+          if (error) {
+             loginInProgressRef.current = false;
+          }
         }
       }
     };
