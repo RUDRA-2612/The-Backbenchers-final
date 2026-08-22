@@ -103,6 +103,11 @@ export default function App() {
     }
   }, []);
 
+  // Force title to be exactly "Backbenchers" to clear any cached tab titles
+  useEffect(() => {
+    document.title = "Backbenchers";
+  }, []);
+
   // Handle browser back button via Native Hash Routing (100% reliable on mobile)
   useEffect(() => {
     const handleHashChange = () => {
