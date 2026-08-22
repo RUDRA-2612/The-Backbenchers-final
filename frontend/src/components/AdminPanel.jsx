@@ -30,19 +30,19 @@ export default function AdminPanel({ onMaterialUploaded }) {
   // Fetch admin logs
   const fetchLogs = async () => {
     try {
-      const loginRes = await fetch(`${API_URL}/api/admin/logins`);
+      const loginRes = await fetch(`${API_URL}/api/admin/logins`, { cache: 'no-store' });
       const loginData = await loginRes.json();
       setLogins(loginData);
 
-      const downloadRes = await fetch(`${API_URL}/api/admin/downloads`);
+      const downloadRes = await fetch(`${API_URL}/api/admin/downloads`, { cache: 'no-store' });
       const downloadData = await downloadRes.json();
       setDownloads(downloadData);
 
-      const studentRes = await fetch(`${API_URL}/api/admin/users`);
+      const studentRes = await fetch(`${API_URL}/api/admin/users`, { cache: 'no-store' });
       const studentData = await studentRes.json();
       setStudents(studentData);
 
-      const blockedRes = await fetch(`${API_URL}/api/admin/blocked-emails`);
+      const blockedRes = await fetch(`${API_URL}/api/admin/blocked-emails`, { cache: 'no-store' });
       const blockedData = await blockedRes.json();
       setBlockedEmails(blockedData);
 

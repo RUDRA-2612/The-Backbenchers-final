@@ -77,7 +77,7 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password, provider, isGoogleLogin, name, microsoftAccountId } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
-    const emailLower = email.toLowerCase();
+    const emailLower = email.trim().toLowerCase();
     
     if (!emailLower.endsWith('@jklu.edu.in')) {
       return res.status(403).json({ error: 'Access restricted. Please use your @jklu.edu.in email address.' });
@@ -212,7 +212,7 @@ app.post('/api/admin/block-email', async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
-    const emailLower = email.toLowerCase();
+    const emailLower = email.trim().toLowerCase();
     
     // Check if already blocked
     const { data: existing } = await supabase.from('blocked_emails').select('*').eq('email', emailLower).single();
@@ -228,7 +228,7 @@ app.post('/api/admin/unblock-email', async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
-    const emailLower = email.toLowerCase();
+    const emailLower = email.trim().toLowerCase();
 
     const { error } = await supabase.from('blocked_emails').delete().eq('email', emailLower);
     if (error) throw error;
@@ -241,7 +241,7 @@ app.get('/api/user/status/:email', async (req, res) => {
     const { email } = req.params;
     const { sessionId } = req.query;
     if (!email) return res.status(400).json({ error: 'Email is required' });
-    const emailLower = email.toLowerCase();
+    const emailLower = email.trim().toLowerCase();
     
     const { data: blockedUser, error } = await supabase.from('blocked_emails').select('id').eq('email', emailLower).single();
     
