@@ -1,4 +1,12 @@
-import { PublicClientApplication } from '@azure/msal-browser';
+import { PublicClientApplication, NavigationClient } from '@azure/msal-browser';
+
+class CustomNavigationClient extends NavigationClient {
+    async navigateInternal(url, options) {
+        // Force replace to avoid polluting the browser back history with Microsoft login pages
+        window.location.replace(url);
+        return false;
+    }
+}
 
 // Environment variables from Vite
 const clientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
@@ -49,3 +57,4 @@ export const loginRequest = {
 };
 
 export const msalInstance = new PublicClientApplication(msalConfig);
+msalInstance.setNavigationClient(new CustomNavigationClient());
