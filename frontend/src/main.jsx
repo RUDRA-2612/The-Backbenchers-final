@@ -8,6 +8,9 @@ import { Analytics } from '@vercel/analytics/react'
 
 // Initialize MSAL outside of the React tree
 msalInstance.initialize().then(() => {
+  // Required by MSAL v3 to process redirects and close popups
+  msalInstance.handleRedirectPromise().catch(console.error);
+  
   ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
       <MsalProvider instance={msalInstance}>
