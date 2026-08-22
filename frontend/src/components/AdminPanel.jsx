@@ -108,6 +108,22 @@ export default function AdminPanel({ onMaterialUploaded }) {
     }
   };
 
+  const handleDeleteReport = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this report? Make sure the issue is resolved first.')) return;
+    try {
+      const res = await fetch(`${API_URL}/api/admin/reports/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setReports(reports.filter(r => r.id !== id));
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete report');
+      }
+    } catch (e) {
+      console.error("Error deleting report", e);
+      alert('Error deleting report');
+    }
+  };
+
   // Synchronize dynamic form dropdowns
   useEffect(() => {
     if (masterSubjects[selectedYear]) {
@@ -800,6 +816,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                       <th>Email</th>
                       <th>Material Title</th>
                       <th>Issue Description</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -818,6 +835,16 @@ export default function AdminPanel({ onMaterialUploaded }) {
                           )}
                         </td>
                         <td style={{ maxWidth: '300px', whiteSpace: 'normal', wordBreak: 'break-word' }}>{r.description}</td>
+                        <td>
+                          <button 
+                            className="btn btn-secondary" 
+                            style={{ padding: '0.4rem', color: '#22c55e', borderColor: '#22c55e' }} 
+                            onClick={() => handleDeleteReport(r.id)} 
+                            title="Mark as Resolved & Delete"
+                          >
+                            <CheckCircle size={16} />
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

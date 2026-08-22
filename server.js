@@ -245,6 +245,23 @@ app.post('/api/admin/unblock-email', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.get('/api/admin/reports', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('reports').select('*').order('timestamp', { ascending: false });
+    if (error) throw error;
+    res.json(data);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/admin/reports/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { error } = await supabase.from('reports').delete().eq('id', id);
+    if (error) throw error;
+    res.json({ message: 'Report deleted successfully' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.get('/api/user/status/:email', async (req, res) => {
   try {
     const { email } = req.params;
