@@ -232,8 +232,16 @@ export default function App() {
           });
           if (res.ok) {
             const data = await res.json();
+            if (user.isAdmin) {
+              // Admins bypass all restrictions (block & single device)
+              return;
+            }
+
             if (data.isBlocked) {
               alert("Your account access has been paused. Please contact the administrator for assistance.");
+              handleLogout();
+            } else if (data.isSessionValid === false) {
+              alert("You have been logged out because your account was accessed from another device.");
               handleLogout();
             }
           }

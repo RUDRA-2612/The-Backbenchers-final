@@ -83,13 +83,15 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(403).json({ error: 'Access restricted. Please use your @jklu.edu.in email address.' });
     }
 
-    // Check if user is blocked
-    const { data: blockedUser } = await supabase.from('blocked_emails').select('id').eq('email', emailLower).single();
-    if (blockedUser) {
-      return res.status(403).json({ error: "Your account access has been paused. Please contact the administrator for assistance." });
-    }
-
     const isAdminEmail = emailLower === 'rudrapalsinghshekhawat@jklu.edu.in' || emailLower === 'amanjhajharia@jklu.edu.in';
+
+    // Check if user is blocked (Admins bypass this restriction)
+    if (!isAdminEmail) {
+      const { data: blockedUser } = await supabase.from('blocked_emails').select('id').eq('email', emailLower).single();
+      if (blockedUser) {
+        return res.status(403).json({ error: "Your account access has been paused. Please contact the administrator for assistance." });
+      }
+    }
 
     let { data: user, error: findError } = await supabase.from('users').select('*').eq('email', emailLower).single();
 
