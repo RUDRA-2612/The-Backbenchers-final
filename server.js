@@ -86,7 +86,7 @@ app.post('/api/auth/login', async (req, res) => {
     // Check if user is blocked
     const { data: blockedUser } = await supabase.from('blocked_emails').select('id').eq('email', emailLower).single();
     if (blockedUser) {
-      return res.status(403).json({ error: "Access denied. Your account has been blocked by the administrator." });
+      return res.status(403).json({ error: "Your account access has been paused. Please contact the administrator for assistance." });
     }
 
     const isAdminEmail = emailLower === 'rudrapalsinghshekhawat@jklu.edu.in' || emailLower === 'amanjhajharia@jklu.edu.in';

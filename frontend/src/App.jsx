@@ -230,7 +230,7 @@ export default function App() {
           if (res.ok) {
             const data = await res.json();
             if (data.isBlocked) {
-              alert("Access denied. Your account has been blocked by the administrator.");
+              alert("Your account access has been paused. Please contact the administrator for assistance.");
               handleLogout();
             }
           }
