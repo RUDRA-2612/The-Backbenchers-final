@@ -18,69 +18,46 @@ export default function Auth({ onLoginSuccess }) {
     }
   }, [inProgress]);
 
-  useEffect(() => {
-    const processBackendLogin = async () => {
-      // If MSAL has finished its work and we have a logged-in account, proceed with our backend auth
-      if (inProgress === 'none' && accounts.length > 0 && !loginInProgressRef.current) {
-        loginInProgressRef.current = true;
-        setLoading(true);
-        try {
-          const account = accounts[0];
-          const email = account.username || '';
-          const name = account.name || 'JKLU Student';
-          const microsoftAccountId = account.localAccountId;
-
-          // Validate domain
-          if (!email.toLowerCase().endsWith('@jklu.edu.in')) {
-            throw new Error('Access restricted to @jklu.edu.in accounts only.');
-          }
-
-          // Register/Login to our backend
-          const response = await fetch(`${API_URL}/api/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: email,
-              name: name,
-              provider: 'Microsoft',
-              microsoftAccountId: microsoftAccountId
-            })
-          });
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Failed to authenticate with backend.');
-          }
-
-          onLoginSuccess(data.user);
-        } catch (err) {
-          console.error("Backend Login Error:", err);
-          setError(err.message || 'An error occurred during login. Please try again.');
-          // Removed automatic logoutRedirect here so the user can actually read the error message.
-        } finally {
-          setLoading(false);
-          // We do NOT reset loginInProgressRef.current here because if it succeeds, Auth unmounts.
-          // If it fails, we might want to let them try again by clicking, but for now we just prevent the loop.
-          if (error) {
-             loginInProgressRef.current = false;
-          }
-        }
-      }
-    };
-
-    processBackendLogin();
-  }, [inProgress, accounts, instance, onLoginSuccess]);
-
   const handleMicrosoftLogin = async () => {
     setError('');
     setLoading(true);
     try {
-      // Use redirect instead of popup to avoid browser blocks
-      await instance.loginRedirect(loginRequest);
+      const response = await instance.loginPopup(loginRequest);
+      if (response && response.account) {
+        const account = response.account;
+        const email = account.username || '';
+        const name = account.name || 'JKLU Student';
+        const microsoftAccountId = account.localAccountId;
+
+        // Validate domain
+        if (!email.toLowerCase().endsWith('@jklu.edu.in')) {
+          throw new Error('Access restricted to @jklu.edu.in accounts only.');
+        }
+
+        // Register/Login to our backend
+        const apiResponse = await fetch(`${API_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            name: name,
+            provider: 'Microsoft',
+            microsoftAccountId: microsoftAccountId
+          })
+        });
+
+        const data = await apiResponse.json();
+
+        if (!apiResponse.ok) {
+          throw new Error(data.error || 'Failed to authenticate with backend.');
+        }
+
+        onLoginSuccess(data.user);
+      }
     } catch (err) {
       console.error("Login Error:", err);
-      setError(err.message || 'An error occurred starting login.');
+      setError(err.message || 'An error occurred during login. Please try again.');
+    } finally {
       setLoading(false);
     }
   };

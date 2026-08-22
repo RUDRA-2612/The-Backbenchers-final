@@ -113,10 +113,9 @@ export default function App() {
         return; 
       }
       
-      if (!rawHash || rawHash === '' || rawHash === '#buffer') {
-        // History Trap: if user presses back from #home, they hit the buffer or root.
-        // We push them forward again so they don't fall back into the Microsoft login URL
-        window.history.forward();
+      if (!rawHash || rawHash === '') {
+        // If they navigate back to the root without a hash, let the browser handle it.
+        // It will either exit the site naturally or just clear the hash.
         return;
       }
 
@@ -204,7 +203,7 @@ export default function App() {
     
     const nextView = userData.isAdmin ? 'admin' : 'home';
     setActiveView(nextView);
-    window.location.hash = nextView;
+    window.location.replace('#' + nextView);
   };
 
   const handleLogout = async () => {
