@@ -231,8 +231,14 @@ app.post('/api/admin/unblock-email', async (req, res) => {
     if (!email) return res.status(400).json({ error: 'Email is required' });
     const emailLower = email.trim().toLowerCase();
 
-    const { error } = await supabase.from('blocked_emails').delete().eq('email', emailLower);
+    // Use ilike and select() to handle any accidental spaces in the database, and verify deletion
+    const { data, error } = await supabase.from('blocked_emails').delete().ilike('email', `%${emailLower}%`).select();
     if (error) throw error;
+    
+    if (!data || data.length === 0) {
+      return res.status(404).json({ error: 'Email not found in blocked list (it might have been deleted already or never blocked).' });
+    }
+    
     res.json({ message: 'Email unblocked successfully' });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
