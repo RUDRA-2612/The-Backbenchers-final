@@ -7,7 +7,7 @@ export default function CreditsModal({ onClose }) {
     {
       name: 'Aman Jhajharia',
       roles: [
-        { title: 'Platform Architect', icon: <Code2 size={14} /> },
+        { title: 'Content Lead', icon: <BookOpen size={14} /> },
         { title: '2nd & 3rd Year Content', icon: <BookOpen size={14} /> }
       ],
       linkedin: 'https://www.linkedin.com/in/aman-jhajharia/'
@@ -15,7 +15,7 @@ export default function CreditsModal({ onClose }) {
     {
       name: 'Aahan Bansal',
       roles: [
-        { title: 'Platform Architect', icon: <Code2 size={14} /> },
+        { title: 'Content Lead', icon: <BookOpen size={14} /> },
         { title: '2nd & 3rd Year Content', icon: <BookOpen size={14} /> }
       ],
       linkedin: 'https://www.linkedin.com/in/aahan-bansal-0a2954351/'
@@ -23,7 +23,6 @@ export default function CreditsModal({ onClose }) {
     {
       name: 'Rudrapal Singh Shekhawat',
       roles: [
-        { title: 'Platform Architect', icon: <Code2 size={14} /> },
         { title: '1st Year Content', icon: <BookOpen size={14} /> }
       ],
       linkedin: 'https://www.linkedin.com/in/rudrapal-singh-shekhawat-5a57a2377'
