@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText, Flag, Star } from 'lucide-react';
-import CreditsModal from './CreditsModal';
+import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText, Flag } from 'lucide-react';
 
 export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSidebar, materials = [], onViewFile, onReportFile }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -9,7 +8,6 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
   const [searchQuery, setSearchQuery] = useState('');
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportDescription, setReportDescription] = useState('');
-  const [showCreditsModal, setShowCreditsModal] = useState(false);
   const dropdownRef = useRef(null);
   const searchRef = useRef(null);
 
@@ -149,15 +147,6 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
           </span>
         </button>
 
-        <button 
-          className="theme-toggle" 
-          onClick={() => setShowCreditsModal(true)}
-          title="Project Credits"
-        >
-          <Star size={18} />
-          <span className="theme-text desktop-only">Credits</span>
-        </button>
-
         {user && (
           <div className="profile-container" ref={dropdownRef}>
             <button className="profile-trigger" onClick={() => setShowDropdown(!showDropdown)}>
@@ -225,11 +214,6 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
             </div>
           </div>
         </div>
-      )}
-
-      {/* Credits Modal */}
-      {showCreditsModal && (
-        <CreditsModal onClose={() => setShowCreditsModal(false)} />
       )}
     </nav>
   );

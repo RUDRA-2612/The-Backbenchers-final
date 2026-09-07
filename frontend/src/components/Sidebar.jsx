@@ -1,7 +1,10 @@
-import React from 'react';
-import { Home, Download, ShieldAlert, Bookmark } from 'lucide-react';
+import React, { useState } from 'react';
+import { Home, Download, ShieldAlert, Bookmark, Star } from 'lucide-react';
+import CreditsModal from './CreditsModal';
 
 export default function Sidebar({ activeView, setActiveView, isCollapsed, isAdmin }) {
+  const [showCreditsModal, setShowCreditsModal] = useState(false);
+
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <button 
@@ -36,6 +39,21 @@ export default function Sidebar({ activeView, setActiveView, isCollapsed, isAdmi
           <ShieldAlert size={20} />
           <span>Admin Panel</span>
         </button>
+      )}
+
+      <div style={{ flexGrow: 1 }} />
+
+      <button 
+        className="sidebar-link"
+        onClick={() => setShowCreditsModal(true)}
+      >
+        <Star size={20} />
+        <span>Credits</span>
+      </button>
+
+      {/* Credits Modal */}
+      {showCreditsModal && (
+        <CreditsModal onClose={() => setShowCreditsModal(false)} />
       )}
     </aside>
   );
