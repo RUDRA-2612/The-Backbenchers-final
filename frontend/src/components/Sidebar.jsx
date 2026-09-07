@@ -41,8 +41,6 @@ export default function Sidebar({ activeView, setActiveView, isCollapsed, isAdmi
         </button>
       )}
 
-      <div style={{ flexGrow: 1 }} />
-
       <button 
         className="sidebar-link"
         onClick={() => setShowCreditsModal(true)}
