@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X, Code2, BookOpen, ExternalLink, User } from 'lucide-react';
 
 export default function CreditsModal({ onClose }) {
@@ -29,7 +30,7 @@ export default function CreditsModal({ onClose }) {
     }
   ];
 
-  return (
+  const modalContent = (
     <div className="modal-overlay credits-overlay" onClick={onClose}>
       <div className="credits-modal-content" onClick={e => e.stopPropagation()}>
         <div className="credits-header">
@@ -76,4 +77,6 @@ export default function CreditsModal({ onClose }) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
