@@ -7,7 +7,7 @@ export default function CreditsModal({ onClose }) {
     {
       name: 'Aman Jhajharia',
       year: 'Final Year',
-      image: '',
+      image: '/aman.jpeg',
       roles: [
         { title: 'Content Lead', icon: <BookOpen size={14} /> },
         { title: '2nd & 3rd Year Content', icon: <BookOpen size={14} /> }
@@ -17,7 +17,7 @@ export default function CreditsModal({ onClose }) {
     {
       name: 'Aahan Bansal',
       year: 'Final Year',
-      image: '/aahan.jpg',
+      image: '/aahan.jpeg',
       roles: [
         { title: 'Content Lead', icon: <BookOpen size={14} /> },
         { title: '2nd & 3rd Year Content', icon: <BookOpen size={14} /> }
