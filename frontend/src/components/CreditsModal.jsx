@@ -26,7 +26,7 @@ export default function CreditsModal({ onClose }) {
       name: 'Rudrapal Singh Shekhawat',
       year: '2nd Year',
       roles: [
-        { title: 'Lead Engineer', icon: <Code2 size={14} /> },
+        { title: 'Web Developer', icon: <Code2 size={14} /> },
         { title: '1st Year Content', icon: <BookOpen size={14} /> }
       ],
       linkedin: 'https://www.linkedin.com/in/rudrapal-singh-shekhawat-5a57a2377'
@@ -64,13 +64,11 @@ export default function CreditsModal({ onClose }) {
                   </svg>
                 </a>
               </div>
-              <div className="credit-card-header">
-                <h3>
-                  {contributor.name} 
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 'normal', marginLeft: '6px' }}>
-                    ({contributor.year})
-                  </span>
-                </h3>
+              <div className="credit-card-header" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <h3 style={{ margin: 0 }}>{contributor.name}</h3>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  {contributor.year}
+                </span>
               </div>
               <div className="credit-roles">
                 {contributor.roles.map((role, rIndex) => (
