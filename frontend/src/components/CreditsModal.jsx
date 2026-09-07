@@ -7,6 +7,7 @@ export default function CreditsModal({ onClose }) {
     {
       name: 'Aman Jhajharia',
       year: 'Final Year',
+      image: '',
       roles: [
         { title: 'Content Lead', icon: <BookOpen size={14} /> },
         { title: '2nd & 3rd Year Content', icon: <BookOpen size={14} /> }
@@ -16,6 +17,7 @@ export default function CreditsModal({ onClose }) {
     {
       name: 'Aahan Bansal',
       year: 'Final Year',
+      image: '/aahan.jpg',
       roles: [
         { title: 'Content Lead', icon: <BookOpen size={14} /> },
         { title: '2nd & 3rd Year Content', icon: <BookOpen size={14} /> }
@@ -25,6 +27,7 @@ export default function CreditsModal({ onClose }) {
     {
       name: 'Rudrapal Singh Shekhawat',
       year: '2nd Year',
+      image: '',
       roles: [
         { title: 'Web Developer', icon: <Code2 size={14} /> },
         { title: '1st Year Content', icon: <BookOpen size={14} /> }
@@ -49,8 +52,12 @@ export default function CreditsModal({ onClose }) {
           {contributors.map((contributor, index) => (
             <div key={index} className="credit-card">
               <div className="credit-card-top">
-                <div className="credit-avatar">
-                  <User size={24} color="var(--accent)" />
+                <div className="credit-avatar" style={{ overflow: 'hidden', padding: contributor.image ? 0 : undefined }}>
+                  {contributor.image ? (
+                    <img src={contributor.image} alt={contributor.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <User size={24} color="var(--accent)" />
+                  )}
                 </div>
                 <a 
                   href={contributor.linkedin} 
