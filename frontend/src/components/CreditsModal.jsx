@@ -6,6 +6,7 @@ export default function CreditsModal({ onClose }) {
   const contributors = [
     {
       name: 'Aman Jhajharia',
+      year: 'Final Year',
       roles: [
         { title: 'Content Lead', icon: <BookOpen size={14} /> },
         { title: '2nd & 3rd Year Content', icon: <BookOpen size={14} /> }
@@ -14,6 +15,7 @@ export default function CreditsModal({ onClose }) {
     },
     {
       name: 'Aahan Bansal',
+      year: 'Final Year',
       roles: [
         { title: 'Content Lead', icon: <BookOpen size={14} /> },
         { title: '2nd & 3rd Year Content', icon: <BookOpen size={14} /> }
@@ -22,6 +24,7 @@ export default function CreditsModal({ onClose }) {
     },
     {
       name: 'Rudrapal Singh Shekhawat',
+      year: '2nd Year',
       roles: [
         { title: 'Website Developer', icon: <Code2 size={14} /> },
         { title: '1st Year Content', icon: <BookOpen size={14} /> }
@@ -62,7 +65,12 @@ export default function CreditsModal({ onClose }) {
                 </a>
               </div>
               <div className="credit-card-header">
-                <h3>{contributor.name}</h3>
+                <h3>
+                  {contributor.name} 
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 'normal', marginLeft: '6px' }}>
+                    ({contributor.year})
+                  </span>
+                </h3>
               </div>
               <div className="credit-roles">
                 {contributor.roles.map((role, rIndex) => (
