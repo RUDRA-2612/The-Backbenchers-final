@@ -26,7 +26,7 @@ export default function CreditsModal({ onClose }) {
       name: 'Rudrapal Singh Shekhawat',
       year: '2nd Year',
       roles: [
-        { title: 'Website Developer', icon: <Code2 size={14} /> },
+        { title: 'Lead Engineer', icon: <Code2 size={14} /> },
         { title: '1st Year Content', icon: <BookOpen size={14} /> }
       ],
       linkedin: 'https://www.linkedin.com/in/rudrapal-singh-shekhawat-5a57a2377'
