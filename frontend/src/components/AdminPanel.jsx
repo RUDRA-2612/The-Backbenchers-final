@@ -464,8 +464,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                   onChange={(e) => setCategory(e.target.value)}
                 >
                   <option value="notes">Notes</option>
-                  <option value="papers">Previous Year Papers & Solutions</option>
-                  <option value="exam-questions">Exam Relevant Questions</option>
+                  <option value="papers">Previous Year Papers &amp; Solutions</option>
                   {currentSubjectHasLab && <option value="labs">Labs</option>}
                 </select>
               </div>
