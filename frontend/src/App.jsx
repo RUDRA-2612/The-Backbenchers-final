@@ -11,6 +11,7 @@ import Saved from './components/Saved';
 import AdminPanel from './components/AdminPanel';
 import Profile from './components/Profile';
 import MockPdfViewer from './components/MockPdfViewer';
+import CreditsModal from './components/CreditsModal';
 import Footer from './components/Footer';
 import { getSemesterForSubject } from './data/subjects';
 import { API_URL } from './config';
@@ -141,6 +142,9 @@ export default function App() {
         // If we check activePdfFile here, it fails due to stale closures.
       } else if (hash.startsWith('semester-')) {
         setActiveView(hash);
+        setActivePdfFile(null);
+      } else if (hash === 'credits') {
+        setActiveView('credits');
         setActivePdfFile(null);
       } else if (hash === 'home' || hash === 'admin' || hash === 'downloads' || hash === 'saved' || hash === 'profile') {
         setActiveView(hash);
@@ -509,6 +513,13 @@ export default function App() {
           onClose={() => window.history.back()}
           onDownload={handleDownloadFile}
         />
+      )}
+
+      {activeView === 'credits' && (
+        <CreditsModal onClose={() => {
+          setActiveView('home');
+          window.location.replace('#home');
+        }} />
       )}
     </div>
   );

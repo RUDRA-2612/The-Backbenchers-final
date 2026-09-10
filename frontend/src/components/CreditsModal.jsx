@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Code2, BookOpen, ExternalLink, User } from 'lucide-react';
+import { X, Code2, BookOpen, User } from 'lucide-react';
 
 export default function CreditsModal({ onClose }) {
   const contributors = [
@@ -37,11 +37,29 @@ export default function CreditsModal({ onClose }) {
     }
   ];
 
+  // Lock background scroll when credits is open
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+
+  // Handle back button — navigate to #credits so popstate closes it
+  useEffect(() => {
+    const handlePopState = () => {
+      onClose();
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [onClose]);
+
   const modalContent = (
     <div className="modal-overlay credits-overlay" onClick={onClose}>
       <div className="credits-modal-content" onClick={e => e.stopPropagation()}>
         <div className="credits-header">
-          <h2>Project Credits</h2>
+          <h2>Credits</h2>
           <button className="credits-close-btn" onClick={onClose} aria-label="Close">
             <X size={20} />
           </button>

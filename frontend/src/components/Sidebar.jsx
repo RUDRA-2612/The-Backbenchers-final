@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Home, Download, ShieldAlert, Bookmark, Star } from 'lucide-react';
-import CreditsModal from './CreditsModal';
 
 export default function Sidebar({ activeView, setActiveView, isCollapsed, isAdmin }) {
-  const [showCreditsModal, setShowCreditsModal] = useState(false);
+
+  const handleCreditsClick = () => {
+    // Push a new history entry so back button can close the credits modal
+    window.history.pushState({ creditsOpen: true }, '', window.location.href.split('#')[0] + '#credits');
+    setActiveView('credits');
+  };
 
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
@@ -42,17 +46,12 @@ export default function Sidebar({ activeView, setActiveView, isCollapsed, isAdmi
       )}
 
       <button 
-        className="sidebar-link"
-        onClick={() => setShowCreditsModal(true)}
+        className={`sidebar-link ${activeView === 'credits' ? 'active' : ''}`}
+        onClick={handleCreditsClick}
       >
         <Star size={20} />
         <span>Credits</span>
       </button>
-
-      {/* Credits Modal */}
-      {showCreditsModal && (
-        <CreditsModal onClose={() => setShowCreditsModal(false)} />
-      )}
     </aside>
   );
 }
