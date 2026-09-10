@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, HelpCircle, Flag, Beaker } from 'lucide-react';
+import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, Flag, Beaker } from 'lucide-react';
 
 export default function SubjectDetail({ subject, materials, savedFiles = [], onBack, onViewFile, onDownloadFile, onSaveFile, onReportFile }) {
   const [activeTab, setActiveTab] = useState('papers'); // papers, notes, exam-questions, labs
@@ -32,7 +32,6 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
     switch (category) {
       case 'papers': return <Calendar size={22} />;
       case 'notes': return <BookOpen size={22} />;
-      case 'exam-questions': return <HelpCircle size={22} />;
       case 'labs': return <Beaker size={22} />;
       default: return <FileText size={22} />;
     }
@@ -65,12 +64,7 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
         >
           Notes
         </button>
-        <button 
-          className={`tab-btn ${activeTab === 'exam-questions' ? 'active' : ''}`}
-          onClick={() => setActiveTab('exam-questions')}
-        >
-          Exam Relevant Questions
-        </button>
+
         {subject.hasLab && (
           <button 
             className={`tab-btn ${activeTab === 'labs' ? 'active' : ''}`}
