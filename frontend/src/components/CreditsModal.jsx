@@ -31,9 +31,18 @@ export default function CreditsModal({ onClose }) {
       image: '/rudra.jpeg',
       roles: [
         { title: 'Web Developer', icon: <Code2 size={14} /> },
-        { title: '1st Year Content', icon: <BookOpen size={14} /> }
+        { title: 'Content Contributor', icon: <BookOpen size={14} /> }
       ],
       linkedin: 'https://www.linkedin.com/in/rudrapal-singh-shekhawat-5a57a2377'
+    },
+    {
+      name: 'Raghuraj Singh Shekhawat',
+      year: '2nd Year',
+      image: null,
+      roles: [
+        { title: 'Content Contributor', icon: <BookOpen size={14} /> }
+      ],
+      linkedin: 'https://www.linkedin.com/in/raghuraj-singh-shekhawat-6a9b4b37b/'
     }
   ];
 
@@ -78,17 +87,19 @@ export default function CreditsModal({ onClose }) {
                     <User size={24} color="var(--accent)" />
                   )}
                 </div>
-                <a 
-                  href={contributor.linkedin} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="linkedin-icon-link"
-                  title={`Connect with ${contributor.name} on LinkedIn`}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                    <path d="M22.23 0H1.77C.8 0 0 .77 0 1.72v20.56C0 23.23.8 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.72V1.72C24 .77 23.2 0 22.23 0zM7.12 20.45H3.56V9h3.56v11.45zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm15.11 13.02h-3.56v-5.56c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.13 1.45-2.13 2.93v5.66h-3.56V9h3.42v1.56h.05c.48-.9 1.63-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29z"/>
-                  </svg>
-                </a>
+                {contributor.linkedin && (
+                  <a 
+                    href={contributor.linkedin} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="linkedin-icon-link"
+                    title={`Connect with ${contributor.name} on LinkedIn`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M22.23 0H1.77C.8 0 0 .77 0 1.72v20.56C0 23.23.8 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.72V1.72C24 .77 23.2 0 22.23 0zM7.12 20.45H3.56V9h3.56v11.45zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm15.11 13.02h-3.56v-5.56c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.13 1.45-2.13 2.93v5.66h-3.56V9h3.42v1.56h.05c.48-.9 1.63-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29z"/>
+                    </svg>
+                  </a>
+                )}
               </div>
               <div className="credit-card-header" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <h3 style={{ margin: 0 }}>{contributor.name}</h3>
