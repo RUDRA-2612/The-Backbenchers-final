@@ -8,6 +8,7 @@ export default function CreditsModal({ onClose }) {
       name: 'Rudrapal Singh Shekhawat',
       year: '2nd Year',
       image: null,
+      nameClass: 'name-rudra',
       roles: [
         { title: 'Web Developer', icon: <Code2 size={14} /> },
         { title: 'Content Contributor', icon: <BookOpen size={14} /> },
@@ -19,6 +20,7 @@ export default function CreditsModal({ onClose }) {
       name: 'Aman Jhajharia',
       year: 'Final Year',
       image: '/aman.jpeg',
+      nameClass: 'name-content-lead',
       roles: [
         { title: 'Content Lead', icon: <BookOpen size={14} /> },
         { title: '2nd & 3rd Year Content', icon: <BookOpen size={14} /> }
@@ -30,6 +32,7 @@ export default function CreditsModal({ onClose }) {
       year: 'Final Year',
       image: '/aahan.jpeg',
       imagePosition: 'center 10%',
+      nameClass: 'name-content-lead',
       roles: [
         { title: 'Content Lead', icon: <BookOpen size={14} /> },
         { title: '2nd & 3rd Year Content', icon: <BookOpen size={14} /> }
@@ -40,6 +43,7 @@ export default function CreditsModal({ onClose }) {
       name: 'Raghuraj Singh Shekhawat',
       year: '2nd Year',
       image: null,
+      nameClass: 'name-raghuraj',
       roles: [
         { title: 'Content Contributor', icon: <BookOpen size={14} /> }
       ],
@@ -103,7 +107,7 @@ export default function CreditsModal({ onClose }) {
                 )}
               </div>
               <div className="credit-card-header" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <h3 style={{ margin: 0 }}>{contributor.name}</h3>
+                <h3 style={{ margin: 0 }} className={contributor.nameClass || ''}>{contributor.name}</h3>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                   {contributor.year}
                 </span>
