@@ -28,7 +28,7 @@ export default function SubjectGrid({ activeSemester = 1, onSelectSubject, onBac
           <span style={{ fontSize: '0.45em', fontWeight: '500', color: 'var(--text-secondary)', lineHeight: '1' }}>Subjects for</span>
           <span className="hero-brand-name" style={{ fontSize: '1.2em' }}>Semester {activeSemester}</span>
         </h1>
-        <p className="hero-subtitle">Explore notes, PYQs, solutions, and important exam topics for Semester {activeSemester}.</p>
+        <p className="hero-subtitle">Explore notes, PYQs, and important exam topics for Semester {activeSemester}.</p>
       </div>
 
       {displaySubjects.length > 0 ? (

@@ -56,7 +56,7 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
           className={`tab-btn ${activeTab === 'papers' ? 'active' : ''}`}
           onClick={() => setActiveTab('papers')}
         >
-          Previous Year Papers & Solutions
+          Previous Year Papers
         </button>
         <button 
           className={`tab-btn ${activeTab === 'notes' ? 'active' : ''}`}

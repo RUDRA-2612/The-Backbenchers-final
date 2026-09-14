@@ -58,7 +58,7 @@ export default function Home({ onSelectSubject, lastOpenedFile, onViewFile }) {
             ))}
           </span>
         </h1>
-        <p className="hero-subtitle">Your ultimate B.Tech companion. Find notes, PYQs, solutions, and exam topics for all 4 years of your engineering journey.</p>
+        <p className="hero-subtitle">Your ultimate B.Tech companion. Find notes, PYQs, and exam topics for all 4 years of your engineering journey.</p>
       </div>
 
       <div className="year-grid">
