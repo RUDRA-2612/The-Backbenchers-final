@@ -31,7 +31,7 @@ export default function CreditsModal({ onClose }) {
       image: null,
       roles: [
         { title: 'Web Developer', icon: <Code2 size={14} /> },
-        { title: 'Content Contributor', icon: <BookOpen size={14} /> }
+        { title: '1st Year Content', icon: <BookOpen size={14} /> }
       ],
       linkedin: 'https://www.linkedin.com/in/rudrapal-singh-shekhawat-5a57a2377'
     },
