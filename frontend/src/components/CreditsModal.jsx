@@ -5,6 +5,17 @@ import { X, Code2, BookOpen, User } from 'lucide-react';
 export default function CreditsModal({ onClose }) {
   const contributors = [
     {
+      name: 'Rudrapal Singh Shekhawat',
+      year: '2nd Year',
+      image: null,
+      roles: [
+        { title: 'Web Developer', icon: <Code2 size={14} /> },
+        { title: 'Content Contributor', icon: <BookOpen size={14} /> },
+        { title: '1st & 2nd Year Content', icon: <BookOpen size={14} /> }
+      ],
+      linkedin: 'https://www.linkedin.com/in/rudrapal-singh-shekhawat-5a57a2377'
+    },
+    {
       name: 'Aman Jhajharia',
       year: 'Final Year',
       image: '/aman.jpeg',
@@ -24,17 +35,6 @@ export default function CreditsModal({ onClose }) {
         { title: '2nd & 3rd Year Content', icon: <BookOpen size={14} /> }
       ],
       linkedin: 'https://www.linkedin.com/in/aahan-bansal-0a2954351/'
-    },
-    {
-      name: 'Rudrapal Singh Shekhawat',
-      year: '2nd Year',
-      image: null,
-      roles: [
-        { title: 'Web Developer', icon: <Code2 size={14} /> },
-        { title: 'Content Contributor', icon: <BookOpen size={14} /> },
-        { title: '1st & 2nd Year Content', icon: <BookOpen size={14} /> }
-      ],
-      linkedin: 'https://www.linkedin.com/in/rudrapal-singh-shekhawat-5a57a2377'
     },
     {
       name: 'Raghuraj Singh Shekhawat',
