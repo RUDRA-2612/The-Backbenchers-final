@@ -7,7 +7,7 @@ export default function CreditsModal({ onClose }) {
     {
       name: 'Rudrapal Singh Shekhawat',
       year: '2nd Year',
-      image: null,
+      image: '/rudra_4.png',
       nameClass: 'name-rudra',
       roles: [
         { title: 'Web Developer', icon: <Code2 size={14} /> },
