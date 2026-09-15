@@ -2,9 +2,13 @@ import React, { useState } from 'react';
 import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, Flag, Beaker } from 'lucide-react';
 
 export default function SubjectDetail({ subject, materials, savedFiles = [], onBack, onViewFile, onDownloadFile, onSaveFile, onReportFile }) {
-  const [activeTab, setActiveTab] = useState('papers'); // papers, notes, exam-questions, labs
-  const [activeSubTab, setActiveSubTab] = useState('mid-term'); // mid-term, end-term, quizzes
-  const [activeYear, setActiveYear] = useState('2025');
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('bb_activeTab') || 'papers');
+  const [activeSubTab, setActiveSubTab] = useState(() => localStorage.getItem('bb_activeSubTab') || 'mid-term');
+  const [activeYear, setActiveYear] = useState(() => localStorage.getItem('bb_activeYear') || '2025');
+
+  React.useEffect(() => localStorage.setItem('bb_activeTab', activeTab), [activeTab]);
+  React.useEffect(() => localStorage.setItem('bb_activeSubTab', activeSubTab), [activeSubTab]);
+  React.useEffect(() => localStorage.setItem('bb_activeYear', activeYear), [activeYear]);
   const [reportModalFile, setReportModalFile] = useState(null);
   const [reportDescription, setReportDescription] = useState('');
 
