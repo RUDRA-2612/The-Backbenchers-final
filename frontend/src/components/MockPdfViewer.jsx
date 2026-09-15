@@ -30,7 +30,7 @@ export default function MockPdfViewer({ file, onClose }) {
           {/* Using object tag to prefer native PDF viewer which handles touchpad zoom natively.
               If the browser doesn't support native PDF (like mobile), it will fallback to Google Docs viewer */}
           <object 
-            data={`${file.filepath}#toolbar=0&navpanes=0&scrollbar=1`} 
+            data={`${file.filepath}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`} 
             type="application/pdf"
             width="100%" 
             height="100%" 
