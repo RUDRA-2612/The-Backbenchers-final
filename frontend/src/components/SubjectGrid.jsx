@@ -2,14 +2,14 @@ import React from 'react';
 import { ArrowRight, ArrowLeft, Frown, Book } from 'lucide-react';
 import { masterSubjects, getSemesterForSubject } from '../data/subjects';
 
-export default function SubjectGrid({ activeSemester, activeYear, onSelectSubject, onBack }) {
+export default function SubjectGrid({ activeSemester, activeYear, activeBranch, onSelectSubject, onBack }) {
   let displaySubjects = [];
   let title = '';
   let subtitle = '';
   
   if (activeSemester) {
     Object.values(masterSubjects).forEach(year => {
-      if (year.semesters[activeSemester]) {
+      if (year.semesters && year.semesters[activeSemester]) {
         displaySubjects = year.semesters[activeSemester];
       }
     });
@@ -18,13 +18,19 @@ export default function SubjectGrid({ activeSemester, activeYear, onSelectSubjec
   } else if (activeYear) {
     const yearKey = `year${activeYear}`;
     if (masterSubjects[yearKey]) {
-      Object.values(masterSubjects[yearKey].semesters).forEach(semSubs => {
-        if (semSubs && semSubs.length > 0) {
-          displaySubjects.push(...semSubs);
-        }
-      });
+      if (activeBranch && masterSubjects[yearKey].branches && masterSubjects[yearKey].branches[activeBranch]) {
+        displaySubjects = masterSubjects[yearKey].branches[activeBranch];
+        title = activeYear === 3 ? `Third Year (${activeBranch.toUpperCase()})` : `Fourth Year (${activeBranch.toUpperCase()})`;
+      } else {
+        // Fallback if no active branch (should not hit normally, but safe to have)
+        Object.values(masterSubjects[yearKey].semesters || {}).forEach(semSubs => {
+          if (semSubs && semSubs.length > 0) {
+            displaySubjects.push(...semSubs);
+          }
+        });
+        title = activeYear === 3 ? 'Third Year' : 'Fourth Year';
+      }
     }
-    title = activeYear === 3 ? 'Third Year' : 'Fourth Year';
     subtitle = `Explore notes, PYQs, and important exam topics for ${title}.`;
   }
 

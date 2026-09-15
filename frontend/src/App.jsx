@@ -406,7 +406,11 @@ export default function App() {
             onBack={() => {
               const semNum = selectedSubject?.semester || (selectedSubject ? getSemesterForSubject(selectedSubject.code) : null);
               if (semNum) {
-                window.location.replace(`#semester-${semNum}`);
+                if (String(semNum).startsWith('year-')) {
+                  window.location.replace(`#${semNum}`);
+                } else {
+                  window.location.replace(`#semester-${semNum}`);
+                }
               } else {
                 window.location.replace('#home');
               }
@@ -449,10 +453,13 @@ export default function App() {
             />
           );
         } else if (activeView.startsWith('year-')) {
-          const yearNum = parseInt(activeView.split('-')[1]);
+          const parts = activeView.split('-');
+          const yearNum = parseInt(parts[1]);
+          const branchName = parts.length > 2 ? parts[2] : null;
           return (
             <SubjectGrid 
               activeYear={yearNum} 
+              activeBranch={branchName}
               onSelectSubject={handleSelectSubject} 
               onBack={() => { window.location.replace('#home'); }} 
             />

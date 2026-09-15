@@ -22,12 +22,18 @@ const years = [
   {
     title: 'Third Year',
     subtitle: 'The Advancement: Master complex topics and start applying your knowledge to real-world problems.',
-    action: { hash: 'year-3', label: 'View Subjects' }
+    branches: [
+      { id: 'core', label: 'Core' },
+      { id: 'ai', label: 'AI' }
+    ]
   },
   {
     title: 'Fourth Year',
     subtitle: 'The Finale: Focus on major projects, advanced electives, and preparing for the industry.',
-    action: { hash: 'year-4', label: 'View Subjects' }
+    branches: [
+      { id: 'core', label: 'Core' },
+      { id: 'ai', label: 'AI' }
+    ]
   }
 ];
 
@@ -62,7 +68,19 @@ export default function Home({ onSelectSubject, lastOpenedFile, onViewFile }) {
               <h2 className="year-title">{year.title}</h2>
               <p className="year-subtitle">{year.subtitle}</p>
             </div>
-            {year.action ? (
+            {year.branches ? (
+              <div className="semester-buttons">
+                {year.branches.map((branch) => (
+                  <button 
+                    key={branch.id}
+                    className="semester-btn"
+                    onClick={() => { window.location.hash = `year-${idx + 1}-${branch.id}`; }}
+                  >
+                    {branch.label}
+                  </button>
+                ))}
+              </div>
+            ) : year.action ? (
               <div className="semester-buttons">
                 <button 
                   className="semester-btn"

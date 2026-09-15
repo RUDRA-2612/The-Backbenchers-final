@@ -46,16 +46,42 @@ export const masterSubjects = {
   },
   year3: {
     title: 'Third Year',
-    semesters: {
-      5: [],
-      6: []
+    branches: {
+      core: [
+        { code: 'CS1224', name: 'Artificial Intelligence', icon: Zap, desc: 'Intro to AI, search algorithms, logic, and problem solving.' },
+        { code: 'CS1140', name: 'Computer Networks', icon: Radio, desc: 'Network layers, TCP/IP, routing protocols, and network security.' },
+        { code: 'CS1261', name: 'Principles of Cloud computing', icon: Database, desc: 'Cloud architectures, virtualization, AWS/Azure, and containerization.' },
+        { code: 'CS1243', name: 'Big Data Analytics with Hadoop and Spark', icon: Activity, desc: 'HDFS, MapReduce, Spark ecosystem, and data processing.' },
+        { code: 'CS1259', name: 'Introduction to Data Science', icon: Activity, desc: 'Data cleaning, EDA, statistical modeling, and data visualization.' },
+        { code: 'EE1232', name: 'Digital Image Processing', icon: Cpu, desc: 'Image enhancement, filtering, segmentation, and feature extraction.' },
+        { code: 'FA1201', name: 'Computational Finance', icon: Calculator, desc: 'Financial modeling, risk analysis, pricing options, and algorithmic trading.' },
+        { code: 'AS1118', name: 'Advanced Differential Equations', icon: Calculator, desc: 'Partial differential equations, boundary value problems, and Fourier series.' },
+        { code: 'AS1209', name: 'Matrix Computations', icon: Calculator, desc: 'Numerical linear algebra, eigenvalue problems, and singular value decomposition.' },
+        { code: 'ED1112', name: 'Entrepreneurship Development', icon: Book, desc: 'Business planning, startup ecosystem, innovation, and venture funding.' },
+        { code: 'AS1202', name: 'Advanced Statistics', icon: Activity, desc: 'Multivariate analysis, ANOVA, non-parametric tests, and stochastic processes.' },
+        { code: 'CS1142', name: 'Discrete Mathematics', icon: Calculator, desc: 'Logic, sets, relations, functions, graphs, and combinatorial mathematics.' }
+      ],
+      ai: [
+        { code: 'CS1224', name: 'Artificial Intelligence', icon: Zap, desc: 'Intro to AI, search algorithms, logic, and problem solving.' },
+        { code: 'CS1218', name: 'Deep Learning', icon: Atom, desc: 'Neural networks, CNNs, RNNs, optimization, and generative models.' },
+        { code: 'CS1261', name: 'Principles of Cloud computing', icon: Database, desc: 'Cloud architectures, virtualization, AWS/Azure, and containerization.' },
+        { code: 'CS1243', name: 'Big Data Analytics with Hadoop and Spark', icon: Activity, desc: 'HDFS, MapReduce, Spark ecosystem, and data processing.' },
+        { code: 'CS1259', name: 'Introduction to Data Science', icon: Activity, desc: 'Data cleaning, EDA, statistical modeling, and data visualization.' },
+        { code: 'EE1232', name: 'Digital Image Processing', icon: Cpu, desc: 'Image enhancement, filtering, segmentation, and feature extraction.' },
+        { code: 'FA1201', name: 'Computational Finance', icon: Calculator, desc: 'Financial modeling, risk analysis, pricing options, and algorithmic trading.' },
+        { code: 'AS1118', name: 'Advanced Differential Equations', icon: Calculator, desc: 'Partial differential equations, boundary value problems, and Fourier series.' },
+        { code: 'AS1209', name: 'Matrix Computations', icon: Calculator, desc: 'Numerical linear algebra, eigenvalue problems, and singular value decomposition.' },
+        { code: 'ED1112', name: 'Entrepreneurship Development', icon: Book, desc: 'Business planning, startup ecosystem, innovation, and venture funding.' },
+        { code: 'AS1202', name: 'Advanced Statistics', icon: Activity, desc: 'Multivariate analysis, ANOVA, non-parametric tests, and stochastic processes.' },
+        { code: 'CS1142', name: 'Discrete Mathematics', icon: Calculator, desc: 'Logic, sets, relations, functions, graphs, and combinatorial mathematics.' }
+      ]
     }
   },
   year4: {
     title: 'Fourth Year',
-    semesters: {
-      7: [],
-      8: []
+    branches: {
+      core: [],
+      ai: []
     }
   }
 };
@@ -63,18 +89,41 @@ export const masterSubjects = {
 export const getAllSubjects = () => {
   const all = [];
   Object.values(masterSubjects).forEach(year => {
-    Object.values(year.semesters).forEach(sem => {
-      all.push(...sem);
-    });
+    if (year.semesters) {
+      Object.values(year.semesters).forEach(sem => {
+        all.push(...sem);
+      });
+    }
+    if (year.branches) {
+      Object.values(year.branches).forEach(branchSubs => {
+        // Prevent duplicate objects since core and ai share some subjects
+        branchSubs.forEach(sub => {
+          if (!all.some(s => s.code === sub.code)) {
+            all.push(sub);
+          }
+        });
+      });
+    }
   });
   return all;
 };
 
 export const getSemesterForSubject = (subjectCode) => {
-  for (const year of Object.values(masterSubjects)) {
-    for (const [semNum, subjects] of Object.entries(year.semesters)) {
-      if (subjects.some(s => s.code === subjectCode)) {
-        return semNum;
+  for (const [yearKey, year] of Object.entries(masterSubjects)) {
+    if (year.semesters) {
+      for (const [semNum, subjects] of Object.entries(year.semesters)) {
+        if (subjects.some(s => s.code === subjectCode)) {
+          return semNum;
+        }
+      }
+    }
+    if (year.branches) {
+      for (const [branchName, subjects] of Object.entries(year.branches)) {
+        if (subjects.some(s => s.code === subjectCode)) {
+          // Returning hash path for branch
+          const yearNum = yearKey.replace('year', '');
+          return `year-${yearNum}-${branchName}`;
+        }
       }
     }
   }
