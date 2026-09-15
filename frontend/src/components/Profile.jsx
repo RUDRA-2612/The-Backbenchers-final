@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Shield } from 'lucide-react';
+import { Mail, Shield, User } from 'lucide-react';
 
 export default function Profile({ user }) {
   return (
@@ -20,9 +20,13 @@ export default function Profile({ user }) {
               <Mail size={16} />
               <span>{user.email}</span>
             </div>
-            {user.isAdmin && (
+            {user.isAdmin ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--accent)', fontSize: '0.85rem', fontWeight: '600', marginTop: '0.25rem' }}>
                 <Shield size={14} /> Administrator
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: '500', marginTop: '0.25rem' }}>
+                <User size={14} /> Student
               </div>
             )}
           </div>
