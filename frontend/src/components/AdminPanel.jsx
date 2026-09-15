@@ -127,28 +127,47 @@ export default function AdminPanel({ onMaterialUploaded }) {
   // Synchronize dynamic form dropdowns
   useEffect(() => {
     if (masterSubjects[selectedYear]) {
-      const sems = Object.keys(masterSubjects[selectedYear].semesters);
-      if (sems.length > 0 && !sems.includes(selectedSemester)) {
-        setSelectedSemester(sems[0]);
+      if (masterSubjects[selectedYear].semesters) {
+        const sems = Object.keys(masterSubjects[selectedYear].semesters);
+        if (sems.length > 0 && !sems.includes(selectedSemester)) {
+          setSelectedSemester(sems[0]);
+        }
+      } else if (masterSubjects[selectedYear].branches) {
+        const branches = Object.keys(masterSubjects[selectedYear].branches);
+        if (branches.length > 0 && !branches.includes(selectedSemester)) {
+          setSelectedSemester(branches[0]);
+        }
       }
     }
   }, [selectedYear, selectedSemester]);
 
   useEffect(() => {
-    if (masterSubjects[selectedYear] && masterSubjects[selectedYear].semesters[selectedSemester]) {
-      const subjects = masterSubjects[selectedYear].semesters[selectedSemester];
-      if (subjects.length > 0) {
-        // Only change subject if it's not valid for current semester
-        if (!subjects.some(s => s.code === subjectCode)) {
-          setSubjectCode(subjects[0].code);
-        }
-      } else {
-        setSubjectCode('');
+    let subjects = [];
+    if (masterSubjects[selectedYear]) {
+      if (masterSubjects[selectedYear].semesters && masterSubjects[selectedYear].semesters[selectedSemester]) {
+        subjects = masterSubjects[selectedYear].semesters[selectedSemester];
+      } else if (masterSubjects[selectedYear].branches && masterSubjects[selectedYear].branches[selectedSemester]) {
+        subjects = masterSubjects[selectedYear].branches[selectedSemester];
       }
+    }
+    
+    if (subjects.length > 0) {
+      if (!subjects.some(s => s.code === subjectCode)) {
+        setSubjectCode(subjects[0].code);
+      }
+    } else {
+      setSubjectCode('');
     }
   }, [selectedSemester, selectedYear, subjectCode]);
 
-  const currentSubjectObj = masterSubjects[selectedYear]?.semesters[selectedSemester]?.find(s => s.code === subjectCode);
+  let currentSubjectObj = null;
+  if (masterSubjects[selectedYear]) {
+    if (masterSubjects[selectedYear].semesters && masterSubjects[selectedYear].semesters[selectedSemester]) {
+       currentSubjectObj = masterSubjects[selectedYear].semesters[selectedSemester].find(s => s.code === subjectCode);
+    } else if (masterSubjects[selectedYear].branches && masterSubjects[selectedYear].branches[selectedSemester]) {
+       currentSubjectObj = masterSubjects[selectedYear].branches[selectedSemester].find(s => s.code === subjectCode);
+    }
+  }
   const currentSubjectHasLab = currentSubjectObj ? currentSubjectObj.hasLab : false;
 
   useEffect(() => {
@@ -425,16 +444,21 @@ export default function AdminPanel({ onMaterialUploaded }) {
                 </div>
                 
                 <div style={{ flex: '1 1 45%' }}>
-                  <label className="form-label" htmlFor="docSemesterSelect">Semester</label>
+                  <label className="form-label" htmlFor="docSemesterSelect">
+                    {masterSubjects[selectedYear]?.branches ? 'Branch' : 'Semester'}
+                  </label>
                   <select
                     id="docSemesterSelect"
                     className="form-input"
                     value={selectedSemester}
                     onChange={(e) => setSelectedSemester(e.target.value)}
-                    disabled={!masterSubjects[selectedYear] || Object.keys(masterSubjects[selectedYear].semesters).length === 0}
+                    disabled={!masterSubjects[selectedYear] || (!masterSubjects[selectedYear].semesters && !masterSubjects[selectedYear].branches)}
                   >
-                    {masterSubjects[selectedYear] && Object.keys(masterSubjects[selectedYear].semesters).map(sem => (
+                    {masterSubjects[selectedYear]?.semesters && Object.keys(masterSubjects[selectedYear].semesters).map(sem => (
                       <option key={sem} value={sem}>Semester {sem}</option>
+                    ))}
+                    {masterSubjects[selectedYear]?.branches && Object.keys(masterSubjects[selectedYear].branches).map(branch => (
+                      <option key={branch} value={branch}>{branch.toUpperCase()}</option>
                     ))}
                   </select>
                 </div>
@@ -447,9 +471,9 @@ export default function AdminPanel({ onMaterialUploaded }) {
                   className="form-input"
                   value={subjectCode}
                   onChange={(e) => setSubjectCode(e.target.value)}
-                  disabled={!masterSubjects[selectedYear] || !masterSubjects[selectedYear].semesters[selectedSemester] || masterSubjects[selectedYear].semesters[selectedSemester].length === 0}
+                  disabled={!masterSubjects[selectedYear] || (!masterSubjects[selectedYear].semesters?.[selectedSemester] && !masterSubjects[selectedYear].branches?.[selectedSemester])}
                 >
-                  {masterSubjects[selectedYear] && masterSubjects[selectedYear].semesters[selectedSemester] && masterSubjects[selectedYear].semesters[selectedSemester].map(s => (
+                  {(masterSubjects[selectedYear]?.semesters?.[selectedSemester] || masterSubjects[selectedYear]?.branches?.[selectedSemester] || []).map(s => (
                     <option key={s.code} value={s.code}>{s.code} - {s.name}</option>
                   ))}
                 </select>
