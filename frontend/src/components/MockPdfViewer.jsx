@@ -13,7 +13,14 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 export default function MockPdfViewer({ file, onClose }) {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [scale, setScale] = useState(1.2);
+  const [scale, setScale] = useState(1.0);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Prevent scrolling the body when PDF viewer is open
   useEffect(() => {
@@ -64,8 +71,8 @@ export default function MockPdfViewer({ file, onClose }) {
     if (pageNumber < numPages) changePage(1);
   }
 
-  const zoomIn = () => setScale(prev => Math.min(prev + 0.3, 3.0));
-  const zoomOut = () => setScale(prev => Math.max(prev - 0.3, 0.6));
+  const zoomIn = () => setScale(prev => Math.min(prev + 0.2, 3.0));
+  const zoomOut = () => setScale(prev => Math.max(prev - 0.2, 0.4));
 
   return (
     <div className="pdf-viewer-overlay">
@@ -125,6 +132,7 @@ export default function MockPdfViewer({ file, onClose }) {
                 <Page 
                   pageNumber={pageNumber} 
                   scale={scale} 
+                  width={windowWidth < 768 ? windowWidth - 16 : 800}
                   renderTextLayer={false} 
                   renderAnnotationLayer={false}
                   loading={<div style={{ padding: '4rem', display: 'flex', justifyContent: 'center' }}><Loader2 size={24} style={{ animation: 'spin 1s linear infinite', color: 'var(--accent)' }} /></div>}
