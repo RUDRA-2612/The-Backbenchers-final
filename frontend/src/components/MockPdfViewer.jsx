@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Download } from 'lucide-react';
 
-export default function MockPdfViewer({ file, onClose }) {
+export default function MockPdfViewer({ file, onClose, onDownload }) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -52,6 +52,9 @@ export default function MockPdfViewer({ file, onClose }) {
             <span className="pdf-title">{file.title}</span>
           </div>
           <div className="pdf-viewer-controls">
+            <button className="pdf-control-btn" onClick={() => onDownload(file)} title="Download Document">
+              <Download size={18} />
+            </button>
             <button className="pdf-control-btn" onClick={onClose} title="Close PDF Viewer" style={{ color: '#ef4444' }}>
               <X size={18} />
             </button>
