@@ -30,7 +30,7 @@ export default function CreditsModal({ onClose }) {
     {
       name: 'Aahan Bansal',
       year: 'Final Year',
-      image: '/aahan.jpeg',
+      image: '/aahan_1.jpeg',
       imagePosition: 'center 10%',
       nameClass: 'name-content-lead',
       roles: [
