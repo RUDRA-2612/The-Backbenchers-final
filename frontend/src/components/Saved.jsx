@@ -27,10 +27,8 @@ export default function Saved({ savedFiles, onViewFile, onDownloadFile, onRemove
               <div className="resource-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button 
-                    className="btn btn-secondary btn-accent-light" 
+                    className="btn btn-primary action-btn-hover" 
                     onClick={() => onViewFile(file)}
-                    title="View Document"
-                    style={{ padding: '0.5rem' }}
                   >
                     <Eye size={18} />
                     <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Open File</span>
@@ -47,10 +45,10 @@ export default function Saved({ savedFiles, onViewFile, onDownloadFile, onRemove
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button 
-                    className="btn btn-secondary" 
+                    className="btn btn-secondary action-btn-hover"
                     onClick={() => onRemoveSaved(file.id)}
                     title="Remove from Saved"
-                    style={{ padding: '0.5rem', color: '#ef4444', borderColor: 'var(--border)' }}
+                    style={{ padding: '0.5rem', color: '#ef4444', borderColor: '#ef4444' }}
                   >
                     <Trash2 size={18} />
                     <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Remove</span>

@@ -143,7 +143,7 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
               <div className="resource-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button 
-                    className="btn btn-secondary btn-accent-light" 
+                    className="btn btn-secondary btn-accent-light action-btn-hover" 
                     onClick={() => onViewFile(file)}
                     title="View Document Online"
                     style={{ padding: '0.5rem' }}
@@ -163,7 +163,7 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button 
-                    className="btn btn-secondary btn-accent-light" 
+                    className="btn btn-secondary btn-accent-light action-btn-hover" 
                     onClick={() => onSaveFile(file)}
                     title={savedFiles.some(f => f.id === file.id) ? "Remove from Saved" : "Save / Bookmark PDF"}
                     style={{ padding: '0.5rem', color: 'var(--accent)' }}
@@ -172,7 +172,7 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
                     <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{savedFiles.some(f => f.id === file.id) ? "Saved" : "Save"}</span>
                   </button>
                   <button 
-                    className="btn btn-secondary" 
+                    className="btn btn-secondary action-btn-hover" 
                     onClick={() => setReportModalFile(file)}
                     title="Report Issue"
                     style={{ padding: '0.5rem', color: '#ff4d4f', borderColor: 'transparent', backgroundColor: 'rgba(255, 77, 79, 0.1)' }}

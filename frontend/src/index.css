@@ -2580,4 +2580,6 @@ h1, h2, h3, h4, h5, h6 {
  
 
 .download-action-btn { transition: filter 0.2s ease, transform 0.2s ease !important; }
-.download-action-btn:hover { filter: brightness(0.7) !important; }
+.download-action-btn:hover { filter: brightness(0.5) !important; }
+.action-btn-hover { transition: filter 0.2s ease, transform 0.2s ease !important; }
+.action-btn-hover:hover { filter: brightness(0.8) !important; }
