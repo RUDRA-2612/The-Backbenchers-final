@@ -86,8 +86,7 @@ app.post('/api/auth/login', async (req, res) => {
     const adminEmails = [
       'rudrapalsinghshekhawat@jklu.edu.in',
       'amanjhajharia@jklu.edu.in',
-      'aahan@jklu.edu.in',
-      'raghurajsinghshekhawat@jklu.edu.in'
+      'aahan@jklu.edu.in'
     ];
     const isAdminEmail = adminEmails.includes(emailLower);
 
