@@ -160,6 +160,12 @@ export default function AdminPanel({ onMaterialUploaded }) {
     }
   }, [selectedSemester, selectedYear, subjectCode]);
 
+  useEffect(() => {
+    if (subjectCode === 'IL1107' && year !== '2025') {
+      setYear('2025');
+    }
+  }, [subjectCode, year]);
+
   let currentSubjectObj = null;
   if (masterSubjects[selectedYear]) {
     if (masterSubjects[selectedYear].semesters && masterSubjects[selectedYear].semesters[selectedSemester]) {
@@ -510,8 +516,12 @@ export default function AdminPanel({ onMaterialUploaded }) {
                       onChange={(e) => setYear(e.target.value)}
                     >
                       <option value="2025">2025</option>
-                      <option value="2024">2024</option>
-                      <option value="2023">2023</option>
+                      {subjectCode !== 'IL1107' && (
+                        <>
+                          <option value="2024">2024</option>
+                          <option value="2023">2023</option>
+                        </>
+                      )}
                     </select>
                   </div>
                 </>
