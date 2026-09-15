@@ -22,18 +22,12 @@ const years = [
   {
     title: 'Third Year',
     subtitle: 'The Advancement: Master complex topics and start applying your knowledge to real-world problems.',
-    semesters: [
-      { num: 5, label: 'Semester 5' },
-      { num: 6, label: 'Semester 6' }
-    ]
+    action: { hash: 'year-3', label: 'View Subjects' }
   },
   {
     title: 'Fourth Year',
     subtitle: 'The Finale: Focus on major projects, advanced electives, and preparing for the industry.',
-    semesters: [
-      { num: 7, label: 'Semester 7' },
-      { num: 8, label: 'Semester 8' }
-    ]
+    action: { hash: 'year-4', label: 'View Subjects' }
   }
 ];
 
@@ -68,17 +62,29 @@ export default function Home({ onSelectSubject, lastOpenedFile, onViewFile }) {
               <h2 className="year-title">{year.title}</h2>
               <p className="year-subtitle">{year.subtitle}</p>
             </div>
-            <div className="semester-buttons">
-              {year.semesters.map((sem) => (
+            {year.action ? (
+              <div className="semester-buttons">
                 <button 
-                  key={sem.num} 
                   className="semester-btn"
-                  onClick={() => { window.location.hash = 'semester-' + sem.num; }}
+                  style={{ width: '100%' }}
+                  onClick={() => { window.location.hash = year.action.hash; }}
                 >
-                  {sem.label}
+                  {year.action.label}
                 </button>
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div className="semester-buttons">
+                {year.semesters.map((sem) => (
+                  <button 
+                    key={sem.num} 
+                    className="semester-btn"
+                    onClick={() => { window.location.hash = 'semester-' + sem.num; }}
+                  >
+                    {sem.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

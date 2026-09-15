@@ -140,7 +140,7 @@ export default function App() {
         // Do nothing on hashchange to pdf-viewer.
         // The PDF modal is opened by handleViewFile setting activePdfFile synchronously.
         // If we check activePdfFile here, it fails due to stale closures.
-      } else if (hash.startsWith('semester-')) {
+      } else if (hash.startsWith('semester-') || hash.startsWith('year-')) {
         setActiveView(hash);
         setActivePdfFile(null);
       } else if (hash === 'credits') {
@@ -444,6 +444,15 @@ export default function App() {
           return (
             <SubjectGrid 
               activeSemester={semNum} 
+              onSelectSubject={handleSelectSubject} 
+              onBack={() => { window.location.replace('#home'); }} 
+            />
+          );
+        } else if (activeView.startsWith('year-')) {
+          const yearNum = parseInt(activeView.split('-')[1]);
+          return (
+            <SubjectGrid 
+              activeYear={yearNum} 
               onSelectSubject={handleSelectSubject} 
               onBack={() => { window.location.replace('#home'); }} 
             />
