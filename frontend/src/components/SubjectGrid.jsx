@@ -14,7 +14,7 @@ export default function SubjectGrid({ activeSemester, activeYear, activeBranch, 
       }
     });
     title = `Semester ${activeSemester}`;
-    subtitle = `Explore notes, PYQs, and important exam topics for Semester ${activeSemester}.`;
+    subtitle = `Explore PYQs for Semester ${activeSemester}.`;
   } else if (activeYear) {
     const yearKey = `year${activeYear}`;
     if (masterSubjects[yearKey]) {
@@ -31,7 +31,7 @@ export default function SubjectGrid({ activeSemester, activeYear, activeBranch, 
         title = activeYear === 3 ? 'Third Year' : 'Fourth Year';
       }
     }
-    subtitle = `Explore notes, PYQs, and important exam topics for ${title}.`;
+    subtitle = `Explore PYQs for ${title}.`;
   }
 
   return (
