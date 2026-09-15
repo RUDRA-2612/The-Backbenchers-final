@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Code2, BookOpen, User, Linkedin, Instagram } from 'lucide-react';
+import { X, Code2, BookOpen, User } from 'lucide-react';
 
 export default function CreditsModal({ onClose }) {
   const contributors = [
