@@ -168,13 +168,6 @@ export default function AdminPanel({ onMaterialUploaded }) {
        currentSubjectObj = masterSubjects[selectedYear].branches[selectedSemester].find(s => s.code === subjectCode);
     }
   }
-  const currentSubjectHasLab = currentSubjectObj ? currentSubjectObj.hasLab : false;
-
-  useEffect(() => {
-    if (category === 'labs' && !currentSubjectHasLab) {
-      setCategory('notes');
-    }
-  }, [currentSubjectHasLab, category]);
 
   const handleDeleteMaterial = async (id) => {
     if (!window.confirm("Are you sure you want to delete this material?")) return;
@@ -489,7 +482,6 @@ export default function AdminPanel({ onMaterialUploaded }) {
                 >
                   <option value="notes">Notes</option>
                   <option value="papers">Previous Year Papers</option>
-                  {currentSubjectHasLab && <option value="labs">Labs</option>}
                 </select>
               </div>
 
