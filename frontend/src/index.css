@@ -2124,7 +2124,6 @@ h1, h2, h3, h4, h5, h6 {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px inset rgba(255,255,255,0.05);
-  animation: modal-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
 }
 
