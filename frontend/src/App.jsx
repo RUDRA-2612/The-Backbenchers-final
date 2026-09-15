@@ -30,7 +30,10 @@ export default function App() {
   });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [activeView, setActiveView] = useState('home'); // home, subject-detail, downloads, admin
-  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState(() => {
+    const saved = localStorage.getItem('backbenchers_selected_subject');
+    return saved ? JSON.parse(saved) : null;
+  });
 
   // Materials & Downloads State
   const [materials, setMaterials] = useState([]);
@@ -149,7 +152,10 @@ export default function App() {
       } else if (hash === 'home' || hash === 'admin' || hash === 'downloads' || hash === 'saved' || hash === 'profile') {
         setActiveView(hash);
         setActivePdfFile(null);
-        if (hash === 'home') setSelectedSubject(null);
+        if (hash === 'home') {
+          setSelectedSubject(null);
+          localStorage.removeItem('backbenchers_selected_subject');
+        }
       } else {
         // Default fallback
         setActiveView('home');
@@ -279,6 +285,7 @@ export default function App() {
 
   const handleSelectSubject = (subject) => {
     setSelectedSubject(subject);
+    localStorage.setItem('backbenchers_selected_subject', JSON.stringify(subject));
     setActiveView('subject-detail');
     window.location.hash = 'subject-detail'; // Downward navigation pushes to history
   };
@@ -500,7 +507,10 @@ export default function App() {
               return;
             }
             setActiveView(view);
-            if (view === 'home') setSelectedSubject(null);
+            if (view === 'home') {
+              setSelectedSubject(null);
+              localStorage.removeItem('backbenchers_selected_subject');
+            }
             window.location.replace(`#${view}`);
             setSidebarCollapsed(true);
           }}
