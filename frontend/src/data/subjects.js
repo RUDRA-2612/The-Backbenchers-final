@@ -48,6 +48,8 @@ export const masterSubjects = {
     title: 'Third Year',
     branches: {
       core: [
+        { code: 'CS1101', name: 'Object Oriented Programming', icon: Code, desc: 'Classes, objects, inheritance, polymorphism, and Java fundamentals.', hasLab: true },
+        { code: 'CC1105', name: 'Understanding and Managing Conflict', icon: Book, desc: 'Conflict resolution, negotiation skills, emotional intelligence, and interpersonal dynamics.' },
         { code: 'CS1224', name: 'Artificial Intelligence', icon: Zap, desc: 'Intro to AI, search algorithms, logic, and problem solving.' },
         { code: 'CS1140', name: 'Computer Networks', icon: Radio, desc: 'Network layers, TCP/IP, routing protocols, and network security.' },
         { code: 'CS1261', name: 'Principles of Cloud computing', icon: Database, desc: 'Cloud architectures, virtualization, AWS/Azure, and containerization.' },
@@ -62,6 +64,8 @@ export const masterSubjects = {
         { code: 'CS1142', name: 'Discrete Mathematics', icon: Calculator, desc: 'Logic, sets, relations, functions, graphs, and combinatorial mathematics.' }
       ],
       ai: [
+        { code: 'CS1101', name: 'Object Oriented Programming', icon: Code, desc: 'Classes, objects, inheritance, polymorphism, and Java fundamentals.', hasLab: true },
+        { code: 'CC1105', name: 'Understanding and Managing Conflict', icon: Book, desc: 'Conflict resolution, negotiation skills, emotional intelligence, and interpersonal dynamics.' },
         { code: 'CS1224', name: 'Artificial Intelligence', icon: Zap, desc: 'Intro to AI, search algorithms, logic, and problem solving.' },
         { code: 'CS1218', name: 'Deep Learning', icon: Atom, desc: 'Neural networks, CNNs, RNNs, optimization, and generative models.' },
         { code: 'CS1261', name: 'Principles of Cloud computing', icon: Database, desc: 'Cloud architectures, virtualization, AWS/Azure, and containerization.' },
