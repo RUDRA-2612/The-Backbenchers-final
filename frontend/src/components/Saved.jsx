@@ -36,7 +36,7 @@ export default function Saved({ savedFiles, onViewFile, onDownloadFile, onRemove
                     <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Open File</span>
                   </button>
                   <button 
-                    className="btn btn-secondary btn-accent-light" 
+                    className="btn btn-secondary btn-accent-light download-action-btn" 
                     onClick={() => onDownloadFile(file)}
                     title="Download PDF"
                     style={{ padding: '0.5rem' }}

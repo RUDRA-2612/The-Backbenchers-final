@@ -152,7 +152,7 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
                     <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>View Online</span>
                   </button>
                   <button 
-                    className="btn btn-secondary btn-accent-light" 
+                    className="btn btn-secondary btn-accent-light download-action-btn" 
                     onClick={() => onDownloadFile(file)}
                     title="Download PDF"
                     style={{ padding: '0.5rem' }}

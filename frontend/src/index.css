@@ -2578,3 +2578,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 @ m e d i a   ( m a x - w i d t h :   7 6 8 p x )   {   . p d f - v i e w e r - h e a d e r   {   p a d d i n g :   0 . 5 r e m ;   f l e x - w r a p :   w r a p ;   g a p :   0 . 5 r e m ;   j u s t i f y - c o n t e n t :   s p a c e - a r o u n d ;   }   . p d f - t i t l e - b o x   {   w i d t h :   1 0 0 % ;   j u s t i f y - c o n t e n t :   c e n t e r ;   m a r g i n - b o t t o m :   0 . 2 r e m ;   }   . p d f - t i t l e   {   f o n t - s i z e :   0 . 9 r e m ;   w h i t e - s p a c e :   n o w r a p ;   o v e r f l o w :   h i d d e n ;   t e x t - o v e r f l o w :   e l l i p s i s ;   m a x - w i d t h :   2 5 0 p x ;   }   . p d f - p a g i n a t i o n   {   g a p :   0 . 5 r e m   ! i m p o r t a n t ;   }   . p d f - c o n t r o l - b t n   {   p a d d i n g :   0 . 3 r e m ;   }   }  
  
+
+.download-action-btn { transition: filter 0.2s ease, transform 0.2s ease !important; }
+.download-action-btn:hover { filter: brightness(0.7) !important; }
