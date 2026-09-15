@@ -246,7 +246,7 @@ export default function App() {
             }
 
             if (data.isBlocked) {
-              alert("तुम्हारे कर्मों का फल तुम्हें ज़रूर मिलता है");
+              alert("Humne tumhe bulaya nahi, tum aa gaye... 😂\nKhatam! Tata! Bye Bye!");
               handleLogout();
             } else if (data.isSessionValid === false) {
               alert("You have been logged out because your account was accessed from another device.");
