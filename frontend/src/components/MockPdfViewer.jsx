@@ -20,9 +20,7 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
             <span className="pdf-title">{file.title}</span>
           </div>
           <div className="pdf-viewer-controls">
-            <button className="pdf-control-btn" onClick={() => onDownload(file)} title="Download Document">
-              <Download size={18} />
-            </button>
+
             <button className="pdf-control-btn" onClick={onClose} title="Close PDF Viewer" style={{ color: '#ef4444' }}>
               <X size={18} />
             </button>
