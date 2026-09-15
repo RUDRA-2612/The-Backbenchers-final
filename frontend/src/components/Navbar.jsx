@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText, Flag } from 'lucide-react';
+import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText, Flag, Shield } from 'lucide-react';
 
 export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSidebar, materials = [], onViewFile, onReportFile }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -188,6 +188,18 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
                   <LogOut size={16} />
                   <span>Log Out</span>
                 </button>
+                <button 
+                  className="dropdown-item" 
+                  onClick={() => {
+                    setShowDropdown(false);
+                    if (onViewFile) {
+                      onViewFile({ id: 'disclaimer', title: 'Disclaimer and Content Policy', filepath: '/Disclaimer_and_Content_Policy.pdf' });
+                    }
+                  }}
+                >
+                  <Shield size={16} />
+                  <span>Disclaimer & Policy</span>
+                </button>
               </div>
             )}
           </div>
@@ -215,6 +227,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
           </div>
         </div>
       )}
+
     </nav>
   );
 }

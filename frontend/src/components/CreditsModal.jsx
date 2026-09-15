@@ -15,7 +15,7 @@ export default function CreditsModal({ onClose }) {
         { title: '1st & 2nd Year Content', icon: <BookOpen size={14} /> }
       ],
       linkedin: 'https://www.linkedin.com/in/rudrapal-singh-shekhawat-5a57a2377',
-      instagram: 'https://www.instagram.com/_rdrsh_/'
+      instagram: 'https://www.instagram.com/back_benchers_26_/'
     },
     {
       name: 'Aman Jhajharia',
