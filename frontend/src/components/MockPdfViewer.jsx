@@ -1,7 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 export default function MockPdfViewer({ file, onClose }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // Check on initial load
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Prevent scrolling the body when PDF viewer is open
   useEffect(() => {
@@ -51,23 +59,40 @@ export default function MockPdfViewer({ file, onClose }) {
         </div>
         
         <div className="pdf-body">
-          {/* Using object tag to prefer native PDF viewer which handles touchpad zoom natively.
-              If the browser doesn't support native PDF (like mobile), it will fallback to Google Docs viewer */}
-          <object 
-            data={`${file.filepath}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`} 
-            type="application/pdf"
-            width="100%" 
-            height="100%" 
-            style={{ border: 'none', display: 'block' }}
-          >
-            <iframe 
-              src={`https://docs.google.com/viewer?url=${encodeURIComponent(file.filepath)}&embedded=true`} 
-              title={file.title} 
+          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            {/* Transparent overlay to block the "pop-out" (redirect) button in Google Docs Viewer on mobile */}
+            {isMobile && (
+              <div 
+                style={{ 
+                  position: 'absolute', 
+                  top: 0, 
+                  right: 0, 
+                  width: '60px', 
+                  height: '60px', 
+                  zIndex: 50,
+                  backgroundColor: 'transparent' 
+                }} 
+              />
+            )}
+            
+            {/* Using object tag to prefer native PDF viewer which handles touchpad zoom natively.
+                If the browser doesn't support native PDF (like mobile), it will fallback to Google Docs viewer */}
+            <object 
+              data={`${file.filepath}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`} 
+              type="application/pdf"
               width="100%" 
               height="100%" 
-              style={{ border: 'none', backgroundColor: '#fff' }}
-            />
-          </object>
+              style={{ border: 'none', display: 'block' }}
+            >
+              <iframe 
+                src={`https://docs.google.com/viewer?url=${encodeURIComponent(file.filepath)}&embedded=true`} 
+                title={file.title} 
+                width="100%" 
+                height="100%" 
+                style={{ border: 'none', backgroundColor: '#fff' }}
+              />
+            </object>
+          </div>
         </div>
       </div>
     </div>
