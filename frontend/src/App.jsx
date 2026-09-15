@@ -546,6 +546,7 @@ export default function App() {
       {activePdfFile && (
         <MockPdfViewer 
           file={activePdfFile} 
+          user={user}
           onClose={() => window.history.back()}
           onDownload={handleDownloadFile}
         />
