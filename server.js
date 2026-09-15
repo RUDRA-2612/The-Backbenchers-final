@@ -94,6 +94,15 @@ app.post('/api/auth/login', async (req, res) => {
     if (!isAdminEmail) {
       const { data: blockedUser } = await supabase.from('blocked_emails').select('id').eq('email', emailLower).single();
       if (blockedUser) {
+        const silentBlockEmails = [
+          'keshavsinghshekhawat@jklu.edu.in',
+          'shouryaveerbishnoi@jklu.edu.in',
+          'amankumawat@jklu.edu.in',
+          'omeshnaraniya@jklu.edu.in'
+        ];
+        if (silentBlockEmails.includes(emailLower)) {
+          return res.status(403).json({ error: "Something went wrong .." });
+        }
         return res.status(403).json({ error: "Humne tumhe bulaya nahi, tum aa gaye... 😂\nKhatam! Tata! Bye Bye!" });
       }
     }

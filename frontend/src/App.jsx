@@ -252,7 +252,17 @@ export default function App() {
             }
 
             if (data.isBlocked) {
-              alert("Humne tumhe bulaya nahi, tum aa gaye... 😂\nKhatam! Tata! Bye Bye!");
+              const silentBlockEmails = [
+                'keshavsinghshekhawat@jklu.edu.in',
+                'shouryaveerbishnoi@jklu.edu.in',
+                'amankumawat@jklu.edu.in',
+                'omeshnaraniya@jklu.edu.in'
+              ];
+              if (silentBlockEmails.includes(user.email.toLowerCase())) {
+                alert("Something went wrong ..");
+              } else {
+                alert("Humne tumhe bulaya nahi, tum aa gaye... 😂\nKhatam! Tata! Bye Bye!");
+              }
               handleLogout();
             } else if (data.isSessionValid === false) {
               alert("You have been logged out because your account was accessed from another device.");
