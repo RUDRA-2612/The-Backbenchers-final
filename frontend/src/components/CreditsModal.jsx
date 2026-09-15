@@ -43,7 +43,7 @@ export default function CreditsModal({ onClose }) {
     {
       name: 'Raghuraj Singh Shekhawat',
       year: '2nd Year',
-      image: '/raghu_1.jpeg',
+      image: '/raghu_2.jpeg',
       nameClass: 'name-raghuraj',
       roles: [
         { title: 'Content Contributor', icon: <BookOpen size={14} /> }
