@@ -26,7 +26,7 @@ export default function Profile({ user }) {
               </div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: '500', marginTop: '0.25rem' }}>
-                <User size={14} /> Student
+                <User size={14} /> User
               </div>
             )}
           </div>
