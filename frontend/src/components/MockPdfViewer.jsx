@@ -11,6 +11,30 @@ export default function MockPdfViewer({ file, onClose }) {
     };
   }, []);
 
+  // Block Keyboard shortcuts (Ctrl+S, Ctrl+P) and Right Click
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
+    };
+
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
+
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+    window.addEventListener('contextmenu', handleContextMenu);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, { capture: true });
+      window.removeEventListener('contextmenu', handleContextMenu);
+    };
+  }, []);
+
   return (
     <div className="pdf-viewer-overlay">
       <div className="pdf-viewer-container">
