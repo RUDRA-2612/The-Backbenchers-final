@@ -83,7 +83,13 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(403).json({ error: 'Access restricted. Please use your @jklu.edu.in email address.' });
     }
 
-    const isAdminEmail = emailLower === 'rudrapalsinghshekhawat@jklu.edu.in' || emailLower === 'amanjhajharia@jklu.edu.in';
+    const adminEmails = [
+      'rudrapalsinghshekhawat@jklu.edu.in',
+      'amanjhajharia@jklu.edu.in',
+      'aahan@jklu.edu.in',
+      'raghurajsinghshekhawat@jklu.edu.in'
+    ];
+    const isAdminEmail = adminEmails.includes(emailLower);
 
     // Check if user is blocked (Admins bypass this restriction)
     if (!isAdminEmail) {
