@@ -77,7 +77,7 @@ export default function MockPdfViewer({ file, onClose }) {
           </div>
           
           {numPages && (
-            <div className="pdf-pagination" style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--text-primary)' }}>
+            <div className="pdf-pagination" style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#f1f1f1' }}>
               <button className="pdf-control-btn" onClick={previousPage} disabled={pageNumber <= 1} style={{ opacity: pageNumber <= 1 ? 0.3 : 1, cursor: pageNumber <= 1 ? 'not-allowed' : 'pointer' }}>
                 <ChevronLeft size={20} />
               </button>

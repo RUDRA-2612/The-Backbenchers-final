@@ -179,16 +179,6 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
                   <span>Report Issue</span>
                 </button>
                 <button 
-                  className="dropdown-item danger" 
-                  onClick={() => {
-                    setShowDropdown(false);
-                    onLogout();
-                  }}
-                >
-                  <LogOut size={16} />
-                  <span>Log Out</span>
-                </button>
-                <button 
                   className="dropdown-item" 
                   onClick={() => {
                     setShowDropdown(false);
@@ -199,6 +189,16 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
                 >
                   <Shield size={16} />
                   <span>Disclaimer & Policy</span>
+                </button>
+                <button 
+                  className="dropdown-item danger" 
+                  onClick={() => {
+                    setShowDropdown(false);
+                    onLogout();
+                  }}
+                >
+                  <LogOut size={16} />
+                  <span>Log Out</span>
                 </button>
               </div>
             )}
