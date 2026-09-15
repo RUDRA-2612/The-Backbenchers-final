@@ -246,7 +246,7 @@ export default function App() {
             }
 
             if (data.isBlocked) {
-              alert("Your account access has been paused. Please contact the administrator for assistance.");
+              alert("तुम्हारे कर्मों का फल तुम्हें ज़रूर मिलता है");
               handleLogout();
             } else if (data.isSessionValid === false) {
               alert("You have been logged out because your account was accessed from another device.");

@@ -89,7 +89,7 @@ app.post('/api/auth/login', async (req, res) => {
     if (!isAdminEmail) {
       const { data: blockedUser } = await supabase.from('blocked_emails').select('id').eq('email', emailLower).single();
       if (blockedUser) {
-        return res.status(403).json({ error: "Your account access has been paused. Please contact the administrator for assistance." });
+        return res.status(403).json({ error: "तुम्हारे कर्मों का फल तुम्हें ज़रूर मिलता है" });
       }
     }
 
