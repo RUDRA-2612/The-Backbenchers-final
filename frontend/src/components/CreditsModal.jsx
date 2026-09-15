@@ -93,16 +93,21 @@ export default function CreditsModal({ onClose }) {
                     <User size={24} color="var(--accent)" />
                   )}
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
                   {contributor.linkedin && (
                     <a 
                       href={contributor.linkedin} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="linkedin-icon-link"
+                      style={{ transition: 'transform 0.2s' }}
+                      onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                      onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                       title={`Connect with ${contributor.name} on LinkedIn`}
                     >
-                      <Linkedin size={18} strokeWidth={2} />
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28">
+                        <rect width="24" height="24" rx="4" fill="#0A66C2"/>
+                        <path fill="#FFF" d="M20.45 20.45h-3.56v-5.56c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.13 1.45-2.13 2.93v5.66H9.35V9h3.42v1.56h.05c.48-.9 1.63-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/>
+                      </svg>
                     </a>
                   )}
                   {contributor.instagram && (
@@ -110,10 +115,26 @@ export default function CreditsModal({ onClose }) {
                       href={contributor.instagram} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="instagram-icon-link"
+                      style={{ transition: 'transform 0.2s' }}
+                      onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                      onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                       title={`Connect with ${contributor.name} on Instagram`}
                     >
-                      <Instagram size={18} strokeWidth={2} />
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                          <linearGradient id="insta-grad" x1="2" y1="22" x2="22" y2="2" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stopColor="#f09433" />
+                            <stop offset="25%" stopColor="#e6683c" />
+                            <stop offset="50%" stopColor="#dc2743" />
+                            <stop offset="75%" stopColor="#cc2366" />
+                            <stop offset="100%" stopColor="#bc1888" />
+                          </linearGradient>
+                        </defs>
+                        <rect x="1" y="1" width="22" height="22" rx="6" fill="url(#insta-grad)" />
+                        <path d="M12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7ZM12 15.2C10.2327 15.2 8.8 13.7673 8.8 12C8.8 10.2327 10.2327 8.8 12 8.8C13.7673 8.8 15.2 10.2327 15.2 12C15.2 13.7673 13.7673 15.2 12 15.2Z" fill="white"/>
+                        <circle cx="17.5" cy="6.5" r="1.3" fill="white"/>
+                        <rect x="4.5" y="4.5" width="15" height="15" rx="3.5" stroke="white" strokeWidth="1.8"/>
+                      </svg>
                     </a>
                   )}
                 </div>
