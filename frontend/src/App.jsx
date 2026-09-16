@@ -276,12 +276,6 @@ export default function App() {
       
       // Check immediately on load
       checkBlockStatus();
-
-      // Check periodically every 15 seconds
-      const intervalId = setInterval(checkBlockStatus, 15000);
-
-      // Cleanup on unmount or user change
-      return () => clearInterval(intervalId);
     }
   }, [user]);
 
@@ -310,10 +304,6 @@ export default function App() {
     
     // Check immediately
     checkVersion();
-    
-    // Then check every 30 seconds
-    const interval = setInterval(checkVersion, 30000);
-    return () => clearInterval(interval);
   }, []);
 
   const toggleTheme = () => {

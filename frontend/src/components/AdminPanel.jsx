@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag, Ban, MessageSquare } from 'lucide-react';
+import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag, Ban, MessageSquare, Search, User } from 'lucide-react';
 import { API_URL } from '../config';
 
 import { masterSubjects } from '../data/subjects';
@@ -14,6 +14,8 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const [materials, setMaterials] = useState([]);
   const [reports, setReports] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [selectedUserEmail, setSelectedUserEmail] = useState('');
 
   // Form State
   const [title, setTitle] = useState('');
@@ -338,11 +340,115 @@ export default function AdminPanel({ onMaterialUploaded }) {
     }
   };
 
+  const searchLower = userSearchQuery.trim().toLowerCase();
+  
+  // Users matching the search query for the dropdown
+  const userSearchResults = searchLower && !selectedUserEmail ? students.filter(s => 
+    s.email.toLowerCase().includes(searchLower) || s.name.toLowerCase().includes(searchLower)
+  ).slice(0, 6) : [];
+
+  // The user currently selected from the dropdown
+  const selectedUserLower = selectedUserEmail.trim().toLowerCase();
+  const foundUser = selectedUserLower ? students.find(s => s.email.toLowerCase() === selectedUserLower) : null;
+  const userLogins = selectedUserLower ? logins.filter(l => l.email.toLowerCase() === selectedUserLower) : [];
+  const userDownloads = selectedUserLower ? downloads.filter(d => d.email.toLowerCase() === selectedUserLower) : [];
+  const lastLogin = userLogins.length > 0 ? userLogins[0].timestamp : null;
+
+  const handleSelectUser = (email) => {
+    setSelectedUserEmail(email);
+    setUserSearchQuery(email); // Keep the email in the input box
+  };
+
   return (
     <div>
       <div className="downloads-header">
         <h2>Administrator Panel</h2>
         <p style={{ color: 'var(--text-secondary)' }}>Manage study materials, monitor student logins, and track downloads activity.</p>
+      </div>
+
+      {/* Global Admin User Search */}
+      <div style={{ marginBottom: '2rem' }}>
+        <div className="global-search-container active" style={{ position: 'relative', maxWidth: '500px', margin: '0' }}>
+          <div className="search-input-wrapper">
+            <input 
+              type="text" 
+              className="global-search-input" 
+              style={{ width: '100%' }}
+              placeholder="Search by student email or name..." 
+              value={userSearchQuery}
+              onChange={(e) => {
+                setUserSearchQuery(e.target.value);
+                setSelectedUserEmail(''); // Clear selection when typing
+              }}
+            />
+            {searchLower && !selectedUserEmail && (
+              <div className="search-results-dropdown">
+                {userSearchResults.length > 0 ? (
+                  userSearchResults.map(user => (
+                    <div key={user.id} className="search-result-item" onClick={() => handleSelectUser(user.email)}>
+                      <User size={16} className="result-icon" />
+                      <div className="result-text">
+                        <div className="result-title">{user.name}</div>
+                        <div className="result-code">{user.email}</div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="search-result-empty">No users found.</div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {selectedUserLower && (
+          <div className="user-search-results admin-card" style={{ marginTop: '1rem' }}>
+            {foundUser ? (
+              <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'rgba(34, 197, 94, 0.1)', borderLeft: '4px solid #22c55e', borderRadius: '4px' }}>
+                <h4 style={{ color: '#22c55e', marginBottom: '0.5rem' }}>User Found!</h4>
+                <p><strong>Name:</strong> {foundUser.name}</p>
+                <p><strong>Email:</strong> {foundUser.email}</p>
+                <p><strong>Joined:</strong> {new Date(foundUser.createdAt).toLocaleDateString()}</p>
+              </div>
+            ) : (
+              <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderLeft: '4px solid #ef4444', borderRadius: '4px' }}>
+                <h4 style={{ color: '#ef4444' }}>User not found</h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>No user is registered with this email ID.</p>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+              <div style={{ flex: '1 1 300px' }}>
+                <h4 style={{ marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-light)' }}>Last Login</h4>
+                {lastLogin ? (
+                  <p style={{ fontSize: '1.1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                    {new Date(lastLogin).toLocaleString()}
+                  </p>
+                ) : (
+                  <p style={{ color: 'var(--text-secondary)' }}>No login history found.</p>
+                )}
+              </div>
+
+              <div style={{ flex: '1 1 300px', maxHeight: '400px', overflowY: 'auto', paddingRight: '10px' }}>
+                <h4 style={{ marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-light)' }}>Download History ({userDownloads.length})</h4>
+                {userDownloads.length > 0 ? (
+                  <ul style={{ listStyleType: 'none', padding: 0 }}>
+                    {userDownloads.map(d => (
+                      <li key={d.id} style={{ marginBottom: '0.75rem', padding: '0.75rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                        <p style={{ fontWeight: '500', marginBottom: '0.25rem' }}>{d.title}</p>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                          {d.subjectCode} • {new Date(d.timestamp).toLocaleString()}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p style={{ color: 'var(--text-secondary)' }}>No downloads found for this user.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Admin tabs */}
