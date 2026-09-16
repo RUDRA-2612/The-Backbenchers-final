@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText, Flag, Shield } from 'lucide-react';
+import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText, Flag, Shield, MessageSquare } from 'lucide-react';
 
 export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSidebar, materials = [], onViewFile, onReportFile }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -8,6 +8,8 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
   const [searchQuery, setSearchQuery] = useState('');
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportDescription, setReportDescription] = useState('');
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackDescription, setFeedbackDescription] = useState('');
   const dropdownRef = useRef(null);
   const searchRef = useRef(null);
 
@@ -19,6 +21,16 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
     setShowReportModal(false);
     setReportDescription('');
     alert('Report submitted successfully. Thank you!');
+  };
+
+  const handleFeedbackSubmit = () => {
+    if (feedbackDescription.trim() === '') return;
+    if (onReportFile) {
+      onReportFile({ id: 'FEEDBACK', title: 'FEEDBACK' }, feedbackDescription);
+    }
+    setShowFeedbackModal(false);
+    setFeedbackDescription('');
+    alert('Feedback submitted successfully. Thank you!');
   };
 
   // Close dropdown if clicked outside
@@ -182,6 +194,16 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
                   className="dropdown-item" 
                   onClick={() => {
                     setShowDropdown(false);
+                    setShowFeedbackModal(true);
+                  }}
+                >
+                  <MessageSquare size={16} />
+                  <span>Feedback</span>
+                </button>
+                <button 
+                  className="dropdown-item" 
+                  onClick={() => {
+                    setShowDropdown(false);
                     if (onViewFile) {
                       onViewFile({ id: 'disclaimer', title: 'Disclaimer and Content Policy', filepath: '/Disclaimer_and_Content_Policy.pdf' });
                     }
@@ -223,6 +245,28 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
               <button className="btn btn-secondary" onClick={() => setShowReportModal(false)}>Cancel</button>
               <button className="btn btn-primary" style={{ backgroundColor: '#ff4d4f', color: '#fff' }} onClick={handleReportSubmit}>Submit Report</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && (
+        <div className="modal-overlay" onClick={() => setShowFeedbackModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+            <h3 style={{ marginBottom: '1rem' }}>Submit Feedback</h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+              We value your thoughts! Tell us how we can improve.
+            </p>
+            <textarea 
+              style={{ width: '100%', height: '100px', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', marginBottom: '1rem', fontFamily: 'inherit', resize: 'vertical' }}
+              placeholder="Share your ideas, suggestions, or feedback here..."
+              value={feedbackDescription}
+              onChange={e => setFeedbackDescription(e.target.value)}
+            />
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+              <button className="btn btn-secondary" onClick={() => setShowFeedbackModal(false)}>Cancel</button>
+              <button className="btn btn-primary" onClick={handleFeedbackSubmit}>Submit Feedback</button>
             </div>
           </div>
         </div>

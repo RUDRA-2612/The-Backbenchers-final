@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag, Ban } from 'lucide-react';
+import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag, Ban, MessageSquare } from 'lucide-react';
 import { API_URL } from '../config';
 
 import { masterSubjects } from '../data/subjects';
@@ -389,6 +389,13 @@ export default function AdminPanel({ onMaterialUploaded }) {
         >
           <Flag size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           User Reports
+        </button>
+        <button
+          className={`tab-btn ${adminTab === 'feedback' ? 'active' : ''}`}
+          onClick={() => setAdminTab('feedback')}
+        >
+          <MessageSquare size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
+          User Feedback
         </button>
       </div>
 
@@ -831,7 +838,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
               <Flag size={20} style={{ color: '#ff4d4f' }} />
               User Reports
             </h3>
-            {reports.length > 0 ? (
+            {reports.filter(r => r.materialId !== 'FEEDBACK').length > 0 ? (
               <div className="admin-table-container">
                 <table className="admin-table">
                   <thead>
@@ -845,7 +852,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {reports.map((r, idx) => (
+                    {reports.filter(r => r.materialId !== 'FEEDBACK').map((r, idx) => (
                       <tr key={r.id || idx}>
                         <td style={{ whiteSpace: 'nowrap' }}>{new Date(r.timestamp).toLocaleString()}</td>
                         <td style={{ fontWeight: '600' }}>{r.userName}</td>
@@ -879,6 +886,56 @@ export default function AdminPanel({ onMaterialUploaded }) {
               <div className="empty-state" style={{ padding: '2rem' }}>
                 <CheckCircle size={32} style={{ color: '#22c55e' }} />
                 <p>No reports found. Everything is looking good!</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 7: FEEDBACK */}
+        {adminTab === 'feedback' && (
+          <div className="admin-card">
+            <h3 className="admin-title">
+              <MessageSquare size={20} style={{ color: '#3b82f6' }} />
+              User Feedback
+            </h3>
+            {reports.filter(r => r.materialId === 'FEEDBACK').length > 0 ? (
+              <div className="admin-table-container">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>User</th>
+                      <th>Email</th>
+                      <th>Feedback Description</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reports.filter(r => r.materialId === 'FEEDBACK').map((r, idx) => (
+                      <tr key={r.id || idx}>
+                        <td style={{ whiteSpace: 'nowrap' }}>{new Date(r.timestamp).toLocaleString()}</td>
+                        <td style={{ fontWeight: '600' }}>{r.userName}</td>
+                        <td>{r.userEmail}</td>
+                        <td style={{ maxWidth: '400px', whiteSpace: 'normal', wordBreak: 'break-word' }}>{r.description}</td>
+                        <td>
+                          <button 
+                            className="btn btn-secondary" 
+                            style={{ padding: '0.4rem', color: '#22c55e', borderColor: '#22c55e' }} 
+                            onClick={() => handleDeleteReport(r.id)} 
+                            title="Mark as Read & Delete"
+                          >
+                            <CheckCircle size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="empty-state" style={{ padding: '2rem' }}>
+                <CheckCircle size={32} style={{ color: '#22c55e' }} />
+                <p>No feedback received yet.</p>
               </div>
             )}
           </div>
