@@ -210,10 +210,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .nav-logo-img {
-  height: 65px;
-  transform: scale(1.3);
-  transform-origin: center left;
-  margin-right: 15px;
+  height: 45px;
+  margin-right: 10px;
   width: auto;
   object-fit: contain;
   transition: var(--transition);
@@ -1678,7 +1676,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.2rem;
   }
   .navbar .logo span {
-    display: none;
+    font-size: 1.1rem;
   }
   .nav-right {
     gap: 0.5rem;
