@@ -285,6 +285,37 @@ export default function App() {
     }
   }, [user]);
 
+  // Auto-Update Checker
+  useEffect(() => {
+    let currentVersion = null;
+    
+    const checkVersion = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/version`, { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (currentVersion === null) {
+            // First time load, set the version
+            currentVersion = data.version;
+          } else if (currentVersion !== data.version) {
+            // Version changed! New deployment detected.
+            console.log("New version detected. Reloading...");
+            window.location.reload(true);
+          }
+        }
+      } catch (err) {
+        // Ignore network errors
+      }
+    };
+    
+    // Check immediately
+    checkVersion();
+    
+    // Then check every 30 seconds
+    const interval = setInterval(checkVersion, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
