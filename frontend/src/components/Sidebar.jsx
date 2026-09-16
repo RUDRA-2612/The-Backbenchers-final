@@ -20,14 +20,6 @@ export default function Sidebar({ activeView, setActiveView, isCollapsed, isAdmi
       </button>
 
       <button 
-        className={`sidebar-link ${activeView === 'downloads' ? 'active' : ''}`}
-        onClick={() => setActiveView('downloads')}
-      >
-        <Download size={20} />
-        <span>My Downloads</span>
-      </button>
-
-      <button 
         className={`sidebar-link ${activeView === 'saved' ? 'active' : ''}`}
         onClick={() => setActiveView('saved')}
       >
