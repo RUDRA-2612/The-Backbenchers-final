@@ -129,6 +129,10 @@ export default function Home({ onSelectSubject, lastOpenedFile, onViewFile }) {
           </button>
         </div>
       )}
+
+      <div style={{ textAlign: 'center', margin: '3rem auto 1rem', padding: '0 2rem', maxWidth: '600px', color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.5' }}>
+        <p>Check back regularly! We are continuously uploading new study materials and resources to help you succeed.</p>
+      </div>
     </div>
   );
 }
