@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, Flag, Beaker } from 'lucide-react';
 
-export default function SubjectDetail({ subject, materials, savedFiles = [], onBack, onViewFile, onDownloadFile, onSaveFile, onReportFile }) {
+export default function SubjectDetail({ subject, materials, savedFiles = [], isAdmin, onBack, onViewFile, onDownloadFile, onSaveFile, onReportFile }) {
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem('bb_activeTab') || 'papers');
   const [activeSubTab, setActiveSubTab] = useState(() => localStorage.getItem('bb_activeSubTab') || 'mid-term');
   const [activeYear, setActiveYear] = useState(() => localStorage.getItem('bb_activeYear') || '2025');
@@ -161,15 +161,7 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
                     <Eye size={18} />
                     <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>View Online</span>
                   </button>
-                  <button 
-                    className="btn btn-secondary btn-accent-light download-action-btn" 
-                    onClick={() => onDownloadFile(file)}
-                    title="Download PDF"
-                    style={{ padding: '0.5rem' }}
-                  >
-                    <Download size={18} />
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Download</span>
-                  </button>
+
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button 

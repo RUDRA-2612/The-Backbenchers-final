@@ -311,6 +311,11 @@ export default function App() {
 
   // Physically download file and log transaction in backend
   const handleDownloadFile = async (file) => {
+    if (!user?.isAdmin) {
+      alert("Downloading is disabled for regular users.");
+      return;
+    }
+    
     try {
       // 1. Log to server
       if (user) {
@@ -432,6 +437,7 @@ export default function App() {
                 window.location.replace('#home');
               }
             }}
+            isAdmin={user?.isAdmin}
             onViewFile={handleViewFile}
             onDownloadFile={handleDownloadFile}
             onSaveFile={handleSaveFile}
@@ -450,6 +456,7 @@ export default function App() {
         return (
           <Saved 
             savedFiles={savedFiles} 
+            isAdmin={user?.isAdmin}
             onViewFile={handleViewFile}
             onDownloadFile={handleDownloadFile}
             onRemoveSaved={handleRemoveSaved}

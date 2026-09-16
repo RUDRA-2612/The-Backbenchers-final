@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bookmark, Eye, Trash2, Download } from 'lucide-react';
 
-export default function Saved({ savedFiles, onViewFile, onDownloadFile, onRemoveSaved }) {
+export default function Saved({ savedFiles, isAdmin, onViewFile, onDownloadFile, onRemoveSaved }) {
   return (
     <div>
       <div className="downloads-header">
@@ -33,15 +33,7 @@ export default function Saved({ savedFiles, onViewFile, onDownloadFile, onRemove
                     <Eye size={18} />
                     <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Open File</span>
                   </button>
-                  <button 
-                    className="btn btn-secondary btn-accent-light download-action-btn" 
-                    onClick={() => onDownloadFile(file)}
-                    title="Download PDF"
-                    style={{ padding: '0.5rem' }}
-                  >
-                    <Download size={18} />
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Download</span>
-                  </button>
+
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button 
