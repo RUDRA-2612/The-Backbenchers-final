@@ -5,6 +5,7 @@ import './index.css'
 import { MsalProvider } from '@azure/msal-react'
 import { msalInstance } from './auth/authConfig'
 import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 // Initialize MSAL outside of the React tree
 msalInstance.initialize().then(() => {
@@ -17,6 +18,7 @@ msalInstance.initialize().then(() => {
         <App />
       </MsalProvider>
       <Analytics />
+      <SpeedInsights />
     </React.StrictMode>,
   );
 }).catch((error) => {
