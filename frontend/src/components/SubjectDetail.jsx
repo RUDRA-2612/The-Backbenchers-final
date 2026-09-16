@@ -9,6 +9,12 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
   React.useEffect(() => localStorage.setItem('bb_activeTab', activeTab), [activeTab]);
   React.useEffect(() => localStorage.setItem('bb_activeSubTab', activeSubTab), [activeSubTab]);
   React.useEffect(() => localStorage.setItem('bb_activeYear', activeYear), [activeYear]);
+
+  React.useEffect(() => {
+    if (activeTab === 'papers' && subject.code.startsWith('CC') && activeSubTab === 'mid-term') {
+      setActiveSubTab('end-term');
+    }
+  }, [subject.code, activeTab, activeSubTab]);
   const [reportModalFile, setReportModalFile] = useState(null);
   const [reportDescription, setReportDescription] = useState('');
 
@@ -73,12 +79,14 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
       {activeTab === 'papers' && (
         <>
           <div className="subtabs-container">
-            <button 
-              className={`subtab-btn ${activeSubTab === 'mid-term' ? 'active' : ''}`}
-              onClick={() => setActiveSubTab('mid-term')}
-            >
-              Mid Term
-            </button>
+            {!subject.code.startsWith('CC') && (
+              <button 
+                className={`subtab-btn ${activeSubTab === 'mid-term' ? 'active' : ''}`}
+                onClick={() => setActiveSubTab('mid-term')}
+              >
+                Mid Term
+              </button>
+            )}
             {subject.code !== 'IL1107' && (
               <button 
                 className={`subtab-btn ${activeSubTab === 'end-term' ? 'active' : ''}`}

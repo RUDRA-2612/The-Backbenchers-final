@@ -166,6 +166,12 @@ export default function AdminPanel({ onMaterialUploaded }) {
     }
   }, [subjectCode, year]);
 
+  useEffect(() => {
+    if (subjectCode.startsWith('CC') && subcategory === 'mid-term') {
+      setSubcategory('end-term');
+    }
+  }, [subjectCode, subcategory]);
+
   let currentSubjectObj = null;
   if (masterSubjects[selectedYear]) {
     if (masterSubjects[selectedYear].semesters && masterSubjects[selectedYear].semesters[selectedSemester]) {
@@ -508,7 +514,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                       value={subcategory}
                       onChange={(e) => setSubcategory(e.target.value)}
                     >
-                      <option value="mid-term">Mid Term</option>
+                      {!subjectCode.startsWith('CC') && <option value="mid-term">Mid Term</option>}
                       <option value="end-term">End Term</option>
                       <option value="quizzes">Quizzes</option>
                     </select>
