@@ -17,6 +17,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [selectedUserEmail, setSelectedUserEmail] = useState('');
   const [showUserSearch, setShowUserSearch] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
   const searchRef = useRef(null);
 
   useEffect(() => {
@@ -400,14 +401,40 @@ export default function AdminPanel({ onMaterialUploaded }) {
               onChange={(e) => {
                 setUserSearchQuery(e.target.value);
                 setSelectedUserEmail(''); // Clear selection when typing
+                setFocusedIndex(-1);
+              }}
+              onKeyDown={(e) => {
+                if (!showUserSearch || userSearchResults.length === 0) return;
+                
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  setFocusedIndex(prev => (prev < userSearchResults.length - 1 ? prev + 1 : prev));
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  setFocusedIndex(prev => (prev > 0 ? prev - 1 : prev));
+                } else if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (focusedIndex >= 0 && focusedIndex < userSearchResults.length) {
+                    handleSelectUser(userSearchResults[focusedIndex].email);
+                    setFocusedIndex(-1);
+                  }
+                }
               }}
               autoFocus={showUserSearch}
             />
             {showUserSearch && searchLower && !selectedUserEmail && (
               <div className="search-results-dropdown">
                 {userSearchResults.length > 0 ? (
-                  userSearchResults.map(user => (
-                    <div key={user.id} className="search-result-item" onClick={() => handleSelectUser(user.email)}>
+                  userSearchResults.map((user, idx) => (
+                    <div 
+                      key={user.id} 
+                      className={`search-result-item ${focusedIndex === idx ? 'focused' : ''}`} 
+                      style={focusedIndex === idx ? { backgroundColor: 'var(--bg-hover)' } : {}}
+                      onClick={() => {
+                        handleSelectUser(user.email);
+                        setFocusedIndex(-1);
+                      }}
+                    >
                       <User size={16} className="result-icon" />
                       <div className="result-text">
                         <div className="result-title">{user.name}</div>
