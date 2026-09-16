@@ -3678,10 +3678,10 @@ function webViewerSwitchAnnotationEditorParams(evt) {
   PDFViewerApplication.pdfViewer.annotationEditorParams = evt;
 }
 function webViewerPrint() {
-  PDFViewerApplication.triggerPrinting();
+  console.log("Printing is disabled.");
 }
 function webViewerDownload() {
-  PDFViewerApplication.downloadOrSave();
+  console.log("Downloading is disabled.");
 }
 function webViewerOpenInExternalApp() {
   PDFViewerApplication.openInExternalApp();
