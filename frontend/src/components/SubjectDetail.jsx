@@ -79,12 +79,14 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], onB
             >
               Mid Term
             </button>
-            <button 
-              className={`subtab-btn ${activeSubTab === 'end-term' ? 'active' : ''}`}
-              onClick={() => setActiveSubTab('end-term')}
-            >
-              End Term
-            </button>
+            {subject.code !== 'IL1107' && (
+              <button 
+                className={`subtab-btn ${activeSubTab === 'end-term' ? 'active' : ''}`}
+                onClick={() => setActiveSubTab('end-term')}
+              >
+                End Term
+              </button>
+            )}
             <button 
               className={`subtab-btn ${activeSubTab === 'quizzes' ? 'active' : ''}`}
               onClick={() => setActiveSubTab('quizzes')}
