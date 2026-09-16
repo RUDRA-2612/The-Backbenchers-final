@@ -3478,9 +3478,9 @@ const PDFViewerApplication = {
         return;
       }
       const fileOrigin = new URL(file, window.location.href).origin;
-      if (fileOrigin !== viewerOrigin) {
-        throw new Error("file origin does not match viewer's");
-      }
+      // if (fileOrigin !== viewerOrigin) {
+      //   throw new Error("file origin does not match viewer's");
+      // }
     } catch (ex) {
       PDFViewerApplication.l10n.get("pdfjs-loading-error").then(msg => {
         PDFViewerApplication._documentError(msg, {
