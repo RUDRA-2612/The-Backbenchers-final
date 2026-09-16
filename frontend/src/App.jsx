@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useMsal } from '@azure/msal-react';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
@@ -280,21 +280,24 @@ export default function App() {
   }, [user]);
 
   // Auto-Update Checker
+  const currentVersionRef = useRef(null);
+
   useEffect(() => {
-    let currentVersion = null;
-    
     const checkVersion = async () => {
       try {
         const res = await fetch(`${API_URL}/api/version`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
-          if (currentVersion === null) {
+          if (currentVersionRef.current === null) {
             // First time load, set the version
-            currentVersion = data.version;
-          } else if (currentVersion !== data.version) {
+            currentVersionRef.current = data.version;
+          } else if (currentVersionRef.current !== data.version) {
             // Version changed! New deployment detected.
-            console.log("New version detected. Reloading...");
-            window.location.reload(true);
+            // DO NOT reload if user is actively reading a PDF
+            if (!activePdfFile) {
+              console.log("New version detected. Reloading...");
+              window.location.reload(true);
+            }
           }
         }
       } catch (err) {
@@ -304,7 +307,11 @@ export default function App() {
     
     // Check immediately
     checkVersion();
-  }, []);
+
+    // Also check every 2 minutes in background
+    const intervalId = setInterval(checkVersion, 2 * 60 * 1000);
+    return () => clearInterval(intervalId);
+  }, [activePdfFile]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');

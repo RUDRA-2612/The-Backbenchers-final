@@ -105,6 +105,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
         </button>
         <div className="logo" onClick={() => window.location.replace('#home')}>
           <img src="/logo.png" alt="Logo" className="nav-logo-img smart-logo" />
+          <span className="desktop-only" style={{ marginLeft: '5px' }}>Back<span>benchers</span></span>
         </div>
       </div>
 

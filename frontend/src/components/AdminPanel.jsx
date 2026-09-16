@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag, Ban, MessageSquare, Search, User } from 'lucide-react';
+import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag, Ban, MessageSquare, Search, User, X } from 'lucide-react';
 import { API_URL } from '../config';
 
 import { masterSubjects } from '../data/subjects';
@@ -31,6 +31,24 @@ export default function AdminPanel({ onMaterialUploaded }) {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if ((selectedUserEmail || showUserSearch) && !window.history.state?.searchActive) {
+      window.history.pushState({ searchActive: true }, '');
+    }
+  }, [selectedUserEmail, showUserSearch]);
+
+  useEffect(() => {
+    const handlePopState = (e) => {
+      if (selectedUserEmail || showUserSearch) {
+        setSelectedUserEmail('');
+        setUserSearchQuery('');
+        setShowUserSearch(false);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [selectedUserEmail, showUserSearch]);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -367,7 +385,10 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const foundUser = selectedUserLower ? students.find(s => s.email.toLowerCase() === selectedUserLower) : null;
   const userLogins = selectedUserLower ? logins.filter(l => l.email.toLowerCase() === selectedUserLower) : [];
   const userDownloads = selectedUserLower ? downloads.filter(d => d.email.toLowerCase() === selectedUserLower) : [];
-  const lastLogin = userLogins.length > 0 ? userLogins[0].timestamp : null;
+  
+  const loginTimestamps = userLogins.map(l => new Date(l.timestamp).getTime());
+  const lastLogin = loginTimestamps.length > 0 ? new Date(Math.max(...loginTimestamps)) : null;
+  const firstLogin = loginTimestamps.length > 0 ? new Date(Math.min(...loginTimestamps)) : null;
 
   const handleSelectUser = (email) => {
     setSelectedUserEmail(email);
@@ -452,13 +473,26 @@ export default function AdminPanel({ onMaterialUploaded }) {
       </div>
 
       {selectedUserLower && (
-        <div className="user-search-results admin-card" style={{ marginTop: '1rem', marginBottom: '2rem' }}>
+        <div className="user-search-results admin-card" style={{ marginTop: '1rem', marginBottom: '2rem', position: 'relative' }}>
+            <button 
+              onClick={() => {
+                setSelectedUserEmail('');
+                setUserSearchQuery('');
+                if (window.history.state?.searchActive) {
+                  window.history.back();
+                }
+              }}
+              style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
+              title="Close Search"
+            >
+              <X size={20} />
+            </button>
             {foundUser ? (
               <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'rgba(34, 197, 94, 0.1)', borderLeft: '4px solid #22c55e', borderRadius: '4px' }}>
                 <h4 style={{ color: '#22c55e', marginBottom: '0.5rem' }}>User Found!</h4>
                 <p><strong>Name:</strong> {foundUser.name}</p>
                 <p><strong>Email:</strong> {foundUser.email}</p>
-                <p><strong>Joined:</strong> {new Date(foundUser.createdAt).toLocaleDateString()}</p>
+                <p><strong>Date Joined:</strong> {new Date(foundUser.createdAt).toLocaleDateString()}</p>
               </div>
             ) : (
               <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderLeft: '4px solid #ef4444', borderRadius: '4px' }}>
@@ -468,15 +502,27 @@ export default function AdminPanel({ onMaterialUploaded }) {
             )}
 
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-              <div style={{ flex: '1 1 300px' }}>
-                <h4 style={{ marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-light)' }}>Last Login</h4>
-                {lastLogin ? (
-                  <p style={{ fontSize: '1.1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
-                    {new Date(lastLogin).toLocaleString()}
-                  </p>
-                ) : (
-                  <p style={{ color: 'var(--text-secondary)' }}>No login history found.</p>
-                )}
+              <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div>
+                  <h4 style={{ marginBottom: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-light)' }}>Last Login</h4>
+                  {lastLogin ? (
+                    <p style={{ fontSize: '1.1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                      {new Date(lastLogin).toLocaleString()}
+                    </p>
+                  ) : (
+                    <p style={{ color: 'var(--text-secondary)' }}>No login history found.</p>
+                  )}
+                </div>
+                <div>
+                  <h4 style={{ marginBottom: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-light)' }}>First Login</h4>
+                  {firstLogin ? (
+                    <p style={{ fontSize: '1.1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                      {new Date(firstLogin).toLocaleString()}
+                    </p>
+                  ) : (
+                    <p style={{ color: 'var(--text-secondary)' }}>No login history found.</p>
+                  )}
+                </div>
               </div>
 
               <div style={{ flex: '1 1 300px', maxHeight: '400px', overflowY: 'auto', paddingRight: '10px' }}>
