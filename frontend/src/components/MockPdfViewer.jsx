@@ -11,11 +11,14 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
   
-  // Prevent scrolling the body when PDF viewer is open
+  // Prevent scrolling the body when PDF viewer is open and prevent layout shift
   useEffect(() => {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
     return () => {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
     };
   }, []);
 

@@ -1328,9 +1328,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .pdf-viewer-container {
-  width: 100vw;
-  height: 100vh;
-  max-width: 100vw;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
   background-color: #525659;
   border-radius: 0;
   display: flex;
@@ -1729,7 +1729,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0;
   }
   .pdf-viewer-container {
-    height: 100vh;
+    height: 100%;
     border-radius: 0;
   }
   .pdf-body {
