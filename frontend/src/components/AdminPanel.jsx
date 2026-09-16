@@ -52,7 +52,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
       const materialData = await materialRes.json();
       setMaterials(materialData);
 
-      const reportRes = await fetch(`${API_URL}/api/admin/reports`);
+      const reportRes = await fetch(`${API_URL}/api/admin/reports?t=${timestamp}`, { cache: 'no-store' });
       if (reportRes.ok) {
         const reportData = await reportRes.json();
         setReports(reportData);
@@ -838,7 +838,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
               <Flag size={20} style={{ color: '#ff4d4f' }} />
               User Reports
             </h3>
-            {reports.filter(r => r.materialId !== 'FEEDBACK').length > 0 ? (
+            {reports.filter(r => r.title !== 'FEEDBACK').length > 0 ? (
               <div className="admin-table-container">
                 <table className="admin-table">
                   <thead>
@@ -846,13 +846,13 @@ export default function AdminPanel({ onMaterialUploaded }) {
                       <th>Time</th>
                       <th>User</th>
                       <th>Email</th>
-                      <th>Material Title</th>
+                      <th>Reported Item</th>
                       <th>Issue Description</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {reports.filter(r => r.materialId !== 'FEEDBACK').map((r, idx) => (
+                    {reports.filter(r => r.title !== 'FEEDBACK').map((r, idx) => (
                       <tr key={r.id || idx}>
                         <td style={{ whiteSpace: 'nowrap' }}>{new Date(r.timestamp).toLocaleString()}</td>
                         <td style={{ fontWeight: '600' }}>{r.userName}</td>
@@ -898,7 +898,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
               <MessageSquare size={20} style={{ color: '#3b82f6' }} />
               User Feedback
             </h3>
-            {reports.filter(r => r.materialId === 'FEEDBACK').length > 0 ? (
+            {reports.filter(r => r.title === 'FEEDBACK').length > 0 ? (
               <div className="admin-table-container">
                 <table className="admin-table">
                   <thead>
@@ -911,7 +911,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {reports.filter(r => r.materialId === 'FEEDBACK').map((r, idx) => (
+                    {reports.filter(r => r.title === 'FEEDBACK').map((r, idx) => (
                       <tr key={r.id || idx}>
                         <td style={{ whiteSpace: 'nowrap' }}>{new Date(r.timestamp).toLocaleString()}</td>
                         <td style={{ fontWeight: '600' }}>{r.userName}</td>

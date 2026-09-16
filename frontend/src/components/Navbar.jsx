@@ -26,7 +26,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
   const handleFeedbackSubmit = () => {
     if (feedbackDescription.trim() === '') return;
     if (onReportFile) {
-      onReportFile({ id: 'FEEDBACK', title: 'FEEDBACK' }, feedbackDescription);
+      onReportFile({ id: null, title: 'FEEDBACK' }, feedbackDescription);
     }
     setShowFeedbackModal(false);
     setFeedbackDescription('');
