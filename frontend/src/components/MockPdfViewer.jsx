@@ -67,46 +67,13 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
         
         <div className="pdf-body">
           <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-            {/* Transparent overlay to block the "pop-out" (redirect) button in Google Docs Viewer on mobile */}
-            {isMobile && (
-              <div 
-                style={{ 
-                  position: 'absolute', 
-                  top: 0, 
-                  right: 0, 
-                  width: '60px', 
-                  height: '60px', 
-                  zIndex: 50,
-                  backgroundColor: 'transparent' 
-                }} 
-              />
-            )}
-            
-            {isMobile ? (
-              <iframe 
-                src={`/pdfjs/web/viewer.html?file=${encodeURIComponent(file.filepath)}`} 
-                title={file.title} 
-                width="100%" 
-                height="100%" 
-                style={{ border: 'none', backgroundColor: '#fff' }}
-              />
-            ) : (
-              <object 
-                data={`${file.filepath}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`} 
-                type="application/pdf"
-                width="100%" 
-                height="100%" 
-                style={{ border: 'none', display: 'block' }}
-              >
-                <iframe 
-                  src={`/pdfjs/web/viewer.html?file=${encodeURIComponent(file.filepath)}`} 
-                  title={file.title} 
-                  width="100%" 
-                  height="100%" 
-                  style={{ border: 'none', backgroundColor: '#fff' }}
-                />
-              </object>
-            )}
+            <iframe 
+              src={`/pdfjs/web/viewer.html?file=${encodeURIComponent(file.filepath)}#zoom=auto`} 
+              title={file.title} 
+              width="100%" 
+              height="100%" 
+              style={{ border: 'none', backgroundColor: '#fff', display: 'block' }}
+            />
           </div>
         </div>
       </div>
