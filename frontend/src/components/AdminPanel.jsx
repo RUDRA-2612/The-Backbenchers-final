@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag, Ban, MessageSquare, Search, User } from 'lucide-react';
 import { API_URL } from '../config';
 
@@ -16,6 +16,20 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const [updatingId, setUpdatingId] = useState(null);
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [selectedUserEmail, setSelectedUserEmail] = useState('');
+  const [showUserSearch, setShowUserSearch] = useState(false);
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowUserSearch(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -361,14 +375,21 @@ export default function AdminPanel({ onMaterialUploaded }) {
 
   return (
     <div>
-      <div className="downloads-header">
-        <h2>Administrator Panel</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>Manage study materials, monitor student logins, and track downloads activity.</p>
-      </div>
+      <div className="downloads-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h2>Administrator Panel</h2>
+          <p style={{ color: 'var(--text-secondary)' }}>Manage study materials, monitor student logins, and track downloads activity.</p>
+        </div>
 
-      {/* Global Admin User Search */}
-      <div style={{ marginBottom: '2rem' }}>
-        <div className="global-search-container active" style={{ position: 'relative', maxWidth: '500px', margin: '0' }}>
+        {/* Global Admin User Search */}
+        <div className={`global-search-container ${showUserSearch ? 'active' : ''}`} ref={searchRef} style={{ position: 'relative', flexShrink: 0 }}>
+          <button 
+            className="search-toggle-btn"
+            onClick={() => setShowUserSearch(true)}
+            aria-label="Search Users"
+          >
+            <Search size={18} />
+          </button>
           <div className="search-input-wrapper">
             <input 
               type="text" 
@@ -380,8 +401,9 @@ export default function AdminPanel({ onMaterialUploaded }) {
                 setUserSearchQuery(e.target.value);
                 setSelectedUserEmail(''); // Clear selection when typing
               }}
+              autoFocus={showUserSearch}
             />
-            {searchLower && !selectedUserEmail && (
+            {showUserSearch && searchLower && !selectedUserEmail && (
               <div className="search-results-dropdown">
                 {userSearchResults.length > 0 ? (
                   userSearchResults.map(user => (
@@ -400,9 +422,10 @@ export default function AdminPanel({ onMaterialUploaded }) {
             )}
           </div>
         </div>
+      </div>
 
-        {selectedUserLower && (
-          <div className="user-search-results admin-card" style={{ marginTop: '1rem' }}>
+      {selectedUserLower && (
+        <div className="user-search-results admin-card" style={{ marginTop: '1rem', marginBottom: '2rem' }}>
             {foundUser ? (
               <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'rgba(34, 197, 94, 0.1)', borderLeft: '4px solid #22c55e', borderRadius: '4px' }}>
                 <h4 style={{ color: '#22c55e', marginBottom: '0.5rem' }}>User Found!</h4>
@@ -449,7 +472,6 @@ export default function AdminPanel({ onMaterialUploaded }) {
             </div>
           </div>
         )}
-      </div>
 
       {/* Admin tabs */}
       <div className="tabs-container">
