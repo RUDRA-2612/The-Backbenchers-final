@@ -10,7 +10,7 @@ const supabase = createClient(
 async function testFeedback() {
   const newReport = {
     id: uuidv4(),
-    materialId: 'FEEDBACK',
+    materialId: null,
     title: 'FEEDBACK',
     description: 'Test feedback description',
     userEmail: 'test@example.com',
