@@ -493,5 +493,20 @@ See https://github.com/adobe-type-tools/cmap-resources
     <div id="printContainer"></div>
 
     <input type="file" id="fileInput" class="hidden">
+    <script>
+      // Block Ctrl+S, Ctrl+P, and Right Click strictly inside the viewer iframe
+      window.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+          if (e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P') {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+      }, { capture: true });
+
+      window.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+      }, { capture: true });
+    </script>
   </body>
 </html>
