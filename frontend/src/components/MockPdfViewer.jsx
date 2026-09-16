@@ -82,23 +82,31 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
               />
             )}
             
-            {/* Using object tag to prefer native PDF viewer which handles touchpad zoom natively.
-                If the browser doesn't support native PDF (like mobile), it will fallback to Google Docs viewer */}
-            <object 
-              data={`${file.filepath}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`} 
-              type="application/pdf"
-              width="100%" 
-              height="100%" 
-              style={{ border: 'none', display: 'block' }}
-            >
+            {isMobile ? (
               <iframe 
-                src={`https://docs.google.com/viewer?url=${encodeURIComponent(file.filepath)}&embedded=true`} 
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(file.filepath)}&embedded=true`} 
                 title={file.title} 
                 width="100%" 
                 height="100%" 
                 style={{ border: 'none', backgroundColor: '#fff' }}
               />
-            </object>
+            ) : (
+              <object 
+                data={`${file.filepath}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`} 
+                type="application/pdf"
+                width="100%" 
+                height="100%" 
+                style={{ border: 'none', display: 'block' }}
+              >
+                <iframe 
+                  src={`https://docs.google.com/gview?url=${encodeURIComponent(file.filepath)}&embedded=true`} 
+                  title={file.title} 
+                  width="100%" 
+                  height="100%" 
+                  style={{ border: 'none', backgroundColor: '#fff' }}
+                />
+              </object>
+            )}
           </div>
         </div>
       </div>
