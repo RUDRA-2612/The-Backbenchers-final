@@ -84,7 +84,7 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
             
             {isMobile ? (
               <iframe 
-                src={`https://docs.google.com/gview?url=${encodeURIComponent(file.filepath)}&embedded=true`} 
+                src={`/pdfjs/web/viewer.html?file=${encodeURIComponent(file.filepath)}`} 
                 title={file.title} 
                 width="100%" 
                 height="100%" 
@@ -99,7 +99,7 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
                 style={{ border: 'none', display: 'block' }}
               >
                 <iframe 
-                  src={`https://docs.google.com/gview?url=${encodeURIComponent(file.filepath)}&embedded=true`} 
+                  src={`/pdfjs/web/viewer.html?file=${encodeURIComponent(file.filepath)}`} 
                   title={file.title} 
                   width="100%" 
                   height="100%" 
