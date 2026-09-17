@@ -283,6 +283,14 @@ app.get('/api/admin/blocked-emails', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.get('/api/admin/user-activities', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('user_activity').select('*');
+    if (error) throw error;
+    res.json(data);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.post('/api/admin/block-email', async (req, res) => {
   try {
     const { email } = req.body;

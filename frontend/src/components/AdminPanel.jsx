@@ -13,6 +13,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const [newBlockedEmail, setNewBlockedEmail] = useState('');
   const [materials, setMaterials] = useState([]);
   const [reports, setReports] = useState([]);
+  const [userActivities, setUserActivities] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [selectedUserEmail, setSelectedUserEmail] = useState('');
@@ -82,6 +83,12 @@ export default function AdminPanel({ onMaterialUploaded }) {
       const blockedRes = await fetch(`${API_URL}/api/admin/blocked-emails?t=${timestamp}`, { cache: 'no-store' });
       const blockedData = await blockedRes.json();
       setBlockedEmails(blockedData);
+
+      const activitiesRes = await fetch(`${API_URL}/api/admin/user-activities?t=${timestamp}`, { cache: 'no-store' });
+      if (activitiesRes.ok) {
+        const activitiesData = await activitiesRes.json();
+        setUserActivities(activitiesData || []);
+      }
 
       const materialRes = await fetch(`${API_URL}/api/materials?t=${timestamp}`);
       const materialData = await materialRes.json();
@@ -878,17 +885,36 @@ export default function AdminPanel({ onMaterialUploaded }) {
                       <th>Full Name</th>
                       <th>Email Address</th>
                       <th>Google Account</th>
+                      <th>Recent Activity (Pages/PDFs)</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {students.map(s => (
-                      <tr key={s.id}>
-                        <td>{new Date(s.createdAt).toLocaleDateString()}</td>
-                        <td style={{ fontWeight: '600' }}>{s.name}</td>
-                        <td>{s.email}</td>
-                        <td>{s.isGoogle ? 'Yes (Gmail)' : 'No (Credentials)'}</td>
-                      </tr>
-                    ))}
+                    {students.map(s => {
+                      const activity = userActivities.find(a => a.email === s.email) || {};
+                      const downloadedCount = activity.downloaded_files ? activity.downloaded_files.length : 0;
+                      const savedCount = activity.saved_files ? activity.saved_files.length : 0;
+                      const lastOpened = activity.last_opened_file ? activity.last_opened_file.title : 'No recent views';
+                      
+                      return (
+                        <tr key={s.id}>
+                          <td>{new Date(s.createdAt).toLocaleDateString()}</td>
+                          <td style={{ fontWeight: '600' }}>{s.name}</td>
+                          <td>{s.email}</td>
+                          <td>{s.isGoogle ? 'Yes (Gmail)' : 'No (Credentials)'}</td>
+                          <td>
+                            <div style={{ fontSize: '0.85rem', maxWidth: '250px' }}>
+                              <p style={{ margin: '0 0 0.25rem 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={lastOpened}>
+                                <strong>Last Viewed:</strong> <span style={{ color: 'var(--accent)' }}>{lastOpened}</span>
+                              </p>
+                              <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                                <span>Downloads: <strong>{downloadedCount}</strong></span>
+                                <span>Saved: <strong>{savedCount}</strong></span>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
