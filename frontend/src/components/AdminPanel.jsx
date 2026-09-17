@@ -790,46 +790,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Only .pdf format files are supported.</span>
               </div>
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm && (
-        <div className="modal-overlay">
-          <div className="modal-content admin-modal">
-            <h3 className="modal-title">Confirm Deletion</h3>
-            <p style={{ margin: '1rem 0' }}>Are you sure you want to delete this material? This action cannot be undone.</p>
-            <div style={{ background: 'var(--bg-secondary)', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-              <strong>File:</strong> {deleteConfirm.filename}<br/>
-              <strong>Title:</strong> {deleteConfirm.title}
-            </div>
-            <div className="modal-actions" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
-              <button 
-                className="btn btn-outline"
-                onClick={() => setDeleteConfirm(null)}
-                disabled={isDeleting}
-              >
-                Cancel
-              </button>
-              <button 
-                className="btn btn-primary"
-                style={{ background: '#ff4d4f' }}
-                onClick={confirmDelete}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete Material'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Activity Timeline Modal */}
-      {timelineUser && (
-        <div className="modal-overlay" onClick={() => setTimelineUser(null)}>
-          <div className="modal-content admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
-              <div>
-                <h3 className="modal-title" style={{ marginBottom: '0.25rem' }}>Activity Timeline</h3>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  Showing history for <strong>{timelineUser.name}</strong> ({timelineUser.email})
+      
                 </p>
               </div>
               <button onClick={() => setTimelineUser(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
@@ -1337,6 +1298,57 @@ export default function AdminPanel({ onMaterialUploaded }) {
             )}
           </div>
         )}
+
+{/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content admin-modal">
+            <h3 className="modal-title">Confirm Deletion</h3>
+            <p style={{ margin: '1rem 0' }}>Are you sure you want to delete this material? This action cannot be undone.</p>
+            <div style={{ background: 'var(--bg-secondary)', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+              <strong>File:</strong> {deleteConfirm.filename}<br/>
+              <strong>Title:</strong> {deleteConfirm.title}
+            </div>
+            <div className="modal-actions" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
+              <button 
+                className="btn btn-outline"
+                onClick={() => setDeleteConfirm(null)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary"
+                style={{ background: '#ff4d4f' }}
+                onClick={confirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Material'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Activity Timeline Modal */}
+      {timelineUser && (
+        <div className="modal-overlay" onClick={() => setTimelineUser(null)}>
+          <div className="modal-content admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+              <div>
+                <h3 className="modal-title" style={{ marginBottom: '0.25rem' }}>Activity Timeline</h3>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Showing history for <strong>{timelineUser.name}</strong> ({timelineUser.email})
+
+{/* Activity Timeline Modal */}
+      {timelineUser && (
+        <div className="modal-overlay" onClick={() => setTimelineUser(null)}>
+          <div className="modal-content admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+              <div>
+                <h3 className="modal-title" style={{ marginBottom: '0.25rem' }}>Activity Timeline</h3>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Showing history for <strong>{timelineUser.name}</strong> ({timelineUser.email})
 
       </div>
     </div>
