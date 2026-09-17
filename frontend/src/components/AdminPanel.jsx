@@ -578,6 +578,9 @@ export default function AdminPanel({ onMaterialUploaded }) {
         >
           <History size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Student Login Audit
+          <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'logins' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'logins' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+            {logins.length}
+          </span>
         </button>
         <button
           className={`tab-btn ${adminTab === 'downloads' ? 'active' : ''}`}
@@ -585,6 +588,9 @@ export default function AdminPanel({ onMaterialUploaded }) {
         >
           <Download size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Downloads Audit
+          <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'downloads' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'downloads' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+            {downloads.length}
+          </span>
         </button>
         <button
           className={`tab-btn ${adminTab === 'students' ? 'active' : ''}`}
@@ -602,6 +608,9 @@ export default function AdminPanel({ onMaterialUploaded }) {
         >
           <Ban size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Blocked Students
+          <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'blocked' ? '#ff4d4f' : 'rgba(255, 77, 79, 0.1)', color: adminTab === 'blocked' ? '#fff' : '#ff4d4f', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+            {blockedEmails.length}
+          </span>
         </button>
         <button
           className={`tab-btn ${adminTab === 'reports' ? 'active' : ''}`}
@@ -609,6 +618,9 @@ export default function AdminPanel({ onMaterialUploaded }) {
         >
           <Flag size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           User Reports
+          <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'reports' ? '#ff4d4f' : 'rgba(255, 77, 79, 0.1)', color: adminTab === 'reports' ? '#fff' : '#ff4d4f', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+            {reports.filter(r => r.title !== 'FEEDBACK').length}
+          </span>
         </button>
         <button
           className={`tab-btn ${adminTab === 'feedback' ? 'active' : ''}`}
@@ -616,6 +628,9 @@ export default function AdminPanel({ onMaterialUploaded }) {
         >
           <MessageSquare size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           User Feedback
+          <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'feedback' ? '#3b82f6' : 'rgba(59, 130, 246, 0.1)', color: adminTab === 'feedback' ? '#fff' : '#3b82f6', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+            {reports.filter(r => r.title === 'FEEDBACK').length}
+          </span>
         </button>
       </div>
 
