@@ -561,6 +561,9 @@ export default function AdminPanel({ onMaterialUploaded }) {
         >
           <FileText size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Manage Materials
+          <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'manage' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'manage' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+            {materials.length}
+          </span>
         </button>
         <button
           className={`tab-btn ${adminTab === 'logins' ? 'active' : ''}`}
@@ -582,6 +585,9 @@ export default function AdminPanel({ onMaterialUploaded }) {
         >
           <Users size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Registered Students
+          <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'students' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'students' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+            {new Set(students.map(s => s.email)).size}
+          </span>
         </button>
         <button
           className={`tab-btn ${adminTab === 'blocked' ? 'active' : ''}`}
@@ -856,9 +862,12 @@ export default function AdminPanel({ onMaterialUploaded }) {
         {/* TAB 4: REGISTERED STUDENTS */}
         {adminTab === 'students' && (
           <div className="admin-card">
-            <h3 className="admin-title">
+            <h3 className="admin-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
               <Users size={20} />
               Registered Student Accounts
+              <span style={{ backgroundColor: 'var(--accent-soft, rgba(34, 197, 94, 0.1))', color: 'var(--accent, #22c55e)', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '600' }}>
+                Total Unique: {new Set(students.map(s => s.email)).size}
+              </span>
             </h3>
             {students.length > 0 ? (
               <div className="admin-table-container">
@@ -961,9 +970,12 @@ export default function AdminPanel({ onMaterialUploaded }) {
         {/* TAB 5: MANAGE MATERIALS */}
         {adminTab === 'manage' && (
           <div className="admin-card">
-            <h3 className="admin-title">
+            <h3 className="admin-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
               <FileText size={20} />
               Manage Uploaded Materials
+              <span style={{ backgroundColor: 'var(--accent-soft, rgba(34, 197, 94, 0.1))', color: 'var(--accent, #22c55e)', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '600' }}>
+                Total PDFs: {materials.length}
+              </span>
             </h3>
             {materials.length > 0 ? (
               <div className="admin-table-container">
