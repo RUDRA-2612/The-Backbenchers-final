@@ -72,7 +72,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
       
       const loginRes = await fetch(`${API_URL}/api/admin/logins?t=${timestamp}`, { cache: 'no-store' });
       const loginData = await loginRes.json();
-      setLogins(loginData);
+      setLogins(Array.isArray(loginData) ? loginData : []);
 
       const downloadRes = await fetch(`${API_URL}/api/admin/downloads?t=${timestamp}`, { cache: 'no-store' });
       const downloadData = await downloadRes.json();
@@ -89,13 +89,13 @@ export default function AdminPanel({ onMaterialUploaded }) {
       const activitiesRes = await fetch(`${API_URL}/api/admin/user-activities?t=${timestamp}`, { cache: 'no-store' });
       if (activitiesRes.ok) {
         const activitiesData = await activitiesRes.json();
-        setUserActivities(Array.isArray(activitiesData) ? activitiesData : []);
+        setUserActivities(activitiesData || []);
       }
 
       const timelineRes = await fetch(`${API_URL}/api/admin/activity-logs?t=${timestamp}`, { cache: 'no-store' });
       if (timelineRes.ok) {
         const timelineData = await timelineRes.json();
-        setActivityLogs(Array.isArray(timelineData) ? timelineData : []);
+        setActivityLogs(timelineData || []);
       }
 
       const materialRes = await fetch(`${API_URL}/api/materials?t=${timestamp}`);
@@ -577,7 +577,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
           <FileText size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Manage Materials
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'manage' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'manage' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {materials.length}
+            {(materials || []).length}
           </span>
         </button>
         <button
@@ -587,7 +587,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
           <History size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Student Login Audit
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'logins' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'logins' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {logins.length}
+            {(logins || []).length}
           </span>
         </button>
         <button
@@ -597,7 +597,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
           <Download size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Downloads Audit
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'downloads' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'downloads' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {downloads.length}
+            {(downloads || []).length}
           </span>
         </button>
         <button
@@ -627,7 +627,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
           <Flag size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           User Reports
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'reports' ? '#ff4d4f' : 'rgba(255, 77, 79, 0.1)', color: adminTab === 'reports' ? '#fff' : '#ff4d4f', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {reports.filter(r => r.title !== 'FEEDBACK').length}
+            {(reports || []).filter(r => r.title !== 'FEEDBACK').length}
           </span>
         </button>
         <button
@@ -637,7 +637,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
           <MessageSquare size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           User Feedback
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'feedback' ? '#3b82f6' : 'rgba(59, 130, 246, 0.1)', color: adminTab === 'feedback' ? '#fff' : '#3b82f6', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {reports.filter(r => r.title === 'FEEDBACK').length}
+            {(reports || []).filter(r => r.title === 'FEEDBACK').length}
           </span>
         </button>
       </div>
@@ -790,6 +790,117 @@ export default function AdminPanel({ onMaterialUploaded }) {
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Only .pdf format files are supported.</span>
               </div>
 
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content admin-modal">
+            <h3 className="modal-title">Confirm Deletion</h3>
+            <p style={{ margin: '1rem 0' }}>Are you sure you want to delete this material? This action cannot be undone.</p>
+            <div style={{ background: 'var(--bg-secondary)', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+              <strong>File:</strong> {deleteConfirm.filename}<br/>
+              <strong>Title:</strong> {deleteConfirm.title}
+            </div>
+            <div className="modal-actions" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
+              <button 
+                className="btn btn-outline"
+                onClick={() => setDeleteConfirm(null)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary"
+                style={{ background: '#ff4d4f' }}
+                onClick={confirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Material'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Activity Timeline Modal */}
+      {timelineUser && (
+        <div className="modal-overlay" onClick={() => setTimelineUser(null)}>
+          <div className="modal-content admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+              <div>
+                <h3 className="modal-title" style={{ marginBottom: '0.25rem' }}>Activity Timeline</h3>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Showing history for <strong>{timelineUser.name}</strong> ({timelineUser.email})
+                </p>
+              </div>
+              <button onClick={() => setTimelineUser(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
+              {(activityLogs || []).filter(log => log.user_email === timelineUser.email).length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
+                  <History size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
+                  <p>No activity recorded yet.</p>
+                </div>
+              ) : (
+                <div style={{ position: 'relative', borderLeft: '2px solid var(--border-color)', marginLeft: '1rem', paddingLeft: '1.5rem' }}>
+                  {activityLogs
+                    .filter(log => log.user_email === timelineUser.email)
+                    .map(log => {
+                      let Icon = History;
+                      let color = 'var(--text-secondary)';
+                      let bg = 'var(--bg-secondary)';
+                      
+                      if (log.action_type === 'VIEW_PDF') { Icon = FileText; color = '#10b981'; bg = 'rgba(16, 185, 129, 0.1)'; }
+                      else if (log.action_type === 'DOWNLOAD_PDF') { Icon = Download; color = '#3b82f6'; bg = 'rgba(59, 130, 246, 0.1)'; }
+                      else if (log.action_type === 'LOGIN') { Icon = Users; color = '#8b5cf6'; bg = 'rgba(139, 92, 246, 0.1)'; }
+                      else if (log.action_type === 'VIEW_PAGE') { Icon = History; color = 'var(--text-primary)'; bg = 'var(--bg-secondary)'; }
+
+                      return (
+                        <div key={log.id} style={{ position: 'relative', marginBottom: '1.5rem' }}>
+                          {/* Timeline dot */}
+                          <div style={{ 
+                            position: 'absolute', 
+                            left: '-2rem', 
+                            top: '4px',
+                            width: '32px', 
+                            height: '32px', 
+                            borderRadius: '50%', 
+                            background: bg, 
+                            color: color,
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            border: '4px solid var(--bg-primary)'
+                          }}>
+                            <Icon size={14} />
+                          </div>
+                          
+                          {/* Content */}
+                          <div style={{ background: 'var(--bg-secondary)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
+                              <span style={{ fontWeight: '600', color: color, fontSize: '0.85rem' }}>
+                                {log.action_type.replace('_', ' ')}
+                              </span>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                {new Date(log.timestamp).toLocaleString()}
+                              </span>
+                            </div>
+                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                              {log.details}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
               <button
                 type="submit"
                 className="btn btn-primary"
@@ -896,7 +1007,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
               <Users size={20} />
               Registered Student Accounts
               <span style={{ backgroundColor: 'var(--accent-soft, rgba(34, 197, 94, 0.1))', color: 'var(--accent, #22c55e)', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '600' }}>
-                Total Unique: {new Set(students.map(s => s.email)).size}
+                Total Unique: {new Set((students || []).map(s => s.email)).size}
               </span>
             </h3>
             {students.length > 0 ? (
@@ -912,8 +1023,8 @@ export default function AdminPanel({ onMaterialUploaded }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {students.map(s => {
-                      const activity = userActivities.find(a => a.email === s.email) || {};
+                    {(students || []).map(s => {
+                      const activity = (userActivities || []).find(a => a.email === s.email) || {};
                       const downloadedCount = activity.downloaded_files ? activity.downloaded_files.length : 0;
                       const savedCount = activity.saved_files ? activity.saved_files.length : 0;
                       const lastOpened = activity.last_opened_file ? activity.last_opened_file.title : 'No recent views';
@@ -1041,10 +1152,10 @@ export default function AdminPanel({ onMaterialUploaded }) {
               <FileText size={20} />
               Manage Uploaded Materials
               <span style={{ backgroundColor: 'var(--accent-soft, rgba(34, 197, 94, 0.1))', color: 'var(--accent, #22c55e)', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '600' }}>
-                Total PDFs: {materials.length}
+                Total PDFs: {(materials || []).length}
               </span>
             </h3>
-            {materials.length > 0 ? (
+            {(materials || []).length > 0 ? (
               <div className="admin-table-container">
                 <table className="admin-table">
                   <thead>
@@ -1124,7 +1235,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
               <Flag size={20} style={{ color: '#ff4d4f' }} />
               User Reports
             </h3>
-            {reports.filter(r => r.title !== 'FEEDBACK').length > 0 ? (
+            {(reports || []).filter(r => r.title !== 'FEEDBACK').length > 0 ? (
               <div className="admin-table-container">
                 <table className="admin-table">
                   <thead>
@@ -1138,7 +1249,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {reports.filter(r => r.title !== 'FEEDBACK').map((r, idx) => (
+                    {(reports || []).filter(r => r.title !== 'FEEDBACK').map((r, idx) => (
                       <tr key={r.id || idx}>
                         <td style={{ whiteSpace: 'nowrap' }}>{new Date(r.timestamp).toLocaleString()}</td>
                         <td style={{ fontWeight: '600' }}>{r.userName}</td>
@@ -1184,7 +1295,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
               <MessageSquare size={20} style={{ color: '#3b82f6' }} />
               User Feedback
             </h3>
-            {reports.filter(r => r.title === 'FEEDBACK').length > 0 ? (
+            {(reports || []).filter(r => r.title === 'FEEDBACK').length > 0 ? (
               <div className="admin-table-container">
                 <table className="admin-table">
                   <thead>
@@ -1197,7 +1308,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {reports.filter(r => r.title === 'FEEDBACK').map((r, idx) => (
+                    {(reports || []).filter(r => r.title === 'FEEDBACK').map((r, idx) => (
                       <tr key={r.id || idx}>
                         <td style={{ whiteSpace: 'nowrap' }}>{new Date(r.timestamp).toLocaleString()}</td>
                         <td style={{ fontWeight: '600' }}>{r.userName}</td>
@@ -1228,115 +1339,6 @@ export default function AdminPanel({ onMaterialUploaded }) {
         )}
 
       </div>
-      
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm && (
-        <div className="modal-overlay">
-          <div className="modal-content admin-modal">
-            <h3 className="modal-title">Confirm Deletion</h3>
-            <p style={{ margin: '1rem 0' }}>Are you sure you want to delete this material? This action cannot be undone.</p>
-            <div style={{ background: 'var(--bg-secondary)', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-              <strong>File:</strong> {deleteConfirm.filename}<br/>
-              <strong>Title:</strong> {deleteConfirm.title}
-            </div>
-            <div className="modal-actions" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
-              <button 
-                className="btn btn-outline"
-                onClick={() => setDeleteConfirm(null)}
-                disabled={isDeleting}
-              >
-                Cancel
-              </button>
-              <button 
-                className="btn btn-primary"
-                style={{ background: '#ff4d4f' }}
-                onClick={confirmDelete}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete Material'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Activity Timeline Modal */}
-      {timelineUser && (
-        <div className="modal-overlay" onClick={() => setTimelineUser(null)}>
-          <div className="modal-content admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
-              <div>
-                <h3 className="modal-title" style={{ marginBottom: '0.25rem' }}>Activity Timeline</h3>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  Showing history for <strong>{timelineUser.name}</strong> ({timelineUser.email})
-                </p>
-              </div>
-              <button onClick={() => setTimelineUser(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
-              {(activityLogs || []).filter(log => log.user_email === timelineUser.email).length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
-                  <History size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
-                  <p>No activity recorded yet.</p>
-                </div>
-              ) : (
-                <div style={{ position: 'relative', borderLeft: '2px solid var(--border-color)', marginLeft: '1rem', paddingLeft: '1.5rem' }}>
-                  {(activityLogs || [])
-                    .filter(log => log.user_email === timelineUser.email)
-                    .map(log => {
-                      let Icon = History;
-                      let color = 'var(--text-secondary)';
-                      let bg = 'var(--bg-secondary)';
-                      
-                      if (log.action_type === 'VIEW_PDF') { Icon = FileText; color = '#10b981'; bg = 'rgba(16, 185, 129, 0.1)'; }
-                      else if (log.action_type === 'DOWNLOAD_PDF') { Icon = Download; color = '#3b82f6'; bg = 'rgba(59, 130, 246, 0.1)'; }
-                      else if (log.action_type === 'LOGIN') { Icon = Users; color = '#8b5cf6'; bg = 'rgba(139, 92, 246, 0.1)'; }
-                      else if (log.action_type === 'VIEW_PAGE') { Icon = History; color = 'var(--text-primary)'; bg = 'var(--bg-secondary)'; }
-
-                      return (
-                        <div key={log.id} style={{ position: 'relative', marginBottom: '1.5rem' }}>
-                          <div style={{ 
-                            position: 'absolute', 
-                            left: '-2rem', 
-                            top: '4px',
-                            width: '32px', 
-                            height: '32px', 
-                            borderRadius: '50%', 
-                            background: bg, 
-                            color: color,
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center',
-                            border: '4px solid var(--bg-primary)'
-                          }}>
-                            <Icon size={14} />
-                          </div>
-                          
-                          <div style={{ background: 'var(--bg-secondary)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
-                              <span style={{ fontWeight: '600', color: color, fontSize: '0.85rem' }}>
-                                {log.action_type.replace('_', ' ')}
-                              </span>
-                              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                {new Date(log.timestamp).toLocaleString()}
-                              </span>
-                            </div>
-                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                              {log.details}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
