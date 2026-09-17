@@ -790,77 +790,6 @@ export default function AdminPanel({ onMaterialUploaded }) {
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Only .pdf format files are supported.</span>
               </div>
 
-      
-                </p>
-              </div>
-              <button onClick={() => setTimelineUser(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
-              {(activityLogs || []).filter(log => log.user_email === timelineUser.email).length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
-                  <History size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
-                  <p>No activity recorded yet.</p>
-                </div>
-              ) : (
-                <div style={{ position: 'relative', borderLeft: '2px solid var(--border-color)', marginLeft: '1rem', paddingLeft: '1.5rem' }}>
-                  {activityLogs
-                    .filter(log => log.user_email === timelineUser.email)
-                    .map(log => {
-                      let Icon = History;
-                      let color = 'var(--text-secondary)';
-                      let bg = 'var(--bg-secondary)';
-                      
-                      if (log.action_type === 'VIEW_PDF') { Icon = FileText; color = '#10b981'; bg = 'rgba(16, 185, 129, 0.1)'; }
-                      else if (log.action_type === 'DOWNLOAD_PDF') { Icon = Download; color = '#3b82f6'; bg = 'rgba(59, 130, 246, 0.1)'; }
-                      else if (log.action_type === 'LOGIN') { Icon = Users; color = '#8b5cf6'; bg = 'rgba(139, 92, 246, 0.1)'; }
-                      else if (log.action_type === 'VIEW_PAGE') { Icon = History; color = 'var(--text-primary)'; bg = 'var(--bg-secondary)'; }
-
-                      return (
-                        <div key={log.id} style={{ position: 'relative', marginBottom: '1.5rem' }}>
-                          {/* Timeline dot */}
-                          <div style={{ 
-                            position: 'absolute', 
-                            left: '-2rem', 
-                            top: '4px',
-                            width: '32px', 
-                            height: '32px', 
-                            borderRadius: '50%', 
-                            background: bg, 
-                            color: color,
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center',
-                            border: '4px solid var(--bg-primary)'
-                          }}>
-                            <Icon size={14} />
-                          </div>
-                          
-                          {/* Content */}
-                          <div style={{ background: 'var(--bg-secondary)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
-                              <span style={{ fontWeight: '600', color: color, fontSize: '0.85rem' }}>
-                                {log.action_type.replace('_', ' ')}
-                              </span>
-                              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                {new Date(log.timestamp).toLocaleString()}
-                              </span>
-                            </div>
-                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                              {log.details}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
               <button
                 type="submit"
@@ -1299,7 +1228,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
           </div>
         )}
 
-{/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal */}
       {deleteConfirm && (
         <div className="modal-overlay">
           <div className="modal-content admin-modal">
@@ -1339,16 +1268,76 @@ export default function AdminPanel({ onMaterialUploaded }) {
                 <h3 className="modal-title" style={{ marginBottom: '0.25rem' }}>Activity Timeline</h3>
                 <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                   Showing history for <strong>{timelineUser.name}</strong> ({timelineUser.email})
+                </p>
+              </div>
+              <button onClick={() => setTimelineUser(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }}>
+              {(activityLogs || []).filter(log => log.user_email === timelineUser.email).length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
+                  <History size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
+                  <p>No activity recorded yet.</p>
+                </div>
+              ) : (
+                <div style={{ position: 'relative', borderLeft: '2px solid var(--border-color)', marginLeft: '1rem', paddingLeft: '1.5rem' }}>
+                  {activityLogs
+                    .filter(log => log.user_email === timelineUser.email)
+                    .map(log => {
+                      let Icon = History;
+                      let color = 'var(--text-secondary)';
+                      let bg = 'var(--bg-secondary)';
+                      
+                      if (log.action_type === 'VIEW_PDF') { Icon = FileText; color = '#10b981'; bg = 'rgba(16, 185, 129, 0.1)'; }
+                      else if (log.action_type === 'DOWNLOAD_PDF') { Icon = Download; color = '#3b82f6'; bg = 'rgba(59, 130, 246, 0.1)'; }
+                      else if (log.action_type === 'LOGIN') { Icon = Users; color = '#8b5cf6'; bg = 'rgba(139, 92, 246, 0.1)'; }
+                      else if (log.action_type === 'VIEW_PAGE') { Icon = History; color = 'var(--text-primary)'; bg = 'var(--bg-secondary)'; }
 
-{/* Activity Timeline Modal */}
-      {timelineUser && (
-        <div className="modal-overlay" onClick={() => setTimelineUser(null)}>
-          <div className="modal-content admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
-              <div>
-                <h3 className="modal-title" style={{ marginBottom: '0.25rem' }}>Activity Timeline</h3>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  Showing history for <strong>{timelineUser.name}</strong> ({timelineUser.email})
+                      return (
+                        <div key={log.id} style={{ position: 'relative', marginBottom: '1.5rem' }}>
+                          {/* Timeline dot */}
+                          <div style={{ 
+                            position: 'absolute', 
+                            left: '-2rem', 
+                            top: '4px',
+                            width: '32px', 
+                            height: '32px', 
+                            borderRadius: '50%', 
+                            background: bg, 
+                            color: color,
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            border: '4px solid var(--bg-primary)'
+                          }}>
+                            <Icon size={14} />
+                          </div>
+                          
+                          {/* Content */}
+                          <div style={{ background: 'var(--bg-secondary)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
+                              <span style={{ fontWeight: '600', color: color, fontSize: '0.85rem' }}>
+                                {log.action_type.replace('_', ' ')}
+                              </span>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                {new Date(log.timestamp).toLocaleString()}
+                              </span>
+                            </div>
+                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                              {log.details}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       </div>
     </div>
