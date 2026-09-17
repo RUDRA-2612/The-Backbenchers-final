@@ -909,54 +909,17 @@ export default function AdminPanel({ onMaterialUploaded }) {
                       <th>Full Name</th>
                       <th>Email Address</th>
                       <th>Google Account</th>
-                      <th>Recent Activity (Pages/PDFs)</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {(students || []).map(s => {
-                      const activity = (userActivities || []).find(a => a.email === s.email) || {};
-                      const downloadedCount = activity.downloaded_files ? activity.downloaded_files.length : 0;
-                      const savedCount = activity.saved_files ? activity.saved_files.length : 0;
-                      const lastOpened = activity.last_opened_file ? activity.last_opened_file.title : 'No recent views';
-                      
-                      return (
-                        <tr key={s.id}>
-                          <td>{new Date(s.createdAt).toLocaleDateString()}</td>
-                          <td style={{ fontWeight: '600' }}>{s.name}</td>
-                          <td>{s.email}</td>
-                          <td>{s.isGoogle ? 'Yes (Gmail)' : 'No (Credentials)'}</td>
-                          <td>
-                            <div style={{ fontSize: '0.85rem', maxWidth: '250px' }}>
-                              <p style={{ margin: '0 0 0.25rem 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={lastOpened}>
-                                <strong>Last Viewed:</strong> <span style={{ color: 'var(--accent)' }}>{lastOpened}</span>
-                              </p>
-                              <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
-                                <span>Downloads: <strong>{downloadedCount}</strong></span>
-                                <span>Saved: <strong>{savedCount}</strong></span>
-                              </div>
-                              <button 
-                                onClick={() => setTimelineUser({ email: s.email, name: s.name })}
-                                style={{
-                                  background: 'var(--accent-soft)',
-                                  color: 'var(--accent)',
-                                  border: 'none',
-                                  padding: '4px 10px',
-                                  borderRadius: '6px',
-                                  fontSize: '0.75rem',
-                                  cursor: 'pointer',
-                                  fontWeight: 'bold',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px'
-                                }}
-                              >
-                                <History size={12} /> View Timeline
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {students.map(s => (
+                      <tr key={s.id}>
+                        <td>{new Date(s.createdAt).toLocaleDateString()}</td>
+                        <td style={{ fontWeight: '600' }}>{s.name}</td>
+                        <td>{s.email}</td>
+                        <td>{s.isGoogle ? 'Yes (Gmail)' : 'No (Credentials)'}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -1228,36 +1191,6 @@ export default function AdminPanel({ onMaterialUploaded }) {
           </div>
         )}
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm && (
-        <div className="modal-overlay">
-          <div className="modal-content admin-modal">
-            <h3 className="modal-title">Confirm Deletion</h3>
-            <p style={{ margin: '1rem 0' }}>Are you sure you want to delete this material? This action cannot be undone.</p>
-            <div style={{ background: 'var(--bg-secondary)', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-              <strong>File:</strong> {deleteConfirm.filename}<br/>
-              <strong>Title:</strong> {deleteConfirm.title}
-            </div>
-            <div className="modal-actions" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
-              <button 
-                className="btn btn-outline"
-                onClick={() => setDeleteConfirm(null)}
-                disabled={isDeleting}
-              >
-                Cancel
-              </button>
-              <button 
-                className="btn btn-primary"
-                style={{ background: '#ff4d4f' }}
-                onClick={confirmDelete}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete Material'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Activity Timeline Modal */}
       {timelineUser && (
