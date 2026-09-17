@@ -77,6 +77,24 @@ export default function App() {
     }
   };
 
+  const trackActivity = async (actionType, details) => {
+    if (!user || !user.email) return;
+    try {
+      await fetch(`${API_URL}/api/activity-log`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.name,
+          actionType,
+          details
+        })
+      });
+    } catch (err) {
+      console.error('Error tracking activity:', err);
+    }
+  };
+
   const loadUserActivity = async (email) => {
     try {
       const response = await fetch(`${API_URL}/api/user/activity/${encodeURIComponent(email)}`);
@@ -135,9 +153,11 @@ export default function App() {
         if (!selectedSubject) {
           window.location.replace('#home');
           setActiveView('home');
+          trackActivity('VIEW_PAGE', 'Home Page');
         } else {
           setActiveView('subject-detail');
           setActivePdfFile(null); // Ensure PDF is closed if they back out
+          trackActivity('VIEW_PAGE', `Subject: ${selectedSubject.code || selectedSubject.name}`);
         }
       } else if (hash === 'pdf-viewer') {
         // Do nothing on hashchange to pdf-viewer.
@@ -146,12 +166,19 @@ export default function App() {
       } else if (hash.startsWith('semester-') || hash.startsWith('year-')) {
         setActiveView(hash);
         setActivePdfFile(null);
+        trackActivity('VIEW_PAGE', `Semester/Year Grid: ${hash}`);
       } else if (hash === 'credits') {
         setActiveView('credits');
         setActivePdfFile(null);
+        trackActivity('VIEW_PAGE', 'Credits Modal');
       } else if (hash === 'home' || hash === 'admin' || hash === 'downloads' || hash === 'saved' || hash === 'profile') {
         setActiveView(hash);
         setActivePdfFile(null);
+        
+        let pageName = hash.charAt(0).toUpperCase() + hash.slice(1);
+        if (hash === 'admin') pageName = 'Admin Panel';
+        trackActivity('VIEW_PAGE', `${pageName} Page`);
+
         if (hash === 'home') {
           setSelectedSubject(null);
           localStorage.removeItem('backbenchers_selected_subject');
@@ -161,6 +188,7 @@ export default function App() {
         setActiveView('home');
         setActivePdfFile(null);
         window.location.replace('#home');
+        trackActivity('VIEW_PAGE', 'Home Page (Fallback)');
       }
 
       // Automatically close sidebar on navigating for all devices (mobile + laptop)
@@ -215,6 +243,18 @@ export default function App() {
     // Fetch materials and sync cloud activity upon login
     fetchMaterials();
     loadUserActivity(userData.email);
+    
+    // Log the login to the new timeline table directly since we have the data
+    fetch(`${API_URL}/api/activity-log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: userData.email,
+        name: userData.name,
+        actionType: 'LOGIN',
+        details: `Logged in via ${userData.isGoogle ? 'Google' : 'Credentials'}`
+      })
+    }).catch(e => console.error(e));
     
     const nextView = userData.isAdmin ? 'admin' : 'home';
     setActiveView(nextView);
@@ -334,6 +374,7 @@ export default function App() {
     setLastOpenedFile(fileWithTime);
     localStorage.setItem('backbenchers_last_opened', JSON.stringify(fileWithTime));
     syncActivityToCloud({ lastOpenedFile: fileWithTime });
+    trackActivity('VIEW_PDF', file.title);
     window.location.hash = 'pdf-viewer';
   };
 
@@ -389,6 +430,7 @@ export default function App() {
         localStorage.setItem('backbenchers_downloads', JSON.stringify(updated));
         syncActivityToCloud({ downloadedFiles: updated });
       }
+      trackActivity('DOWNLOAD_PDF', file.title);
     } catch (err) {
       console.error('Download processing failed:', err);
     }

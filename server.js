@@ -610,6 +610,38 @@ app.get('/api/user/activity/:email', async (req, res) => {
   }
 });
 
+app.get('/api/admin/activity-logs', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('activity_logs').select('*').order('timestamp', { ascending: false });
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/activity-log', async (req, res) => {
+  try {
+    const { email, name, actionType, details } = req.body;
+    if (!email || !actionType) return res.status(400).json({ error: 'Email and actionType are required' });
+
+    const newLog = {
+      user_email: email.toLowerCase(),
+      user_name: name || 'Unknown',
+      action_type: actionType,
+      details: details || ''
+    };
+
+    const { error } = await supabase.from('activity_logs').insert(newLog);
+    if (error) throw error;
+
+    res.status(201).json({ success: true, message: 'Activity logged' });
+  } catch (err) {
+    console.error('Activity log error:', err);
+    res.status(500).json({ error: 'Failed to log activity' });
+  }
+});
+
 app.post('/api/user/activity', async (req, res) => {
   try {
     const { email, savedFiles, downloadedFiles, lastOpenedFile } = req.body;
