@@ -114,7 +114,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
           <div className={`global-search-container ${showSearch ? 'active' : ''}`} ref={searchRef}>
             <button 
               className="search-toggle-btn"
-              onClick={() => setShowSearch(true)}
+              onClick={() => setShowSearch(!showSearch)}
               aria-label="Search Materials"
             >
               <Search size={18} />

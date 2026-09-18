@@ -422,7 +422,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
         <div className={`global-search-container ${showUserSearch ? 'active' : ''}`} ref={searchRef} style={{ position: 'relative', flexShrink: 0 }}>
           <button 
             className="search-toggle-btn"
-            onClick={() => setShowUserSearch(true)}
+            onClick={() => setShowUserSearch(!showUserSearch)}
             aria-label="Search Users"
           >
             <Search size={18} />
