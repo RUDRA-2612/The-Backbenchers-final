@@ -313,6 +313,12 @@ export default function App() {
             const data = await res.json();
             
             if (data.isAdmin !== undefined && data.isAdmin !== user.isAdmin) {
+              // If they spoofed admin access locally but are not an admin, log them out completely
+              if (user.isAdmin === true && data.isAdmin === false) {
+                alert("Unauthorized privilege modification detected. You are being logged out.");
+                handleLogout();
+                return;
+              }
               const updatedUser = { ...user, isAdmin: data.isAdmin };
               setUser(updatedUser);
               localStorage.setItem('backbenchers_user', JSON.stringify(updatedUser));
