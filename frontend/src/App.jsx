@@ -52,6 +52,15 @@ export default function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const getAuthHeaders = () => {
+    if (!user) return {};
+    return {
+      'x-user-email': user.email || '',
+      'x-session-id': user.sessionId || '',
+      'x-user-id': user.id || ''
+    };
+  };
+
   const fetchMaterials = async () => {
     try {
       const response = await fetch(`${API_URL}/api/materials`);
@@ -69,7 +78,7 @@ export default function App() {
     try {
       await fetch(`${API_URL}/api/user/activity`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ email: user.email, ...payload })
       });
     } catch (err) {
@@ -82,7 +91,7 @@ export default function App() {
     try {
       await fetch(`${API_URL}/api/activity-log`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           email: user.email,
           name: user.name,
@@ -97,7 +106,9 @@ export default function App() {
 
   const loadUserActivity = async (email) => {
     try {
-      const response = await fetch(`${API_URL}/api/user/activity/${encodeURIComponent(email)}`);
+      const response = await fetch(`${API_URL}/api/user/activity/${encodeURIComponent(email)}`, {
+        headers: { ...getAuthHeaders() }
+      });
       if (response.ok) {
         const data = await response.json();
         if (data.savedFiles) {
@@ -133,7 +144,7 @@ export default function App() {
         try {
           await fetch(`${API_URL}/api/user/ping`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
             body: JSON.stringify({ email: user.email })
           });
         } catch (err) {
@@ -430,7 +441,7 @@ export default function App() {
       if (user) {
         await fetch(`${API_URL}/api/downloads`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
           body: JSON.stringify({
             name: user.name,
             email: user.email,
@@ -510,7 +521,7 @@ export default function App() {
     try {
       await fetch(`${API_URL}/api/report`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           materialId: file.id,
           title: file.title,

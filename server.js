@@ -122,6 +122,35 @@ const verifyAdmin = async (req, res, next) => {
   }
 };
 
+const verifyUser = async (req, res, next) => {
+  try {
+    const email = req.headers['x-user-email'];
+    const sessionId = req.headers['x-session-id'];
+    const userId = req.headers['x-user-id'];
+
+    if (!email) return res.status(401).json({ error: 'Unauthorized: Missing email' });
+    const emailLower = email.trim().toLowerCase();
+    req.verifiedEmail = emailLower;
+
+    if (adminEmails.includes(emailLower)) {
+      if (!userId) return res.status(401).json({ error: 'Unauthorized: Missing admin credentials' });
+      const { data: adminUser } = await supabase.from('users').select('id').eq('email', emailLower).single();
+      if (!adminUser || adminUser.id !== userId) return res.status(401).json({ error: 'Unauthorized: Invalid admin credentials' });
+      return next();
+    }
+
+    if (!sessionId) return res.status(401).json({ error: 'Unauthorized: Missing session' });
+    const { data: activeSession } = await supabase.from('active_sessions').select('session_id').eq('email', emailLower).single();
+    if (!activeSession || activeSession.session_id !== sessionId) {
+      return res.status(401).json({ error: 'Unauthorized: Invalid session' });
+    }
+
+    next();
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error during user auth' });
+  }
+};
+
 // --- API ROUTES ---
 
 app.get('/api/health', async (req, res) => {
@@ -560,15 +589,15 @@ app.put('/api/materials/:id', verifyAdmin, async (req, res) => {
   }
 });
 
-app.post('/api/downloads', async (req, res) => {
+app.post('/api/downloads', verifyUser, async (req, res) => {
   try {
-    const { name, email, subjectCode, title, filename } = req.body;
-    if (!email || !filename) return res.status(400).json({ error: 'Email and filename are required' });
+    const { name, subjectCode, title, filename } = req.body;
+    if (!filename) return res.status(400).json({ error: 'Filename is required' });
 
     const log = {
       id: uuidv4(),
       name: name || 'Guest',
-      email,
+      email: req.verifiedEmail,
       subjectCode: subjectCode || 'N/A',
       title: title || filename,
       filename
@@ -583,12 +612,13 @@ app.post('/api/downloads', async (req, res) => {
   }
 });
 
-app.post('/api/report', async (req, res) => {
+app.post('/api/report', verifyUser, async (req, res) => {
   try {
-    const { materialId, title, description, userEmail, userName } = req.body;
+    const { materialId, title, description, userName } = req.body;
+    const userEmail = req.verifiedEmail;
     console.log(`\n=== NEW REPORT RECEIVED ===`);
     console.log(`Material: ${title} (${materialId})`);
-    console.log(`From: ${userName || 'Unknown'} (${userEmail || 'Unknown'})`);
+    console.log(`From: ${userName || 'Unknown'} (${userEmail})`);
     console.log(`Issue: ${description}`);
     console.log(`===========================\n`);
     
@@ -613,12 +643,15 @@ app.post('/api/report', async (req, res) => {
   }
 });
 
-app.get('/api/user/activity/:email', async (req, res) => {
+app.get('/api/user/activity/:email', verifyUser, async (req, res) => {
   try {
     const { email } = req.params;
     if (!email) return res.status(400).json({ error: 'Email is required' });
+    if (email.toLowerCase() !== req.verifiedEmail) {
+      return res.status(403).json({ error: 'Forbidden: Cannot access other users activity' });
+    }
 
-    const { data, error } = await supabase.from('user_activity').select('*').eq('email', email.toLowerCase()).single();
+    const { data, error } = await supabase.from('user_activity').select('*').eq('email', req.verifiedEmail).single();
     
     // If no data exists yet for this user, just return empty arrays
     if (error && error.code === 'PGRST116') {
@@ -647,13 +680,13 @@ app.get('/api/admin/activity-logs', verifyAdmin, async (req, res) => {
   }
 });
 
-app.post('/api/activity-log', async (req, res) => {
+app.post('/api/activity-log', verifyUser, async (req, res) => {
   try {
-    const { email, name, actionType, details } = req.body;
-    if (!email || !actionType) return res.status(400).json({ error: 'Email and actionType are required' });
+    const { name, actionType, details } = req.body;
+    if (!actionType) return res.status(400).json({ error: 'actionType is required' });
 
     const newLog = {
-      user_email: email.toLowerCase(),
+      user_email: req.verifiedEmail,
       user_name: name || 'Unknown',
       action_type: actionType,
       details: details || ''
@@ -669,13 +702,12 @@ app.post('/api/activity-log', async (req, res) => {
   }
 });
 
-app.post('/api/user/activity', async (req, res) => {
+app.post('/api/user/activity', verifyUser, async (req, res) => {
   try {
-    const { email, savedFiles, downloadedFiles, lastOpenedFile } = req.body;
-    if (!email) return res.status(400).json({ error: 'Email is required' });
+    const { savedFiles, downloadedFiles, lastOpenedFile } = req.body;
 
     const payload = {
-      email: email.toLowerCase(),
+      email: req.verifiedEmail,
       updated_at: new Date().toISOString()
     };
     
@@ -693,13 +725,10 @@ app.post('/api/user/activity', async (req, res) => {
   }
 });
 
-app.post('/api/user/ping', async (req, res) => {
+app.post('/api/user/ping', verifyUser, async (req, res) => {
   try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ error: 'Email is required' });
-
     const { error } = await supabase.from('user_activity').upsert({
-      email: email.toLowerCase(),
+      email: req.verifiedEmail,
       updated_at: new Date().toISOString()
     }, { onConflict: 'email' });
     
