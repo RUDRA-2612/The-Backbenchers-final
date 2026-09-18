@@ -125,6 +125,31 @@ export default function App() {
     }
   }, []);
 
+  // Heartbeat to track online status
+  useEffect(() => {
+    let pingInterval;
+    if (user && user.email) {
+      const pingServer = async () => {
+        try {
+          await fetch(`${API_URL}/api/user/ping`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: user.email })
+          });
+        } catch (err) {
+          console.error('Ping failed:', err);
+        }
+      };
+      
+      pingServer(); // Ping immediately
+      pingInterval = setInterval(pingServer, 60 * 1000); // Ping every 60 seconds
+    }
+    
+    return () => {
+      if (pingInterval) clearInterval(pingInterval);
+    };
+  }, [user]);
+
   // Force title to be exactly "Backbenchers" to clear any cached tab titles
   useEffect(() => {
     document.title = "Backbenchers";

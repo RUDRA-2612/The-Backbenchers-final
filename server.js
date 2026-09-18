@@ -666,6 +666,25 @@ app.post('/api/user/activity', async (req, res) => {
   }
 });
 
+app.post('/api/user/ping', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    const { error } = await supabase.from('user_activity').upsert({
+      email: email.toLowerCase(),
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'email' });
+    
+    if (error) throw error;
+
+    res.json({ success: true, message: 'Ping recorded successfully' });
+  } catch (err) {
+    console.error('Ping error:', err);
+    res.status(500).json({ error: 'Failed to record ping' });
+  }
+});
+
 if (require.main === module) {
   app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 }

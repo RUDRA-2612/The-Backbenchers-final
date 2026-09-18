@@ -410,6 +410,21 @@ export default function AdminPanel({ onMaterialUploaded }) {
     setUserSearchQuery(email); // Keep the email in the input box
   };
 
+  // Online Students Calculation
+  const TWO_MINUTES = 2 * 60 * 1000;
+  const now = Date.now();
+  const onlineStudents = (userActivities || [])
+    .filter(activity => activity.updated_at && (now - new Date(activity.updated_at).getTime() < TWO_MINUTES))
+    .map(activity => {
+      const student = (students || []).find(s => s.email.toLowerCase() === activity.email.toLowerCase());
+      return {
+        email: activity.email,
+        name: student ? student.name : 'Unknown',
+        lastActive: new Date(activity.updated_at)
+      };
+    })
+    .sort((a, b) => b.lastActive - a.lastActive);
+
   return (
     <div>
       <div className="downloads-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
@@ -611,6 +626,16 @@ export default function AdminPanel({ onMaterialUploaded }) {
           </span>
         </button>
         <button
+          className={`tab-btn ${adminTab === 'online' ? 'active' : ''}`}
+          onClick={() => setAdminTab('online')}
+        >
+          <div style={{ width: '8px', height: '8px', backgroundColor: '#22c55e', borderRadius: '50%', display: 'inline-block', marginRight: '6px', boxShadow: '0 0 8px #22c55e' }}></div>
+          Online Students
+          <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'online' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'online' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+            {onlineStudents.length}
+          </span>
+        </button>
+        <button
           className={`tab-btn ${adminTab === 'blocked' ? 'active' : ''}`}
           onClick={() => setAdminTab('blocked')}
         >
@@ -644,6 +669,54 @@ export default function AdminPanel({ onMaterialUploaded }) {
 
       {/* Admin content */}
       <div className="admin-content" style={{ marginTop: '1.5rem' }}>
+
+        {/* TAB: ONLINE STUDENTS */}
+        {adminTab === 'online' && (
+          <div className="admin-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h3 className="admin-title" style={{ margin: 0 }}>
+                <div style={{ width: '12px', height: '12px', backgroundColor: '#22c55e', borderRadius: '50%', display: 'inline-block', marginRight: '8px', boxShadow: '0 0 10px #22c55e' }}></div>
+                Currently Online Students
+              </h3>
+              <button className="btn btn-secondary" onClick={fetchLogs}>Refresh Status</button>
+            </div>
+            
+            {onlineStudents.length > 0 ? (
+              <div className="admin-table-container">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Status</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Last Active</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {onlineStudents.map(student => (
+                      <tr key={student.email}>
+                        <td style={{ textAlign: 'center' }}>
+                          <div style={{ width: '10px', height: '10px', backgroundColor: '#22c55e', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 5px #22c55e' }}></div>
+                        </td>
+                        <td style={{ fontWeight: '500' }}>{student.name}</td>
+                        <td>{student.email}</td>
+                        <td style={{ color: 'var(--text-secondary)' }}>
+                          {Math.floor((Date.now() - student.lastActive.getTime()) / 60000) === 0 ? 'Just now' : `${Math.floor((Date.now() - student.lastActive.getTime()) / 60000)} min ago`}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div style={{ padding: '3rem', textAlign: 'center', backgroundColor: 'var(--bg-elevated)', borderRadius: '12px', border: '1px dashed var(--border)' }}>
+                <User size={48} color="var(--text-muted)" style={{ marginBottom: '1rem' }} />
+                <h4 style={{ color: 'var(--text-secondary)' }}>No students are currently online.</h4>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Students will appear here automatically when they are active.</p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* TAB 1: UPLOAD FORM */}
         {adminTab === 'upload' && (
