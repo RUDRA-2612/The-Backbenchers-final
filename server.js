@@ -101,18 +101,19 @@ const adminEmails = [
 const verifyAdmin = async (req, res, next) => {
   try {
     const email = req.headers['x-user-email'];
-    const sessionId = req.headers['x-session-id'];
+    const userId = req.headers['x-user-id'];
     
-    if (!email || !sessionId) return res.status(401).json({ error: 'Unauthorized: Missing credentials' });
+    if (!email || !userId) return res.status(401).json({ error: 'Unauthorized: Missing credentials' });
     const emailLower = email.trim().toLowerCase();
     
     if (!adminEmails.includes(emailLower)) {
       return res.status(403).json({ error: 'Forbidden: Admin access required' });
     }
     
-    const { data: activeSession } = await supabase.from('active_sessions').select('session_id').eq('email', emailLower).single();
-    if (!activeSession || activeSession.session_id !== sessionId) {
-      return res.status(401).json({ error: 'Unauthorized: Invalid session' });
+    // Admins bypass single-device session checks. We authenticate them via their private UUID.
+    const { data: adminUser } = await supabase.from('users').select('id').eq('email', emailLower).single();
+    if (!adminUser || adminUser.id !== userId) {
+      return res.status(401).json({ error: 'Unauthorized: Invalid admin credentials' });
     }
     
     next();

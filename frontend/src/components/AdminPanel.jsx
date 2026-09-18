@@ -11,7 +11,8 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
       headers: {
         ...options.headers,
         'x-user-email': user?.email || '',
-        'x-session-id': user?.sessionId || ''
+        'x-session-id': user?.sessionId || '',
+        'x-user-id': user?.id || ''
       }
     });
   };
