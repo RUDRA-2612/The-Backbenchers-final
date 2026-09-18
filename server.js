@@ -91,6 +91,36 @@ const upload = multer({
   }
 });
 
+const adminEmails = [
+  'rudrapalsinghshekhawat@jklu.edu.in',
+  'amanjhajharia@jklu.edu.in',
+  'aahan@jklu.edu.in',
+  'raghurajsinghshekhawat@jklu.edu.in'
+];
+
+const verifyAdmin = async (req, res, next) => {
+  try {
+    const email = req.headers['x-user-email'];
+    const sessionId = req.headers['x-session-id'];
+    
+    if (!email || !sessionId) return res.status(401).json({ error: 'Unauthorized: Missing credentials' });
+    const emailLower = email.trim().toLowerCase();
+    
+    if (!adminEmails.includes(emailLower)) {
+      return res.status(403).json({ error: 'Forbidden: Admin access required' });
+    }
+    
+    const { data: activeSession } = await supabase.from('active_sessions').select('session_id').eq('email', emailLower).single();
+    if (!activeSession || activeSession.session_id !== sessionId) {
+      return res.status(401).json({ error: 'Unauthorized: Invalid session' });
+    }
+    
+    next();
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error during auth' });
+  }
+};
+
 // --- API ROUTES ---
 
 app.get('/api/health', async (req, res) => {
@@ -140,12 +170,6 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(403).json({ error: 'Access restricted. Please use your @jklu.edu.in email address.' });
     }
 
-    const adminEmails = [
-      'rudrapalsinghshekhawat@jklu.edu.in',
-      'amanjhajharia@jklu.edu.in',
-      'aahan@jklu.edu.in',
-      'raghurajsinghshekhawat@jklu.edu.in'
-    ];
     const isAdminEmail = adminEmails.includes(emailLower);
 
     // Check if user is blocked (Admins bypass this restriction)
@@ -250,7 +274,7 @@ app.post('/api/auth/change-password', async (req, res) => {
   }
 });
 
-app.get('/api/admin/logins', async (req, res) => {
+app.get('/api/admin/logins', verifyAdmin, async (req, res) => {
   try {
     const { data: logs, error } = await supabase.from('login_logs').select('*').order('timestamp', { ascending: false });
     if (error) throw error;
@@ -258,7 +282,7 @@ app.get('/api/admin/logins', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/admin/downloads', async (req, res) => {
+app.get('/api/admin/downloads', verifyAdmin, async (req, res) => {
   try {
     const { data: logs, error } = await supabase.from('download_logs').select('*').order('timestamp', { ascending: false });
     if (error) throw error;
@@ -266,7 +290,7 @@ app.get('/api/admin/downloads', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/admin/users', async (req, res) => {
+app.get('/api/admin/users', verifyAdmin, async (req, res) => {
   try {
     const { data: users, error } = await supabase.from('users').select('id, name, email, isGoogle, createdAt').order('createdAt', { ascending: false });
     if (error) throw error;
@@ -274,7 +298,7 @@ app.get('/api/admin/users', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/admin/blocked-emails', async (req, res) => {
+app.get('/api/admin/blocked-emails', verifyAdmin, async (req, res) => {
   try {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     const { data, error } = await supabase.from('blocked_emails').select('*').order('created_at', { ascending: false });
@@ -283,7 +307,7 @@ app.get('/api/admin/blocked-emails', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/admin/user-activities', async (req, res) => {
+app.get('/api/admin/user-activities', verifyAdmin, async (req, res) => {
   try {
     const { data, error } = await supabase.from('user_activity').select('*');
     if (error) throw error;
@@ -291,7 +315,7 @@ app.get('/api/admin/user-activities', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/admin/block-email', async (req, res) => {
+app.post('/api/admin/block-email', verifyAdmin, async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
@@ -307,7 +331,7 @@ app.post('/api/admin/block-email', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/admin/unblock-email', async (req, res) => {
+app.post('/api/admin/unblock-email', verifyAdmin, async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
@@ -325,7 +349,7 @@ app.post('/api/admin/unblock-email', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/admin/reports', async (req, res) => {
+app.get('/api/admin/reports', verifyAdmin, async (req, res) => {
   try {
     const { data, error } = await supabase.from('reports').select('*').order('timestamp', { ascending: false });
     if (error) throw error;
@@ -333,7 +357,7 @@ app.get('/api/admin/reports', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/admin/reports/:id', async (req, res) => {
+app.delete('/api/admin/reports/:id', verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { error } = await supabase.from('reports').delete().eq('id', id);
@@ -364,12 +388,14 @@ app.get('/api/user/status/:email', async (req, res) => {
       }
     }
     
+    const isAdmin = adminEmails.includes(emailLower);
+    
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.json({ isBlocked: !!blockedUser, isSessionValid });
+    res.json({ isBlocked: !!blockedUser, isSessionValid, isAdmin });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/admin/reports', async (req, res) => {
+app.get('/api/admin/reports', verifyAdmin, async (req, res) => {
   try {
     const { data: reports, error } = await supabase.from('reports').select('*').order('timestamp', { ascending: false });
     if (error) throw error;
@@ -387,7 +413,7 @@ app.get('/api/materials', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/materials/signed-url', async (req, res) => {
+app.post('/api/materials/signed-url', verifyAdmin, async (req, res) => {
   try {
     const { filename } = req.body;
     if (!filename) return res.status(400).json({ error: 'Filename is required' });
@@ -409,7 +435,7 @@ app.post('/api/materials/signed-url', async (req, res) => {
   }
 });
 
-app.post('/api/materials/record', async (req, res) => {
+app.post('/api/materials/record', verifyAdmin, async (req, res) => {
   try {
     const { title, subjectCode, category, subcategory, year, filename, filepath } = req.body;
     if (!title || !subjectCode || !category || !filepath) return res.status(400).json({ error: 'Missing required fields' });
@@ -435,7 +461,7 @@ app.post('/api/materials/record', async (req, res) => {
   }
 });
 
-app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
+app.post('/api/materials/upload', verifyAdmin, upload.single('file'), async (req, res) => {
   // Keeping this for backward compatibility if needed
   try {
     const { title, subjectCode, category, subcategory, year } = req.body;
@@ -479,7 +505,7 @@ app.post('/api/materials/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-app.delete('/api/materials/:id', async (req, res) => {
+app.delete('/api/materials/:id', verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -504,7 +530,7 @@ app.delete('/api/materials/:id', async (req, res) => {
   }
 });
 
-app.put('/api/materials/:id', async (req, res) => {
+app.put('/api/materials/:id', verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { filename, filepath, title } = req.body;
@@ -610,7 +636,7 @@ app.get('/api/user/activity/:email', async (req, res) => {
   }
 });
 
-app.get('/api/admin/activity-logs', async (req, res) => {
+app.get('/api/admin/activity-logs', verifyAdmin, async (req, res) => {
   try {
     const { data, error } = await supabase.from('activity_logs').select('*').order('timestamp', { ascending: false });
     if (error) throw error;

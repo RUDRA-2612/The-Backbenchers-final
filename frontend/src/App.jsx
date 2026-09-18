@@ -311,6 +311,15 @@ export default function App() {
           });
           if (res.ok) {
             const data = await res.json();
+            
+            if (data.isAdmin !== undefined && data.isAdmin !== user.isAdmin) {
+              const updatedUser = { ...user, isAdmin: data.isAdmin };
+              setUser(updatedUser);
+              localStorage.setItem('backbenchers_user', JSON.stringify(updatedUser));
+              // Update the local reference for the rest of this function
+              user.isAdmin = data.isAdmin; 
+            }
+
             if (user.isAdmin) {
               // Admins bypass all restrictions (block & single device)
               return;
@@ -560,7 +569,7 @@ export default function App() {
       case 'profile':
         return <Profile user={user} />;
       case 'admin':
-        return user?.isAdmin ? <AdminPanel onMaterialUploaded={fetchMaterials} /> : <Home onSelectSubject={handleSelectSubject} lastOpenedFile={lastOpenedFile} onViewFile={handleViewFile} />;
+        return user?.isAdmin ? <AdminPanel user={user} onMaterialUploaded={fetchMaterials} /> : <Home onSelectSubject={handleSelectSubject} lastOpenedFile={lastOpenedFile} onViewFile={handleViewFile} />;
       default:
         if (activeView.startsWith('semester-')) {
           const semNum = parseInt(activeView.split('-')[1]);

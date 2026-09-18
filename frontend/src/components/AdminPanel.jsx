@@ -4,7 +4,17 @@ import { API_URL } from '../config';
 
 import { masterSubjects } from '../data/subjects';
 
-export default function AdminPanel({ onMaterialUploaded }) {
+export default function AdminPanel({ user, onMaterialUploaded }) {
+  const adminFetch = (url, options = {}) => {
+    return fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'x-user-email': user?.email || '',
+        'x-session-id': user?.sessionId || ''
+      }
+    });
+  };
   const [adminTab, setAdminTab] = useState('upload'); // upload, logins, downloads, students
   const [logins, setLogins] = useState([]);
   const [downloads, setDownloads] = useState([]);
@@ -70,39 +80,39 @@ export default function AdminPanel({ onMaterialUploaded }) {
     try {
       const timestamp = Date.now();
       
-      const loginRes = await fetch(`${API_URL}/api/admin/logins?t=${timestamp}`, { cache: 'no-store' });
+      const loginRes = await adminFetch(`${API_URL}/api/admin/logins?t=${timestamp}`, { cache: 'no-store' });
       const loginData = await loginRes.json();
       setLogins(Array.isArray(loginData) ? loginData : []);
 
-      const downloadRes = await fetch(`${API_URL}/api/admin/downloads?t=${timestamp}`, { cache: 'no-store' });
+      const downloadRes = await adminFetch(`${API_URL}/api/admin/downloads?t=${timestamp}`, { cache: 'no-store' });
       const downloadData = await downloadRes.json();
       setDownloads(Array.isArray(downloadData) ? downloadData : []);
 
-      const studentRes = await fetch(`${API_URL}/api/admin/users?t=${timestamp}`, { cache: 'no-store' });
+      const studentRes = await adminFetch(`${API_URL}/api/admin/users?t=${timestamp}`, { cache: 'no-store' });
       const studentData = await studentRes.json();
       setStudents(Array.isArray(studentData) ? studentData : []);
 
-      const blockedRes = await fetch(`${API_URL}/api/admin/blocked-emails?t=${timestamp}`, { cache: 'no-store' });
+      const blockedRes = await adminFetch(`${API_URL}/api/admin/blocked-emails?t=${timestamp}`, { cache: 'no-store' });
       const blockedData = await blockedRes.json();
       setBlockedEmails(Array.isArray(blockedData) ? blockedData : []);
 
-      const activitiesRes = await fetch(`${API_URL}/api/admin/user-activities?t=${timestamp}`, { cache: 'no-store' });
+      const activitiesRes = await adminFetch(`${API_URL}/api/admin/user-activities?t=${timestamp}`, { cache: 'no-store' });
       if (activitiesRes.ok) {
         const activitiesData = await activitiesRes.json();
         setUserActivities(activitiesData || []);
       }
 
-      const timelineRes = await fetch(`${API_URL}/api/admin/activity-logs?t=${timestamp}`, { cache: 'no-store' });
+      const timelineRes = await adminFetch(`${API_URL}/api/admin/activity-logs?t=${timestamp}`, { cache: 'no-store' });
       if (timelineRes.ok) {
         const timelineData = await timelineRes.json();
         setActivityLogs(timelineData || []);
       }
 
-      const materialRes = await fetch(`${API_URL}/api/materials?t=${timestamp}`);
+      const materialRes = await adminFetch(`${API_URL}/api/materials?t=${timestamp}`);
       const materialData = await materialRes.json();
       setMaterials(Array.isArray(materialData) ? materialData : []);
 
-      const reportRes = await fetch(`${API_URL}/api/admin/reports?t=${timestamp}`, { cache: 'no-store' });
+      const reportRes = await adminFetch(`${API_URL}/api/admin/reports?t=${timestamp}`, { cache: 'no-store' });
       if (reportRes.ok) {
         const reportData = await reportRes.json();
         setReports(Array.isArray(reportData) ? reportData : []);
@@ -120,7 +130,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
     e.preventDefault();
     if (!newBlockedEmail) return;
     try {
-      const res = await fetch(`${API_URL}/api/admin/block-email`, {
+      const res = await adminFetch(`${API_URL}/api/admin/block-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: newBlockedEmail })
@@ -141,7 +151,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const handleUnblockEmail = async (email) => {
     if (!window.confirm(`Are you sure you want to unblock ${email}?`)) return;
     try {
-      const res = await fetch(`${API_URL}/api/admin/unblock-email`, {
+      const res = await adminFetch(`${API_URL}/api/admin/unblock-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -161,7 +171,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const handleDeleteReport = async (id) => {
     if (!window.confirm('Are you sure you want to delete this report? Make sure the issue is resolved first.')) return;
     try {
-      const res = await fetch(`${API_URL}/api/admin/reports/${id}`, { method: 'DELETE' });
+      const res = await adminFetch(`${API_URL}/api/admin/reports/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setReports(reports.filter(r => r.id !== id));
       } else {
@@ -234,7 +244,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
   const handleDeleteMaterial = async (id) => {
     if (!window.confirm("Are you sure you want to delete this material?")) return;
     try {
-      const res = await fetch(`${API_URL}/api/materials/${id}`, { method: 'DELETE' });
+      const res = await adminFetch(`${API_URL}/api/materials/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setMaterials(materials.filter(m => m.id !== id));
         onMaterialUploaded();
@@ -249,7 +259,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
     if (!newTitle || newTitle.trim() === '' || newTitle === currentTitle) return;
 
     try {
-      const res = await fetch(`${API_URL}/api/materials/${id}`, {
+      const res = await adminFetch(`${API_URL}/api/materials/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: newTitle.trim() })
@@ -274,7 +284,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
     
     try {
       // 1. Get signed URL
-      const signedUrlRes = await fetch(`${API_URL}/api/materials/signed-url`, {
+      const signedUrlRes = await adminFetch(`${API_URL}/api/materials/signed-url`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: file.name })
@@ -294,7 +304,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
       if (!uploadRes.ok) throw new Error('Failed to upload file to storage');
 
       // 3. Update DB
-      const res = await fetch(`${API_URL}/api/materials/${id}`, {
+      const res = await adminFetch(`${API_URL}/api/materials/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: file.name, filepath: signedUrlData.publicUrl })
@@ -332,7 +342,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
 
     try {
       // 1. Get signed URL
-      const signedUrlRes = await fetch(`${API_URL}/api/materials/signed-url`, {
+      const signedUrlRes = await adminFetch(`${API_URL}/api/materials/signed-url`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: file.name })
@@ -362,7 +372,7 @@ export default function AdminPanel({ onMaterialUploaded }) {
         filepath: signedUrlData.publicUrl
       };
 
-      const recordRes = await fetch(`${API_URL}/api/materials/record`, {
+      const recordRes = await adminFetch(`${API_URL}/api/materials/record`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(recordPayload)
@@ -1349,3 +1359,4 @@ export default function AdminPanel({ onMaterialUploaded }) {
     </div>
   );
 }
+
