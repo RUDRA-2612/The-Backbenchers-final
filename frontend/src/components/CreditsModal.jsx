@@ -62,6 +62,28 @@ export default function CreditsModal({ onClose }) {
     };
   }, []);
 
+  const glowStyles = `
+    .rudra-avatar-glow {
+      border: 3px solid #ec4899 !important;
+      animation: pulseAvatarGlow 2s infinite alternate !important;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 0 15px #ec4899;
+    }
+    @keyframes pulseAvatarGlow {
+      0% { 
+        box-shadow: 0 0 10px #ec4899, 0 0 20px #f97316; 
+        border-color: #ec4899;
+        transform: scale(1);
+      }
+      100% { 
+        box-shadow: 0 0 25px #a855f7, 0 0 45px #3b82f6; 
+        border-color: #3b82f6;
+        transform: scale(1.08);
+      }
+    }
+  `;
+
   // Handle back button — navigate to #credits so popstate closes it
   useEffect(() => {
     const handlePopState = () => {
@@ -73,6 +95,7 @@ export default function CreditsModal({ onClose }) {
 
   const modalContent = (
     <div className="modal-overlay credits-overlay" onClick={onClose}>
+      <style>{glowStyles}</style>
       <div className="credits-modal-content" onClick={e => e.stopPropagation()}>
         <div className="credits-header">
           <h2>Credits</h2>
