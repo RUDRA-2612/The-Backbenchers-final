@@ -32,7 +32,7 @@ const sendAdminNotification = async (subject, text) => {
   try {
     const info = await transporter.sendMail({
       from: `"Backbenchers Portal" <${process.env.EMAIL_USER}>`,
-      to: 'rudrapalsinghshekhawat@jklu.edu.in',
+      to: 'shaansingh101206@gmail.com',
       subject: subject + ` [${new Date().toLocaleTimeString()}]`,
       text: text
     });
