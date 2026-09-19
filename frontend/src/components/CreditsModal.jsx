@@ -64,22 +64,31 @@ export default function CreditsModal({ onClose }) {
 
   const glowStyles = `
     .rudra-avatar-glow {
-      border: 3px solid #ec4899 !important;
-      animation: pulseAvatarGlow 2s infinite alternate !important;
+      border: 2px solid rgba(236, 72, 153, 0.7) !important;
+      animation: lightColorChangeGlow 6s infinite alternate !important;
       position: relative;
       z-index: 10;
-      box-shadow: 0 0 15px #ec4899;
     }
-    @keyframes pulseAvatarGlow {
+    @keyframes lightColorChangeGlow {
       0% { 
-        box-shadow: 0 0 10px #ec4899, 0 0 20px #f97316; 
-        border-color: #ec4899;
+        box-shadow: 0 0 5px rgba(236, 72, 153, 0.5); 
+        border-color: rgba(236, 72, 153, 0.7);
+        transform: scale(1);
+      }
+      33% { 
+        box-shadow: 0 0 8px rgba(168, 85, 247, 0.5); 
+        border-color: rgba(168, 85, 247, 0.7);
+        transform: scale(1.03);
+      }
+      66% { 
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); 
+        border-color: rgba(59, 130, 246, 0.7);
         transform: scale(1);
       }
       100% { 
-        box-shadow: 0 0 25px #a855f7, 0 0 45px #3b82f6; 
-        border-color: #3b82f6;
-        transform: scale(1.08);
+        box-shadow: 0 0 8px rgba(45, 212, 191, 0.5); 
+        border-color: rgba(45, 212, 191, 0.7);
+        transform: scale(1.03);
       }
     }
   `;

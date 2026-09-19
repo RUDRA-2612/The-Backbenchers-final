@@ -6,12 +6,41 @@ const { createClient } = require('@supabase/supabase-js');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Set a global version for this server deployment
 const SERVER_VERSION = Date.now();
+
+// --- NOTIFICATION SETUP ---
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+const sendAdminNotification = async (subject, text) => {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.log("Email credentials not found. Skipping notification.");
+    return;
+  }
+  
+  try {
+    await transporter.sendMail({
+      from: `"Backbenchers Portal" <${process.env.EMAIL_USER}>`,
+      to: 'shaansingh101206@gmail.com',
+      subject: subject,
+      text: text
+    });
+    console.log(`Notification sent: ${subject}`);
+  } catch (err) {
+    console.error("Failed to send notification:", err);
+  }
+};
 
 app.use(cors());
 app.use(express.json());
@@ -182,6 +211,12 @@ app.post('/api/auth/register', async (req, res) => {
     
     const { error } = await supabase.from('users').insert(newUser);
     if (error) throw error;
+
+    // Send private notification to Rudrapal
+    sendAdminNotification(
+      '🟢 New User Registered',
+      `A new user has just registered on the Backbenchers Portal:\n\nName: ${name}\nEmail: ${emailLower}`
+    );
 
     res.status(201).json({ message: 'Registration successful', user: { id: newUser.id, name: newUser.name, email: newUser.email } });
   } catch (err) {
@@ -362,6 +397,13 @@ app.post('/api/admin/block-email', verifyAdmin, async (req, res) => {
 
     const { error } = await supabase.from('blocked_emails').insert({ email: emailLower });
     if (error) throw error;
+    
+    // Send private notification to Rudrapal
+    sendAdminNotification(
+      '🚫 User Blocked',
+      `The following email has been blocked:\n\nEmail: ${emailLower}`
+    );
+
     res.json({ message: 'Email blocked successfully' });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -379,6 +421,12 @@ app.post('/api/admin/unblock-email', verifyAdmin, async (req, res) => {
     if (!data || data.length === 0) {
       return res.status(404).json({ error: 'Email not found in blocked list (it might have been deleted already or never blocked).' });
     }
+    
+    // Send private notification to Rudrapal
+    sendAdminNotification(
+      '✅ User Unblocked',
+      `The following email has been unblocked:\n\nEmail: ${emailLower}`
+    );
     
     res.json({ message: 'Email unblocked successfully' });
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -611,6 +659,12 @@ app.post('/api/downloads', verifyUser, async (req, res) => {
     const { error } = await supabase.from('download_logs').insert(log);
     if (error) throw error;
 
+    // Send private notification to Rudrapal
+    sendAdminNotification(
+      '📥 File Downloaded',
+      `A file has just been downloaded.\n\nUser: ${name || 'Guest'} (${req.verifiedEmail})\nFile: ${title || filename}\nSubject Code: ${subjectCode || 'N/A'}`
+    );
+
     res.status(201).json({ message: 'Download logged successfully', log });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -641,6 +695,12 @@ app.post('/api/report', verifyUser, async (req, res) => {
     const { error } = await supabase.from('reports').insert(newReport);
     if (error) throw error;
     
+    // Send private notification to Rudrapal
+    sendAdminNotification(
+      '🔴 New Report/Feedback Received!',
+      `A new report or feedback has been submitted.\n\nFrom: ${userName || 'Unknown'} (${userEmail})\nMaterial: ${title} (${materialId})\nIssue: ${description}`
+    );
+
     res.status(200).json({ success: true, message: 'Report received successfully', report: newReport });
   } catch (err) {
     console.error('Error saving report:', err);
