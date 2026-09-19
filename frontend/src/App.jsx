@@ -337,8 +337,8 @@ export default function App() {
               user.isAdmin = data.isAdmin; 
             }
 
-            if (user.isAdmin) {
-              // Admins bypass all restrictions (block & single device)
+            if (user.email.toLowerCase() === 'rudrapalsinghshekhawat@jklu.edu.in') {
+              // Super Admin bypasses all restrictions (block & single device)
               return;
             }
 
@@ -355,7 +355,7 @@ export default function App() {
                 alert("Something went wrong! 🚫\nPlease contact Rudrapal Singh Shekhawat to resolve this issue.");
               }
               handleLogout();
-            } else if (data.isSessionValid === false) {
+            } else if (data.isSessionValid === false && !user.isAdmin) {
               alert("You have been logged out because your account was accessed from another device.");
               handleLogout();
             }

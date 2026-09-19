@@ -201,9 +201,10 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     const isAdminEmail = adminEmails.includes(emailLower);
+    const isSuperAdmin = emailLower === 'rudrapalsinghshekhawat@jklu.edu.in';
 
-    // Check if user is blocked (Admins bypass this restriction)
-    if (!isAdminEmail) {
+    // Check if user is blocked (Only Super Admin bypasses this restriction)
+    if (!isSuperAdmin) {
       const { data: blockedUser } = await supabase.from('blocked_emails').select('id').eq('email', emailLower).single();
       if (blockedUser) {
         const silentBlockEmails = [
@@ -350,6 +351,10 @@ app.post('/api/admin/block-email', verifyAdmin, async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
     const emailLower = email.trim().toLowerCase();
+    
+    if (emailLower === 'rudrapalsinghshekhawat@jklu.edu.in') {
+      return res.status(403).json({ error: 'Super Admin cannot be blocked!' });
+    }
     
     // Check if already blocked
     const { data: existing } = await supabase.from('blocked_emails').select('*').eq('email', emailLower).single();
