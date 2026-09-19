@@ -352,7 +352,7 @@ export default function App() {
               if (silentBlockEmails.includes(user.email.toLowerCase())) {
                 alert("Something went wrong ..");
               } else {
-                alert("Humne tumhe bulaya nahi, tum aa gaye... 😂\nKhatam! Tata! Bye Bye!");
+                alert("Something went wrong! 🚫\nPlease contact Rudrapal Singh Shekhawat to resolve this issue.");
               }
               handleLogout();
             } else if (data.isSessionValid === false) {
