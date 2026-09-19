@@ -25,18 +25,18 @@ const transporter = nodemailer.createTransport({
 
 const sendAdminNotification = async (subject, text) => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.log("Email credentials not found. Skipping notification.");
-    return;
+    console.error("CRITICAL ERROR: Email credentials not found in process.env!");
+    throw new Error("Email credentials not found in backend configuration (.env is missing EMAIL_USER or EMAIL_PASS).");
   }
   
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"Backbenchers Portal" <${process.env.EMAIL_USER}>`,
-      to: 'shaansingh101206@gmail.com',
-      subject: subject,
+      to: 'rudrapalsinghshekhawat@jklu.edu.in',
+      subject: subject + ` [${new Date().toLocaleTimeString()}]`,
       text: text
     });
-    console.log(`Notification sent: ${subject}`);
+    console.log(`Notification sent: ${subject} | MessageID: ${info.messageId}`);
   } catch (err) {
     console.error("Failed to send notification:", err);
     throw err;
