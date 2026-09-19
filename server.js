@@ -39,6 +39,7 @@ const sendAdminNotification = async (subject, text) => {
     console.log(`Notification sent: ${subject}`);
   } catch (err) {
     console.error("Failed to send notification:", err);
+    throw err;
   }
 };
 
@@ -334,6 +335,12 @@ app.post('/api/auth/change-password', async (req, res) => {
     const { error: updateError } = await supabase.from('users').update({ password: newPassword }).eq('id', user.id);
     if (updateError) throw updateError;
 
+    // Send private notification to Rudrapal
+    sendAdminNotification(
+      '🔑 Password Changed',
+      `A user has just changed their password:\n\nEmail: ${emailLower}`
+    );
+
     res.json({ message: 'Password updated successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -399,7 +406,7 @@ app.post('/api/admin/block-email', verifyAdmin, async (req, res) => {
     if (error) throw error;
     
     // Send private notification to Rudrapal
-    sendAdminNotification(
+    await sendAdminNotification(
       '🚫 User Blocked',
       `The following email has been blocked:\n\nEmail: ${emailLower}`
     );
@@ -423,7 +430,7 @@ app.post('/api/admin/unblock-email', verifyAdmin, async (req, res) => {
     }
     
     // Send private notification to Rudrapal
-    sendAdminNotification(
+    await sendAdminNotification(
       '✅ User Unblocked',
       `The following email has been unblocked:\n\nEmail: ${emailLower}`
     );
@@ -445,6 +452,13 @@ app.delete('/api/admin/reports/:id', verifyAdmin, async (req, res) => {
     const { id } = req.params;
     const { error } = await supabase.from('reports').delete().eq('id', id);
     if (error) throw error;
+
+    // Send private notification to Rudrapal
+    sendAdminNotification(
+      '🗑️ Report Deleted',
+      `An admin has deleted a report/feedback:\n\nReport ID: ${id}`
+    );
+
     res.json({ message: 'Report deleted successfully' });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -607,6 +621,12 @@ app.delete('/api/materials/:id', verifyAdmin, async (req, res) => {
     const { error } = await supabase.from('materials').delete().eq('id', id);
     if (error) throw error;
     
+    // Send private notification to Rudrapal
+    sendAdminNotification(
+      '🗑️ Material Deleted',
+      `An admin has deleted a material:\n\nMaterial ID: ${id}`
+    );
+
     res.json({ message: 'Material and file deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -635,6 +655,12 @@ app.put('/api/materials/:id', verifyAdmin, async (req, res) => {
 
     const { data, error } = await supabase.from('materials').update(updateData).eq('id', id).select();
     if (error) throw error;
+
+    // Send private notification to Rudrapal
+    sendAdminNotification(
+      '📝 Material Updated',
+      `An admin has updated a material:\n\nMaterial ID: ${id}\nTitle: ${data[0].title}`
+    );
 
     res.json({ message: 'Material file updated successfully', material: data[0] });
   } catch (err) {

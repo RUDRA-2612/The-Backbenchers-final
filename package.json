@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
-    "server": "nodemon server.js",
+    "server": "nodemon --ext js,json,env server.js",
     "frontend": "npm run dev --prefix frontend",
     "dev": "concurrently \"npm run server\" \"npm run frontend\"",
     "build": "npm run build --prefix frontend",

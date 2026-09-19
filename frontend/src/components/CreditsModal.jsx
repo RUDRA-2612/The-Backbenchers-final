@@ -64,31 +64,26 @@ export default function CreditsModal({ onClose }) {
 
   const glowStyles = `
     .rudra-avatar-glow {
-      border: 2px solid rgba(236, 72, 153, 0.7) !important;
-      animation: lightColorChangeGlow 6s infinite alternate !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      animation: lightColorChangeGlow 5s infinite alternate ease-in-out !important;
       position: relative;
       z-index: 10;
     }
     @keyframes lightColorChangeGlow {
       0% { 
-        box-shadow: 0 0 5px rgba(236, 72, 153, 0.5); 
-        border-color: rgba(236, 72, 153, 0.7);
+        box-shadow: 0 0 3px rgba(236, 72, 153, 0.3), -2px -2px 4px rgba(168, 85, 247, 0.2), 2px 2px 4px rgba(59, 130, 246, 0.2); 
+        border-color: rgba(236, 72, 153, 0.2);
         transform: scale(1);
       }
-      33% { 
-        box-shadow: 0 0 8px rgba(168, 85, 247, 0.5); 
-        border-color: rgba(168, 85, 247, 0.7);
-        transform: scale(1.03);
-      }
-      66% { 
-        box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); 
-        border-color: rgba(59, 130, 246, 0.7);
-        transform: scale(1);
+      50% { 
+        box-shadow: 0 0 4px rgba(59, 130, 246, 0.3), 2px -2px 4px rgba(45, 212, 191, 0.2), -2px 2px 4px rgba(236, 72, 153, 0.2); 
+        border-color: rgba(168, 85, 247, 0.2);
+        transform: scale(1.01);
       }
       100% { 
-        box-shadow: 0 0 8px rgba(45, 212, 191, 0.5); 
-        border-color: rgba(45, 212, 191, 0.7);
-        transform: scale(1.03);
+        box-shadow: 0 0 3px rgba(45, 212, 191, 0.3), 2px 2px 4px rgba(236, 72, 153, 0.2), -2px -2px 4px rgba(168, 85, 247, 0.2); 
+        border-color: rgba(59, 130, 246, 0.2);
+        transform: scale(1);
       }
     }
   `;
