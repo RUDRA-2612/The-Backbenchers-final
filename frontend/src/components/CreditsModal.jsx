@@ -9,6 +9,7 @@ export default function CreditsModal({ onClose }) {
       year: '2nd Year',
       image: '/Rudra_6.png',
       nameClass: 'name-rudra',
+      avatarClass: 'rudra-avatar-glow',
       roles: [
         { title: 'Web Developer', icon: <Code2 size={14} /> },
         { title: 'Content Contributor', icon: <BookOpen size={14} /> },
@@ -86,7 +87,7 @@ export default function CreditsModal({ onClose }) {
           {contributors.map((contributor, index) => (
             <div key={index} className="credit-card">
               <div className="credit-card-top">
-                <div className="credit-avatar" style={{ overflow: 'hidden', padding: contributor.image ? 0 : undefined }}>
+                <div className={`credit-avatar ${contributor.avatarClass || ''}`} style={{ overflow: 'hidden', padding: contributor.image ? 0 : undefined }}>
                   {contributor.image ? (
                     <img src={contributor.image} alt={contributor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: contributor.imagePosition || 'center' }} />
                   ) : (
