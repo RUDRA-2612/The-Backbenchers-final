@@ -270,6 +270,12 @@ app.post('/api/auth/login', async (req, res) => {
         // If we wanted to store microsoftAccountId, we'd add it here after adding the column to Supabase
         const { error: insertError } = await supabase.from('users').insert(user);
         if (insertError) throw insertError;
+
+        // Send private notification to Rudrapal
+        sendAdminNotification(
+          '🟢 New User Registered',
+          `A new user has just registered on the Backbenchers Portal:\n\nName: ${user.name}\nEmail: ${user.email}`
+        );
       } else if (name && user.name !== name) {
         // Update user's name in case they changed it in Microsoft Entra ID
         await supabase.from('users').update({ name: name }).eq('id', user.id);
