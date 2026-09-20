@@ -247,10 +247,11 @@ app.post('/api/auth/login', async (req, res) => {
           'keshavsinghshekhawat@jklu.edu.in',
           'shouryaveerbishnoi@jklu.edu.in',
           'amankumawat@jklu.edu.in',
-          'omeshnaraniya@jklu.edu.in'
+          'omeshnaraniya@jklu.edu.in',
+          'adityagautam@jklu.edu.in'
         ];
         if (silentBlockEmails.includes(emailLower)) {
-          return res.status(403).json({ error: "Something went wrong .." });
+          return res.status(403).json({ error: "..." });
         }
         return res.status(403).json({ error: "Something went wrong!\nPlease contact Rudrapal Singh Shekhawat to resolve this issue." });
       }

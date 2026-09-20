@@ -632,7 +632,9 @@ export default function App() {
           <h2 style={{ color: 'var(--text-primary)', marginBottom: '15px' }}>Access Denied</h2>
           
           {blockedState === 'silent' ? (
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '30px' }}>Something went wrong ..</p>
+            <div style={{ textAlign: 'center', margin: '15px 0', color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: 'bold' }}>
+              ...
+            </div>
           ) : (
             <div style={{ color: 'var(--text-secondary)', marginBottom: '30px', lineHeight: '1.6' }}>
               <p>Something went wrong!</p>
