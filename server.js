@@ -252,7 +252,7 @@ app.post('/api/auth/login', async (req, res) => {
         if (silentBlockEmails.includes(emailLower)) {
           return res.status(403).json({ error: "Something went wrong .." });
         }
-        return res.status(403).json({ error: "Something went wrong! 🚫\nPlease contact Rudrapal Singh Shekhawat to resolve this issue." });
+        return res.status(403).json({ error: "Something went wrong!\nPlease contact Rudrapal Singh Shekhawat to resolve this issue." });
       }
     }
 
