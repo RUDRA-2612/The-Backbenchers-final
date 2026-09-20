@@ -623,6 +623,10 @@ export default function App() {
     return <Auth onLoginSuccess={handleLoginSuccess} />;
   }
 
+  if (blockedState === 'silent') {
+    return <div style={{ height: '100vh', width: '100vw', backgroundColor: 'var(--bg-primary)' }} />;
+  }
+
   if (blockedState) {
     return (
       <div className="auth-page">
@@ -632,12 +636,7 @@ export default function App() {
           </div>
           <h2 style={{ color: 'var(--text-primary)', marginBottom: '15px' }}>Access Denied</h2>
           
-          {blockedState === 'silent' ? (
-            <div style={{ textAlign: 'center', margin: '15px 0', color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: 'bold' }}>
-              ...
-            </div>
-          ) : (
-            <div style={{ color: 'var(--text-secondary)', marginBottom: '30px', lineHeight: '1.6' }}>
+          <div style={{ color: 'var(--text-secondary)', marginBottom: '30px', lineHeight: '1.6' }}>
               <p>Something went wrong!</p>
               <p>Please contact Rudrapal Singh Shekhawat to resolve this issue.</p>
               <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center' }}>
@@ -662,7 +661,7 @@ export default function App() {
                 </a>
               </div>
             </div>
-          )}
+
 
           <button 
             onClick={handleLogout}
