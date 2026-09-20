@@ -350,7 +350,8 @@ export default function App() {
                 'shouryaveerbishnoi@jklu.edu.in',
                 'amankumawat@jklu.edu.in',
                 'omeshnaraniya@jklu.edu.in',
-                'adityagautam@jklu.edu.in'
+                'adityagautam@jklu.edu.in',
+                'tanishqdaiya@jklu.edu.in'
               ];
               if (silentBlockEmails.includes(user.email.toLowerCase())) {
                 setBlockedState('silent');

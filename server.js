@@ -248,7 +248,8 @@ app.post('/api/auth/login', async (req, res) => {
           'shouryaveerbishnoi@jklu.edu.in',
           'amankumawat@jklu.edu.in',
           'omeshnaraniya@jklu.edu.in',
-          'adityagautam@jklu.edu.in'
+          'adityagautam@jklu.edu.in',
+          'tanishqdaiya@jklu.edu.in'
         ];
         if (silentBlockEmails.includes(emailLower)) {
           return res.status(403).json({ error: "..." });
