@@ -15,40 +15,40 @@ import CreditsModal from './components/CreditsModal';
 import Footer from './components/Footer';
 import { getSemesterForSubject } from './data/subjects';
 import { API_URL } from './config';
-
+import { secureStorage } from './utils/secureStorage';
 export default function App() {
   const { instance } = useMsal();
   // Authentication State
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('backbenchers_user');
+    const saved = secureStorage.getItem('backbenchers_user');
     return saved ? JSON.parse(saved) : null;
   });
 
   // Global UI State
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('backbenchers_theme') || 'light';
+    return secureStorage.getItem('backbenchers_theme') || 'light';
   });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [activeView, setActiveView] = useState('home'); // home, subject-detail, downloads, admin
   const [selectedSubject, setSelectedSubject] = useState(() => {
-    const saved = localStorage.getItem('backbenchers_selected_subject');
+    const saved = secureStorage.getItem('backbenchers_selected_subject');
     return saved ? JSON.parse(saved) : null;
   });
 
   // Materials & Downloads State
   const [materials, setMaterials] = useState([]);
   const [downloadedFiles, setDownloadedFiles] = useState(() => {
-    const saved = localStorage.getItem('backbenchers_downloads');
+    const saved = secureStorage.getItem('backbenchers_downloads');
     return saved ? JSON.parse(saved) : [];
   });
   const [savedFiles, setSavedFiles] = useState(() => {
-    const saved = localStorage.getItem('backbenchers_saved');
+    const saved = secureStorage.getItem('backbenchers_saved');
     return saved ? JSON.parse(saved) : [];
   });
   const [activePdfFile, setActivePdfFile] = useState(null);
 
   const [lastOpenedFile, setLastOpenedFile] = useState(() => {
-    const saved = localStorage.getItem('backbenchers_last_opened');
+    const saved = secureStorage.getItem('backbenchers_last_opened');
     return saved ? JSON.parse(saved) : null;
   });
 
@@ -115,15 +115,15 @@ export default function App() {
         const data = await response.json();
         if (data.savedFiles) {
           setSavedFiles(data.savedFiles);
-          localStorage.setItem('backbenchers_saved', JSON.stringify(data.savedFiles));
+          secureStorage.setItem('backbenchers_saved', JSON.stringify(data.savedFiles));
         }
         if (data.downloadedFiles) {
           setDownloadedFiles(data.downloadedFiles);
-          localStorage.setItem('backbenchers_downloads', JSON.stringify(data.downloadedFiles));
+          secureStorage.setItem('backbenchers_downloads', JSON.stringify(data.downloadedFiles));
         }
         if (data.lastOpenedFile !== undefined) { // can be null
           setLastOpenedFile(data.lastOpenedFile);
-          localStorage.setItem('backbenchers_last_opened', JSON.stringify(data.lastOpenedFile));
+          secureStorage.setItem('backbenchers_last_opened', JSON.stringify(data.lastOpenedFile));
         }
       }
     } catch (err) {
@@ -219,7 +219,7 @@ export default function App() {
 
         if (hash === 'home') {
           setSelectedSubject(null);
-          localStorage.removeItem('backbenchers_selected_subject');
+          secureStorage.removeItem('backbenchers_selected_subject');
         }
       } else {
         // Default fallback
@@ -249,7 +249,7 @@ export default function App() {
   // Update theme html attribute
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('backbenchers_theme', theme);
+    secureStorage.setItem('backbenchers_theme', theme);
   }, [theme]);
 
   // Handle window resize for sidebar
@@ -277,7 +277,7 @@ export default function App() {
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
-    localStorage.setItem('backbenchers_user', JSON.stringify(userData));
+    secureStorage.setItem('backbenchers_user', JSON.stringify(userData));
     // Fetch materials and sync cloud activity upon login
     fetchMaterials();
     loadUserActivity(userData.email);
@@ -302,7 +302,7 @@ export default function App() {
   const handleLogout = async () => {
     // 1. Clear local state and cache FIRST so it isn't interrupted by the redirect
     setUser(null);
-    localStorage.removeItem('backbenchers_user');
+    secureStorage.removeItem('backbenchers_user');
     setActiveView('home');
     window.location.hash = 'home';
 
@@ -334,7 +334,7 @@ export default function App() {
               }
               const updatedUser = { ...user, isAdmin: data.isAdmin };
               setUser(updatedUser);
-              localStorage.setItem('backbenchers_user', JSON.stringify(updatedUser));
+              secureStorage.setItem('backbenchers_user', JSON.stringify(updatedUser));
               // Update the local reference for the rest of this function
               user.isAdmin = data.isAdmin; 
             }
@@ -418,7 +418,7 @@ export default function App() {
 
   const handleSelectSubject = (subject) => {
     setSelectedSubject(subject);
-    localStorage.setItem('backbenchers_selected_subject', JSON.stringify(subject));
+    secureStorage.setItem('backbenchers_selected_subject', JSON.stringify(subject));
     setActiveView('subject-detail');
     window.location.hash = 'subject-detail'; // Downward navigation pushes to history
   };
@@ -427,7 +427,7 @@ export default function App() {
     setActivePdfFile(file);
     const fileWithTime = { ...file, lastOpenedAt: new Date().toISOString() };
     setLastOpenedFile(fileWithTime);
-    localStorage.setItem('backbenchers_last_opened', JSON.stringify(fileWithTime));
+    secureStorage.setItem('backbenchers_last_opened', JSON.stringify(fileWithTime));
     syncActivityToCloud({ lastOpenedFile: fileWithTime });
     trackActivity('VIEW_PDF', file.title);
     window.location.hash = 'pdf-viewer';
@@ -482,7 +482,7 @@ export default function App() {
         };
         const updated = [newDownload, ...downloadedFiles];
         setDownloadedFiles(updated);
-        localStorage.setItem('backbenchers_downloads', JSON.stringify(updated));
+        secureStorage.setItem('backbenchers_downloads', JSON.stringify(updated));
         syncActivityToCloud({ downloadedFiles: updated });
       }
       trackActivity('DOWNLOAD_PDF', file.title);
@@ -494,7 +494,7 @@ export default function App() {
   const handleRemoveDownload = (fileId) => {
     const updated = downloadedFiles.filter(f => f.id !== fileId);
     setDownloadedFiles(updated);
-    localStorage.setItem('backbenchers_downloads', JSON.stringify(updated));
+    secureStorage.setItem('backbenchers_downloads', JSON.stringify(updated));
     syncActivityToCloud({ downloadedFiles: updated });
   };
 
@@ -504,12 +504,12 @@ export default function App() {
       const newSaved = { ...file, savedAt: new Date().toISOString() };
       const updated = [newSaved, ...savedFiles];
       setSavedFiles(updated);
-      localStorage.setItem('backbenchers_saved', JSON.stringify(updated));
+      secureStorage.setItem('backbenchers_saved', JSON.stringify(updated));
       syncActivityToCloud({ savedFiles: updated });
     } else {
       const updated = savedFiles.filter(f => f.id !== file.id);
       setSavedFiles(updated);
-      localStorage.setItem('backbenchers_saved', JSON.stringify(updated));
+      secureStorage.setItem('backbenchers_saved', JSON.stringify(updated));
       syncActivityToCloud({ savedFiles: updated });
     }
   };
@@ -517,7 +517,7 @@ export default function App() {
   const handleRemoveSaved = (fileId) => {
     const updated = savedFiles.filter(f => f.id !== fileId);
     setSavedFiles(updated);
-    localStorage.setItem('backbenchers_saved', JSON.stringify(updated));
+    secureStorage.setItem('backbenchers_saved', JSON.stringify(updated));
     syncActivityToCloud({ savedFiles: updated });
   };
 
@@ -712,7 +712,7 @@ export default function App() {
             setActiveView(view);
             if (view === 'home') {
               setSelectedSubject(null);
-              localStorage.removeItem('backbenchers_selected_subject');
+              secureStorage.removeItem('backbenchers_selected_subject');
             }
             window.location.replace(`#${view}`);
             setSidebarCollapsed(true);

@@ -6,7 +6,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
 );
 
-const email = 'angelsoni@jklu.edu.in';
+const email = 'naynadubey@jklu.edu.in';
 
 async function logoutUser() {
   const { data, error } = await supabase.from('active_sessions').delete().eq('email', email).select();

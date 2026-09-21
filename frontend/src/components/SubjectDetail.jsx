@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, Flag, Beaker } from 'lucide-react';
+import { secureStorage } from '../utils/secureStorage';
 
 export default function SubjectDetail({ subject, materials, savedFiles = [], isAdmin, onBack, onViewFile, onDownloadFile, onSaveFile, onReportFile }) {
-  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('bb_activeTab') || 'papers');
-  const [activeSubTab, setActiveSubTab] = useState(() => localStorage.getItem('bb_activeSubTab') || 'mid-term');
-  const [activeYear, setActiveYear] = useState(() => localStorage.getItem('bb_activeYear') || '2025');
+  const [activeTab, setActiveTab] = useState(() => secureStorage.getItem('bb_activeTab') || 'papers');
+  const [activeSubTab, setActiveSubTab] = useState(() => secureStorage.getItem('bb_activeSubTab') || 'mid-term');
+  const [activeYear, setActiveYear] = useState(() => secureStorage.getItem('bb_activeYear') || '2025');
 
-  React.useEffect(() => localStorage.setItem('bb_activeTab', activeTab), [activeTab]);
-  React.useEffect(() => localStorage.setItem('bb_activeSubTab', activeSubTab), [activeSubTab]);
-  React.useEffect(() => localStorage.setItem('bb_activeYear', activeYear), [activeYear]);
+  React.useEffect(() => secureStorage.setItem('bb_activeTab', activeTab), [activeTab]);
+  React.useEffect(() => secureStorage.setItem('bb_activeSubTab', activeSubTab), [activeSubTab]);
+  React.useEffect(() => secureStorage.setItem('bb_activeYear', activeYear), [activeYear]);
 
   React.useEffect(() => {
     if (activeTab === 'papers' && subject.code.startsWith('CC') && activeSubTab === 'mid-term') {
