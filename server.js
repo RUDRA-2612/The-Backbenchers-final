@@ -124,8 +124,7 @@ const upload = multer({
 const adminEmails = [
   'rudrapalsinghshekhawat@jklu.edu.in',
   'amanjhajharia@jklu.edu.in',
-  'aahan@jklu.edu.in',
-  'raghurajsinghshekhawat@jklu.edu.in'
+  'aahan@jklu.edu.in'
 ];
 
 const verifyAdmin = async (req, res, next) => {
