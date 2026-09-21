@@ -183,6 +183,34 @@ const verifyUser = async (req, res, next) => {
 
 // --- API ROUTES ---
 
+const fetchAllRecords = async (table, selectStr = '*', orderByCol = null, ascending = false) => {
+  let allData = [];
+  let from = 0;
+  const step = 1000;
+  
+  while (true) {
+    let query = supabase.from(table).select(selectStr).range(from, from + step - 1);
+    if (orderByCol) {
+      query = query.order(orderByCol, { ascending });
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    
+    if (data && data.length > 0) {
+      allData = allData.concat(data);
+    }
+    
+    if (!data || data.length < step) {
+      break;
+    }
+    
+    from += step;
+  }
+  
+  return allData;
+};
+
 app.get('/api/health', async (req, res) => {
   const { error } = await supabase.from('users').select('id').limit(1);
   res.json({ status: 'ok', db: error ? 'error' : 'connected' });
@@ -357,24 +385,21 @@ app.post('/api/auth/change-password', async (req, res) => {
 
 app.get('/api/admin/logins', verifyAdmin, async (req, res) => {
   try {
-    const { data: logs, error } = await supabase.from('login_logs').select('*').order('timestamp', { ascending: false });
-    if (error) throw error;
+    const logs = await fetchAllRecords('login_logs', '*', 'timestamp', false);
     res.json(logs);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/admin/downloads', verifyAdmin, async (req, res) => {
   try {
-    const { data: logs, error } = await supabase.from('download_logs').select('*').order('timestamp', { ascending: false });
-    if (error) throw error;
+    const logs = await fetchAllRecords('download_logs', '*', 'timestamp', false);
     res.json(logs);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/admin/users', verifyAdmin, async (req, res) => {
   try {
-    const { data: users, error } = await supabase.from('users').select('id, name, email, isGoogle, createdAt').order('createdAt', { ascending: false });
-    if (error) throw error;
+    const users = await fetchAllRecords('users', 'id, name, email, isGoogle, createdAt', 'createdAt', false);
     res.json(users);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -382,16 +407,14 @@ app.get('/api/admin/users', verifyAdmin, async (req, res) => {
 app.get('/api/admin/blocked-emails', verifyAdmin, async (req, res) => {
   try {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    const { data, error } = await supabase.from('blocked_emails').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
+    const data = await fetchAllRecords('blocked_emails', '*', 'created_at', false);
     res.json(data);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/admin/user-activities', verifyAdmin, async (req, res) => {
   try {
-    const { data, error } = await supabase.from('user_activity').select('*');
-    if (error) throw error;
+    const data = await fetchAllRecords('user_activity', '*');
     res.json(data);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -449,8 +472,7 @@ app.post('/api/admin/unblock-email', verifyAdmin, async (req, res) => {
 
 app.get('/api/admin/reports', verifyAdmin, async (req, res) => {
   try {
-    const { data, error } = await supabase.from('reports').select('*').order('timestamp', { ascending: false });
-    if (error) throw error;
+    const data = await fetchAllRecords('reports', '*', 'timestamp', false);
     res.json(data);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -502,8 +524,7 @@ app.get('/api/user/status/:email', async (req, res) => {
 
 app.get('/api/admin/reports', verifyAdmin, async (req, res) => {
   try {
-    const { data: reports, error } = await supabase.from('reports').select('*').order('timestamp', { ascending: false });
-    if (error) throw error;
+    const reports = await fetchAllRecords('reports', '*', 'timestamp', false);
     res.json(reports);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -512,8 +533,7 @@ app.get('/api/admin/reports', verifyAdmin, async (req, res) => {
 
 app.get('/api/materials', async (req, res) => {
   try {
-    const { data: materials, error } = await supabase.from('materials').select('*').order('uploadedAt', { ascending: false });
-    if (error) throw error;
+    const materials = await fetchAllRecords('materials', '*', 'uploadedAt', false);
     res.json(materials);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -771,8 +791,7 @@ app.get('/api/user/activity/:email', verifyUser, async (req, res) => {
 
 app.get('/api/admin/activity-logs', verifyAdmin, async (req, res) => {
   try {
-    const { data, error } = await supabase.from('activity_logs').select('*').order('timestamp', { ascending: false });
-    if (error) throw error;
+    const data = await fetchAllRecords('activity_logs', '*', 'timestamp', false);
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
