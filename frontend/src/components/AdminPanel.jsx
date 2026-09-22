@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag, Ban, MessageSquare, Search, User, X } from 'lucide-react';
+import { UploadCloud, Users, History, Download, FileText, CheckCircle, AlertCircle, Trash2, Edit2, Flag, Ban, MessageSquare, Search, User, X, Star } from 'lucide-react';
 import { API_URL } from '../config';
 
 import { masterSubjects } from '../data/subjects';
@@ -1250,7 +1250,27 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
                         <td style={{ whiteSpace: 'nowrap' }}>{new Date(r.timestamp).toLocaleString()}</td>
                         <td style={{ fontWeight: '600' }}>{r.userName}</td>
                         <td>{r.userEmail}</td>
-                        <td style={{ maxWidth: '400px', whiteSpace: 'normal', wordBreak: 'break-word' }}>{r.description}</td>
+                        <td style={{ maxWidth: '400px', whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                          {(() => {
+                            const desc = r.description || '';
+                            const match = desc.match(/^\[Rating: (\d)\/5\]\n?([\s\S]*)$/);
+                            if (match) {
+                              const rating = parseInt(match[1]);
+                              const text = match[2];
+                              return (
+                                <div>
+                                  <div style={{ display: 'flex', gap: '2px', marginBottom: text.trim() ? '0.5rem' : '0' }}>
+                                    {[1, 2, 3, 4, 5].map(s => (
+                                      <Star key={s} size={16} fill={s <= rating ? '#fbbf24' : 'none'} color={s <= rating ? '#fbbf24' : 'var(--border)'} strokeWidth={1.5} />
+                                    ))}
+                                  </div>
+                                  {text.trim() && <div>{text.trim()}</div>}
+                                </div>
+                              );
+                            }
+                            return desc;
+                          })()}
+                        </td>
                         <td>
                           <button 
                             className="btn btn-secondary" 

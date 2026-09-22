@@ -403,8 +403,8 @@ export default function App() {
     // Check immediately
     checkVersion();
 
-    // Also check every 2 minutes in background
-    const intervalId = setInterval(checkVersion, 2 * 60 * 1000);
+    // Also check every 5 minutes in background
+    const intervalId = setInterval(checkVersion, 5 * 60 * 1000);
     return () => clearInterval(intervalId);
   }, [activePdfFile]);
 

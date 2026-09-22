@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText, Flag, Shield, MessageSquare } from 'lucide-react';
+import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText, Flag, Shield, MessageSquare, Star } from 'lucide-react';
 
 export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSidebar, materials = [], onViewFile, onReportFile }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -10,6 +10,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
   const [reportDescription, setReportDescription] = useState('');
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackDescription, setFeedbackDescription] = useState('');
+  const [feedbackRating, setFeedbackRating] = useState(0);
   const dropdownRef = useRef(null);
   const searchRef = useRef(null);
 
@@ -24,12 +25,24 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
   };
 
   const handleFeedbackSubmit = () => {
-    if (feedbackDescription.trim() === '') return;
+    if (feedbackDescription.trim() === '' && feedbackRating === 0) return;
+    
+    if (feedbackDescription.trim() === '' && feedbackRating > 0) {
+      if (!window.confirm("Do you want to submit your rating without any text feedback?")) {
+        return;
+      }
+    }
+
     if (onReportFile) {
-      onReportFile({ id: null, title: 'FEEDBACK' }, feedbackDescription);
+      let finalDesc = feedbackDescription;
+      if (feedbackRating > 0) {
+        finalDesc = `[Rating: ${feedbackRating}/5]\n${feedbackDescription}`;
+      }
+      onReportFile({ id: null, title: 'FEEDBACK' }, finalDesc.trim());
     }
     setShowFeedbackModal(false);
     setFeedbackDescription('');
+    setFeedbackRating(0);
     alert('Feedback submitted successfully. Thank you!');
   };
 
@@ -259,9 +272,33 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
             <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
               We value your thoughts! Tell us how we can improve.
             </p>
+
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setFeedbackRating(star)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0.2rem',
+                    color: star <= feedbackRating ? '#fbbf24' : 'var(--border-color)',
+                    transition: 'transform 0.1s ease, color 0.2s ease',
+                    outline: 'none'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.2)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
+                  title={`${star} Star${star > 1 ? 's' : ''}`}
+                >
+                  <Star size={32} fill={star <= feedbackRating ? '#fbbf24' : 'none'} strokeWidth={1.5} />
+                </button>
+              ))}
+            </div>
+
             <textarea 
-              style={{ width: '100%', height: '100px', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', marginBottom: '1rem', fontFamily: 'inherit', resize: 'vertical' }}
-              placeholder="Share your ideas, suggestions, or feedback here..."
+              style={{ width: '100%', height: '100px', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', marginBottom: '1rem', fontFamily: 'inherit', resize: 'vertical' }}
+              placeholder="Share your ideas, suggestions, or feedback here (optional)..."
               value={feedbackDescription}
               onChange={e => setFeedbackDescription(e.target.value)}
             />
