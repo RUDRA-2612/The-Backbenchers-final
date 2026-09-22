@@ -714,7 +714,7 @@ export default function App() {
               setSelectedSubject(null);
               secureStorage.removeItem('backbenchers_selected_subject');
             }
-            window.location.replace(`#${view}`);
+            window.location.hash = view;
             setSidebarCollapsed(true);
           }}
           isCollapsed={sidebarCollapsed}
