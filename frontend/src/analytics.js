@@ -25,6 +25,25 @@ export const ANALYTICS_EVENTS = Object.freeze({
   INTERACTION: 'ui_interaction', ADMIN_ACTION: 'admin_action', BLOCKED_ACTION: 'blocked_action',
 });
 
+// Firebase permits 500 custom event types. The 27 semantic events above leave
+// 473 interaction slots, giving this application an exact 500-type taxonomy.
+// Slot selection is stable for a particular control/route/phase combination.
+const INTERACTION_SLOT_COUNT = 473;
+const interactionSlots = Array.from({ length: INTERACTION_SLOT_COUNT }, (_, index) =>
+  `research_interaction_${String(index + 1).padStart(3, '0')}`
+);
+
+const stableHash = value => {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) hash = ((hash << 5) - hash + value.charCodeAt(index)) | 0;
+  return Math.abs(hash);
+};
+
+function interactionEventName(params) {
+  const fingerprint = [params.interaction_name, params.element_kind, params.interaction_phase, route()].join('|');
+  return interactionSlots[stableHash(fingerprint) % INTERACTION_SLOT_COUNT];
+}
+
 let analytics = null;
 let sessionId = null;
 let initialized = false;
@@ -94,6 +113,10 @@ export function trackMaterial(event, material, extra = {}) {
   });
 }
 
+export function trackInteraction(params = {}) {
+  track(interactionEventName(params), { event_family: 'ui_interaction', ...params });
+}
+
 function installBehaviorObservers() {
   const markActive = () => { lastActiveAt = Date.now(); };
   ['pointerdown', 'keydown', 'touchstart', 'focus'].forEach(type => window.addEventListener(type, markActive, { passive: true }));
@@ -103,7 +126,7 @@ function installBehaviorObservers() {
   document.addEventListener('click', event => {
     const element = event.target.closest('button, a, input, select, textarea, [role="button"], [data-analytics]');
     if (!element) return;
-    track(ANALYTICS_EVENTS.INTERACTION, {
+    trackInteraction({
       interaction_name: safe(element.dataset.analytics || element.getAttribute('aria-label') || element.name || element.id || element.tagName.toLowerCase(), 60),
       element_kind: safe(element.tagName.toLowerCase(), 20),
       input_type: safe(element.getAttribute('type') || 'none', 20),
@@ -113,7 +136,7 @@ function installBehaviorObservers() {
   document.addEventListener('change', event => {
     const element = event.target;
     if (!element.matches('input, select, textarea')) return;
-    track(ANALYTICS_EVENTS.INTERACTION, {
+    trackInteraction({
       interaction_name: safe(element.dataset.analytics || element.getAttribute('aria-label') || element.name || element.id || 'field_change', 60),
       element_kind: safe(element.tagName.toLowerCase(), 20),
       input_type: safe(element.getAttribute('type') || 'none', 20),
@@ -124,7 +147,7 @@ function installBehaviorObservers() {
   }, { capture: true, passive: true });
   document.addEventListener('submit', event => {
     const form = event.target;
-    track(ANALYTICS_EVENTS.INTERACTION, {
+    trackInteraction({
       interaction_name: safe(form.dataset.analytics || form.getAttribute('aria-label') || form.id || 'form_submit', 60),
       element_kind: 'form',
       interaction_phase: 'submit',

@@ -17,3 +17,5 @@ Use `?analytics_debug=1` during development and Firebase DebugView to validate e
 ## High-volume interaction trail
 
 The delegated browser observers emit `ui_interaction` for every click, control change, and form submission across the portal. Thus a research session can generate thousands of distinct **event records** when users perform thousands of actions, while retaining a small, queryable event taxonomy. The event records identify the control, element type, interaction phase, route, session, device, and pseudonymous user ID—but never input values or visible text that can contain personal data.
+
+The deployed taxonomy contains exactly 500 Firebase event types: 27 semantic events and 473 deterministic `research_interaction_001` through `research_interaction_473` slots. Each UI action maps stably to one slot from its control, route, and phase, and includes `event_family=ui_interaction` plus the action metadata. This preserves a 500-type Firebase-compatible schema while allowing unlimited interaction records.
