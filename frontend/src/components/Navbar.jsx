@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText, Flag, Shield, MessageSquare, Star } from 'lucide-react';
 import { API_URL } from '../config';
+import { ANALYTICS_EVENTS, track, trackMaterial } from '../analytics';
 
 export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSidebar, materials = [], onViewFile, onReportFile }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -131,6 +132,8 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
   ).slice(0, 6) : [];
 
   const handleSelectResult = (file) => {
+    track(ANALYTICS_EVENTS.SEARCH, { search_result_count: searchResults.length, search_selected: true });
+    trackMaterial(ANALYTICS_EVENTS.INTERACTION, file, { interaction_name: 'search_result_open' });
     setShowSearch(false);
     setSearchQuery('');
     if (onViewFile) onViewFile(file);
@@ -153,7 +156,10 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
           <div className={`global-search-container ${showSearch ? 'active' : ''}`} ref={searchRef}>
             <button 
               className="search-toggle-btn"
-              onClick={() => setShowSearch(!showSearch)}
+              onClick={() => {
+                track(ANALYTICS_EVENTS.INTERACTION, { interaction_name: showSearch ? 'search_close' : 'search_open' });
+                setShowSearch(!showSearch);
+              }}
               aria-label="Search Materials"
             >
               <Search size={18} />
@@ -164,7 +170,10 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
                 className="global-search-input" 
                 placeholder="Search by subject or code..." 
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (e.target.value.length === 1) track(ANALYTICS_EVENTS.SEARCH, { search_started: true });
+                }}
                 autoFocus={showSearch}
               />
               {showSearch && searchQuery.trim() && (
