@@ -270,17 +270,6 @@ app.post('/api/auth/login', async (req, res) => {
     if (!isSuperAdmin) {
       const { data: blockedUser } = await supabase.from('blocked_emails').select('id').eq('email', emailLower).single();
       if (blockedUser) {
-        const silentBlockEmails = [
-          'keshavsinghshekhawat@jklu.edu.in',
-          'shouryaveerbishnoi@jklu.edu.in',
-          'amankumawat@jklu.edu.in',
-          'omeshnaraniya@jklu.edu.in',
-          'adityagautam@jklu.edu.in',
-          'tanishqdaiya@jklu.edu.in'
-        ];
-        if (silentBlockEmails.includes(emailLower)) {
-          return res.status(403).json({ error: "SILENT_BLOCK" });
-        }
         return res.status(403).json({ error: "Something went wrong!\nPlease contact Rudrapal Singh Shekhawat to resolve this issue." });
       }
     }

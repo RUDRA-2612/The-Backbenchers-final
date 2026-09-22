@@ -345,19 +345,7 @@ export default function App() {
             }
 
             if (data.isBlocked) {
-              const silentBlockEmails = [
-                'keshavsinghshekhawat@jklu.edu.in',
-                'shouryaveerbishnoi@jklu.edu.in',
-                'amankumawat@jklu.edu.in',
-                'omeshnaraniya@jklu.edu.in',
-                'adityagautam@jklu.edu.in',
-                'tanishqdaiya@jklu.edu.in'
-              ];
-              if (silentBlockEmails.includes(user.email.toLowerCase())) {
-                setBlockedState('silent');
-              } else {
-                setBlockedState('normal');
-              }
+              setBlockedState('normal');
               return;
             } else if (data.isSessionValid === false && !user.isAdmin) {
               alert("You have been logged out because your account was accessed from another device.");
@@ -623,9 +611,7 @@ export default function App() {
     return <Auth onLoginSuccess={handleLoginSuccess} />;
   }
 
-  if (blockedState === 'silent') {
-    return <div style={{ height: '100vh', width: '100vw', backgroundColor: 'var(--bg-primary)' }} />;
-  }
+
 
   if (blockedState) {
     return (

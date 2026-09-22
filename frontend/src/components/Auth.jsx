@@ -108,7 +108,7 @@ export default function Auth({ onLoginSuccess }) {
           </p>
         </div>
 
-        {error && error !== "SILENT_BLOCK" && (
+        {error && (
           <div className="auth-error">
             {error}
             {error.includes("Rudrapal") && (
