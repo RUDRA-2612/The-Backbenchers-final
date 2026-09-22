@@ -728,6 +728,27 @@ app.post('/api/report', verifyUser, async (req, res) => {
   try {
     const { materialId, title, description, userName } = req.body;
     const userEmail = req.verifiedEmail;
+
+    if (title === 'FEEDBACK') {
+      const { data: existingFeedback } = await supabase.from('reports').select('id').eq('userEmail', userEmail).eq('title', 'FEEDBACK').single();
+      
+      if (existingFeedback) {
+        const { error } = await supabase.from('reports').update({
+          description,
+          timestamp: new Date().toISOString()
+        }).eq('id', existingFeedback.id);
+        
+        if (error) throw error;
+        
+        sendAdminNotification(
+          '🔄 Feedback Updated!',
+          `A user has updated their feedback.\n\nFrom: ${userName || 'Unknown'} (${userEmail})\nNew Feedback: ${description}`
+        );
+        
+        return res.status(200).json({ success: true, message: 'Feedback updated successfully' });
+      }
+    }
+
     console.log(`\n=== NEW REPORT RECEIVED ===`);
     console.log(`Material: ${title} (${materialId})`);
     console.log(`From: ${userName || 'Unknown'} (${userEmail})`);
@@ -758,6 +779,16 @@ app.post('/api/report', verifyUser, async (req, res) => {
   } catch (err) {
     console.error('Error saving report:', err);
     res.status(500).json({ error: 'Failed to submit report' });
+  }
+});
+
+app.get('/api/user/feedback', verifyUser, async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('reports').select('*').eq('userEmail', req.verifiedEmail).eq('title', 'FEEDBACK').single();
+    if (error && error.code !== 'PGRST116') throw error;
+    res.json(data || null);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

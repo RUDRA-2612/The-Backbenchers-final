@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sun, Moon, User, LogOut, Menu, BookOpen, ChevronDown, ChevronUp, Key, Search, FileText, Flag, Shield, MessageSquare, Star } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSidebar, materials = [], onViewFile, onReportFile }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -45,6 +46,31 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
     setFeedbackRating(0);
     alert('Feedback submitted successfully. Thank you!');
   };
+
+  useEffect(() => {
+    if (showFeedbackModal && user) {
+      const getAuthHeaders = () => ({
+        'x-user-email': user.email || '',
+        'x-session-id': user.sessionId || '',
+        'x-user-id': user.id || ''
+      });
+      fetch(`${API_URL}/api/user/feedback`, { headers: getAuthHeaders() })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.description) {
+             const match = data.description.match(/^\[Rating: (\d)\/5\]\n?([\s\S]*)$/);
+             if (match) {
+               setFeedbackRating(parseInt(match[1]));
+               setFeedbackDescription(match[2]);
+             } else {
+               setFeedbackRating(0);
+               setFeedbackDescription(data.description);
+             }
+          }
+        })
+        .catch(e => console.error("Error fetching feedback:", e));
+    }
+  }, [showFeedbackModal, user]);
 
   // Close dropdown if clicked outside
   useEffect(() => {
