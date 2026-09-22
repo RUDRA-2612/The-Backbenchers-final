@@ -97,6 +97,39 @@ export function trackMaterial(event, material, extra = {}) {
 function installBehaviorObservers() {
   const markActive = () => { lastActiveAt = Date.now(); };
   ['pointerdown', 'keydown', 'touchstart', 'focus'].forEach(type => window.addEventListener(type, markActive, { passive: true }));
+  // Capture every meaningful DOM interaction as an event *instance*. This produces
+  // an unlimited, ordered interaction trail in BigQuery without consuming thousands
+  // of GA4 event-name definitions or collecting form/search contents.
+  document.addEventListener('click', event => {
+    const element = event.target.closest('button, a, input, select, textarea, [role="button"], [data-analytics]');
+    if (!element) return;
+    track(ANALYTICS_EVENTS.INTERACTION, {
+      interaction_name: safe(element.dataset.analytics || element.getAttribute('aria-label') || element.name || element.id || element.tagName.toLowerCase(), 60),
+      element_kind: safe(element.tagName.toLowerCase(), 20),
+      input_type: safe(element.getAttribute('type') || 'none', 20),
+      interaction_phase: 'click',
+    });
+  }, { capture: true, passive: true });
+  document.addEventListener('change', event => {
+    const element = event.target;
+    if (!element.matches('input, select, textarea')) return;
+    track(ANALYTICS_EVENTS.INTERACTION, {
+      interaction_name: safe(element.dataset.analytics || element.getAttribute('aria-label') || element.name || element.id || 'field_change', 60),
+      element_kind: safe(element.tagName.toLowerCase(), 20),
+      input_type: safe(element.getAttribute('type') || 'none', 20),
+      interaction_phase: 'change',
+      // Never send the field value: it can contain PII or research responses.
+      field_has_value: Boolean(element.value),
+    });
+  }, { capture: true, passive: true });
+  document.addEventListener('submit', event => {
+    const form = event.target;
+    track(ANALYTICS_EVENTS.INTERACTION, {
+      interaction_name: safe(form.dataset.analytics || form.getAttribute('aria-label') || form.id || 'form_submit', 60),
+      element_kind: 'form',
+      interaction_phase: 'submit',
+    });
+  }, { capture: true });
   document.addEventListener('visibilitychange', () => track(ANALYTICS_EVENTS.VISIBILITY, { visibility_state: document.visibilityState }));
   window.addEventListener('error', () => track(ANALYTICS_EVENTS.APP_ERROR, { error_type: 'window_error' }));
   window.addEventListener('unhandledrejection', () => track(ANALYTICS_EVENTS.APP_ERROR, { error_type: 'unhandled_rejection' }));
