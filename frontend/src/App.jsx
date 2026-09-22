@@ -138,30 +138,7 @@ export default function App() {
     }
   }, []);
 
-  // Heartbeat to track online status
-  useEffect(() => {
-    let pingInterval;
-    if (user && user.email) {
-      const pingServer = async () => {
-        try {
-          await fetch(`${API_URL}/api/user/ping`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-            body: JSON.stringify({ email: user.email })
-          });
-        } catch (err) {
-          console.error('Ping failed:', err);
-        }
-      };
-      
-      pingServer(); // Ping immediately
-      pingInterval = setInterval(pingServer, 60 * 1000); // Ping every 60 seconds
-    }
-    
-    return () => {
-      if (pingInterval) clearInterval(pingInterval);
-    };
-  }, [user]);
+
 
   // Force title to be exactly "Backbenchers" to clear any cached tab titles
   useEffect(() => {
@@ -362,39 +339,7 @@ export default function App() {
     }
   }, [user]);
 
-  // Auto-Update Checker
-  const currentVersionRef = useRef(null);
 
-  useEffect(() => {
-    const checkVersion = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/version`, { cache: 'no-store' });
-        if (res.ok) {
-          const data = await res.json();
-          if (currentVersionRef.current === null) {
-            // First time load, set the version
-            currentVersionRef.current = data.version;
-          } else if (currentVersionRef.current !== data.version) {
-            // Version changed! New deployment detected.
-            // DO NOT reload if user is actively reading a PDF
-            if (!activePdfFile) {
-              console.log("New version detected. Reloading...");
-              window.location.reload(true);
-            }
-          }
-        }
-      } catch (err) {
-        // Ignore network errors
-      }
-    };
-    
-    // Check immediately
-    checkVersion();
-
-    // Also check every 5 minutes in background
-    const intervalId = setInterval(checkVersion, 5 * 60 * 1000);
-    return () => clearInterval(intervalId);
-  }, [activePdfFile]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
