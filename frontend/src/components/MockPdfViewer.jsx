@@ -1,8 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { ANALYTICS_EVENTS, trackMaterial } from '../analytics';
 
 export default function MockPdfViewer({ file, onClose, onDownload }) {
   const [isMobile, setIsMobile] = useState(false);
+  const openedAt = React.useRef(0);
+
+  useEffect(() => {
+    openedAt.current = Date.now();
+  }, []);
+
+  const closeViewer = () => {
+    trackMaterial(ANALYTICS_EVENTS.MATERIAL_CLOSE, file, {
+      reading_duration_seconds: Math.round((Date.now() - openedAt.current) / 1000),
+    });
+    onClose();
+  };
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -62,7 +75,7 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
             <span className="pdf-title">{file.title}</span>
           </div>
           <div className="pdf-viewer-controls">
-            <button className="pdf-control-btn" onClick={onClose} title="Close PDF Viewer" style={{ color: '#ef4444' }}>
+            <button className="pdf-control-btn" onClick={closeViewer} title="Close PDF Viewer" style={{ color: '#ef4444' }}>
               <X size={18} />
             </button>
           </div>
