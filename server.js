@@ -521,6 +521,8 @@ app.get('/api/admin/reports', verifyAdmin, async (req, res) => {
 
 app.get('/api/materials', async (req, res) => {
   try {
+    // Cache on Edge for 5 minutes (300s) to drastically reduce Vercel Edge requests
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
     const materials = await fetchAllRecords('materials', '*', 'uploadedAt', false);
     res.json(materials);
   } catch (err) { res.status(500).json({ error: err.message }); }
