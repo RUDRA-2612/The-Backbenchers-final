@@ -201,7 +201,10 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
         </button>
         <div className="logo" onClick={() => { window.history.pushState(null, '', '/'); window.dispatchEvent(new Event('popstate')); }}>
           <img src="/logo.png" alt="Logo" className="nav-logo-img smart-logo" />
-          <span className="desktop-only" style={{ marginLeft: '5px' }}>Back<span>benchers</span></span>
+          <span className="desktop-only" style={{ marginLeft: '5px' }}>
+            <span style={{ color: 'var(--text-primary)' }}>Back</span>
+            <span style={{ color: 'var(--accent)' }}>benchers</span>
+          </span>
         </div>
       </div>
 
