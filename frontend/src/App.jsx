@@ -391,7 +391,7 @@ export default function App() {
     secureStorage.setItem('backbenchers_last_opened', JSON.stringify(fileWithTime));
     syncActivityToCloud({ lastOpenedFile: fileWithTime });
     trackActivity('VIEW_PDF', file.title);
-    // modal opens over current path;
+    navigate('/pdf-viewer');
   };
 
   // Physically download file and log transaction in backend
