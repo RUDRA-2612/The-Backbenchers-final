@@ -15,6 +15,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
   const [feedbackRating, setFeedbackRating] = useState(0);
   const dropdownRef = useRef(null);
   const searchRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   const handleReportSubmit = () => {
     if (reportDescription.trim() === '') return;
@@ -121,6 +122,15 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
     };
   }, [showSearch]);
 
+  // Focus the search input automatically when search is opened
+  useEffect(() => {
+    if (showSearch && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current.focus();
+      }, 50);
+    }
+  }, [showSearch]);
+
   const getInitials = (name) => {
     if (!name) return 'S';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -166,6 +176,7 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
             </button>
             <div className="search-input-wrapper">
               <input 
+                ref={searchInputRef}
                 type="text" 
                 className="global-search-input" 
                 placeholder="Search by subject or code..." 

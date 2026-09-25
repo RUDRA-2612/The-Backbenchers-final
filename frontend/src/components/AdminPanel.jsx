@@ -32,7 +32,17 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
   const [selectedUserEmail, setSelectedUserEmail] = useState('');
   const [showUserSearch, setShowUserSearch] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
+  const focusedIndexRef = useRef(null);
   const searchRef = useRef(null);
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    if (showUserSearch && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current.focus();
+      }, 50);
+    }
+  }, [showUserSearch]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -440,6 +450,7 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
           </button>
           <div className="search-input-wrapper">
             <input 
+              ref={searchInputRef}
               type="text" 
               className="global-search-input" 
               style={{ width: '100%' }}
