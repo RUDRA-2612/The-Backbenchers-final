@@ -108,7 +108,7 @@ export default function CreditsModal({ onClose }) {
           </button>
         </div>
         
-        <p className="credits-subtitle">Meet the visionary team behind the Backbenchers Portal</p>
+        <p className="credits-subtitle">Meet the visionary team behind the <span style={{ color: 'var(--text-primary)' }}>Back</span><span style={{ color: 'var(--accent)' }}>benchers</span> Portal</p>
         
         <div className="credits-grid">
           {contributors.map((contributor, index) => (
