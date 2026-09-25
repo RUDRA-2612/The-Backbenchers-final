@@ -122,6 +122,50 @@ export default function Navbar({ user, onLogout, theme, toggleTheme, toggleSideb
     };
   }, [showSearch]);
 
+  // Handle mobile back button to close report modal
+  useEffect(() => {
+    const handlePopState = () => {
+      if (showReportModal) {
+        setShowReportModal(false);
+      }
+    };
+
+    if (showReportModal) {
+      window.history.pushState({ reportOpen: true }, '');
+      window.addEventListener('popstate', handlePopState);
+    } else {
+      if (window.history.state && window.history.state.reportOpen) {
+        window.history.back();
+      }
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [showReportModal]);
+
+  // Handle mobile back button to close feedback modal
+  useEffect(() => {
+    const handlePopState = () => {
+      if (showFeedbackModal) {
+        setShowFeedbackModal(false);
+      }
+    };
+
+    if (showFeedbackModal) {
+      window.history.pushState({ feedbackOpen: true }, '');
+      window.addEventListener('popstate', handlePopState);
+    } else {
+      if (window.history.state && window.history.state.feedbackOpen) {
+        window.history.back();
+      }
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [showFeedbackModal]);
+
   // Focus the search input automatically when search is opened
   useEffect(() => {
     if (showSearch && searchInputRef.current) {
