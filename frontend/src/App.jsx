@@ -16,6 +16,7 @@ import Footer from './components/Footer';
 import { getSemesterForSubject } from './data/subjects';
 import { API_URL } from './config';
 import { secureStorage } from './utils/secureStorage';
+import { ANALYTICS_EVENTS, identifyResearchUser, track, trackMaterial, trackPageView } from './analytics';
 export default function App() {
   const { instance } = useMsal();
   // Authentication State
@@ -71,6 +72,7 @@ export default function App() {
         setMaterials(data);
       }
     } catch (err) {
+      track(ANALYTICS_EVENTS.API_ERROR, { api_name: 'materials_fetch' });
       console.error('Error fetching materials from API:', err);
     }
   };
@@ -102,6 +104,7 @@ export default function App() {
         })
       });
     } catch (err) {
+      track(ANALYTICS_EVENTS.API_ERROR, { api_name: 'activity_log' });
       console.error('Error tracking activity:', err);
     }
   };
@@ -139,7 +142,6 @@ export default function App() {
   }, []);
 
 
-
   // Force title to be exactly "Backbenchers" to clear any cached tab titles
   useEffect(() => {
     document.title = "Backbenchers";
@@ -169,10 +171,12 @@ export default function App() {
           window.location.replace('#home');
           setActiveView('home');
           trackActivity('VIEW_PAGE', 'Home Page');
+          trackPageView('home');
         } else {
           setActiveView('subject-detail');
           setActivePdfFile(null); // Ensure PDF is closed if they back out
           trackActivity('VIEW_PAGE', `Subject: ${selectedSubject.code || selectedSubject.name}`);
+          trackPageView('subject_detail', { subject_code: selectedSubject.code || 'unknown' });
         }
       } else if (hash === 'pdf-viewer') {
         // Do nothing on hashchange to pdf-viewer.
@@ -182,10 +186,12 @@ export default function App() {
         setActiveView(hash);
         setActivePdfFile(null);
         trackActivity('VIEW_PAGE', `Semester/Year Grid: ${hash}`);
+        trackPageView('subject_grid', { grid_name: hash });
       } else if (hash === 'credits') {
         setActiveView('credits');
         setActivePdfFile(null);
         trackActivity('VIEW_PAGE', 'Credits Modal');
+        trackPageView('credits');
       } else if (hash === 'home' || hash === 'admin' || hash === 'downloads' || hash === 'saved' || hash === 'profile') {
         setActiveView(hash);
         setActivePdfFile(null);
@@ -193,6 +199,7 @@ export default function App() {
         let pageName = hash.charAt(0).toUpperCase() + hash.slice(1);
         if (hash === 'admin') pageName = 'Admin Panel';
         trackActivity('VIEW_PAGE', `${pageName} Page`);
+        trackPageView(hash);
 
         if (hash === 'home') {
           setSelectedSubject(null);
@@ -204,6 +211,7 @@ export default function App() {
         setActivePdfFile(null);
         window.location.replace('#home');
         trackActivity('VIEW_PAGE', 'Home Page (Fallback)');
+        trackPageView('home', { navigation_result: 'fallback' });
       }
 
       // Automatically close sidebar on navigating for all devices (mobile + laptop)
@@ -258,6 +266,8 @@ export default function App() {
     // Fetch materials and sync cloud activity upon login
     fetchMaterials();
     loadUserActivity(userData.email);
+    identifyResearchUser(userData);
+    track(ANALYTICS_EVENTS.LOGIN, { user_role: userData.isAdmin ? 'admin' : 'student', auth_provider: 'microsoft' });
     
     // Log the login to the new timeline table directly since we have the data
     fetch(`${API_URL}/api/activity-log`, {
@@ -277,6 +287,7 @@ export default function App() {
   };
 
   const handleLogout = async () => {
+    track(ANALYTICS_EVENTS.LOGOUT);
     // 1. Clear local state and cache FIRST so it isn't interrupted by the redirect
     setUser(null);
     secureStorage.removeItem('backbenchers_user');
@@ -342,14 +353,22 @@ export default function App() {
 
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    setTheme(prev => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      track(ANALYTICS_EVENTS.THEME_CHANGE, { theme_name: next });
+      return next;
+    });
   };
 
   const toggleSidebar = () => {
-    setSidebarCollapsed(prev => !prev);
+    setSidebarCollapsed(prev => {
+      track(ANALYTICS_EVENTS.SIDEBAR, { sidebar_state: prev ? 'expanded' : 'collapsed' });
+      return !prev;
+    });
   };
 
   const handleSelectSubject = (subject) => {
+    track(ANALYTICS_EVENTS.SUBJECT_OPEN, { subject_code: subject.code || 'unknown', semester: String(subject.semester || 'unknown') });
     setSelectedSubject(subject);
     secureStorage.setItem('backbenchers_selected_subject', JSON.stringify(subject));
     setActiveView('subject-detail');
@@ -357,6 +376,7 @@ export default function App() {
   };
 
   const handleViewFile = (file) => {
+    trackMaterial(ANALYTICS_EVENTS.MATERIAL_OPEN, file);
     setActivePdfFile(file);
     const fileWithTime = { ...file, lastOpenedAt: new Date().toISOString() };
     setLastOpenedFile(fileWithTime);
@@ -369,11 +389,13 @@ export default function App() {
   // Physically download file and log transaction in backend
   const handleDownloadFile = async (file) => {
     if (!user?.isAdmin) {
+      trackMaterial(ANALYTICS_EVENTS.BLOCKED_ACTION, file, { blocked_action: 'download' });
       alert("Downloading is disabled for regular users.");
       return;
     }
     
     try {
+      trackMaterial(ANALYTICS_EVENTS.DOWNLOAD_START, file);
       // 1. Log to server
       if (user) {
         await fetch(`${API_URL}/api/downloads`, {
@@ -419,12 +441,15 @@ export default function App() {
         syncActivityToCloud({ downloadedFiles: updated });
       }
       trackActivity('DOWNLOAD_PDF', file.title);
+      trackMaterial(ANALYTICS_EVENTS.DOWNLOAD_COMPLETE, file);
     } catch (err) {
+      trackMaterial(ANALYTICS_EVENTS.DOWNLOAD_FAILED, file);
       console.error('Download processing failed:', err);
     }
   };
 
   const handleRemoveDownload = (fileId) => {
+    track(ANALYTICS_EVENTS.INTERACTION, { interaction_name: 'download_removed', material_id: String(fileId) });
     const updated = downloadedFiles.filter(f => f.id !== fileId);
     setDownloadedFiles(updated);
     secureStorage.setItem('backbenchers_downloads', JSON.stringify(updated));
@@ -434,12 +459,14 @@ export default function App() {
   const handleSaveFile = (file) => {
     const isExist = savedFiles.some(f => f.id === file.id);
     if (!isExist) {
+      trackMaterial(ANALYTICS_EVENTS.MATERIAL_SAVE, file);
       const newSaved = { ...file, savedAt: new Date().toISOString() };
       const updated = [newSaved, ...savedFiles];
       setSavedFiles(updated);
       secureStorage.setItem('backbenchers_saved', JSON.stringify(updated));
       syncActivityToCloud({ savedFiles: updated });
     } else {
+      trackMaterial(ANALYTICS_EVENTS.MATERIAL_UNSAVE, file);
       const updated = savedFiles.filter(f => f.id !== file.id);
       setSavedFiles(updated);
       secureStorage.setItem('backbenchers_saved', JSON.stringify(updated));
@@ -448,6 +475,7 @@ export default function App() {
   };
 
   const handleRemoveSaved = (fileId) => {
+    track(ANALYTICS_EVENTS.MATERIAL_UNSAVE, { material_id: String(fileId), action_source: 'saved_page' });
     const updated = savedFiles.filter(f => f.id !== fileId);
     setSavedFiles(updated);
     secureStorage.setItem('backbenchers_saved', JSON.stringify(updated));
@@ -640,7 +668,8 @@ export default function App() {
               setSidebarCollapsed(true);
               return;
             }
-            setActiveView(view);
+          setActiveView(view);
+            track(ANALYTICS_EVENTS.NAVIGATION, { navigation_target: view, navigation_source: 'sidebar' });
             if (view === 'home') {
               setSelectedSubject(null);
               secureStorage.removeItem('backbenchers_selected_subject');

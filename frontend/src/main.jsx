@@ -6,11 +6,13 @@ import { MsalProvider } from '@azure/msal-react'
 import { msalInstance } from './auth/authConfig'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import { initializeAnalytics } from './analytics'
 
 // Initialize MSAL outside of the React tree
 msalInstance.initialize().then(() => {
   // Required by MSAL v3 to process redirects
   msalInstance.handleRedirectPromise().catch(console.error);
+  initializeAnalytics();
   
   ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
