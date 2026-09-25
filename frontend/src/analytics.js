@@ -52,7 +52,7 @@ let heartbeat = null;
 const scrollMilestones = new Set();
 
 const deviceClass = () => window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop';
-const route = () => window.location.hash.replace('#', '') || 'login';
+const route = () => window.location.pathname.slice(1) || 'home';
 const safe = (value, limit = 100) => typeof value === 'string' ? value.replace(/[\r\n]/g, ' ').slice(0, limit) : value;
 const baseParams = () => ({
   research_session_id: sessionId,

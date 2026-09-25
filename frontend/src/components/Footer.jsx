@@ -24,6 +24,10 @@ export default function Footer() {
 
         </ul>
       </div>
+      
+      <div className="seo-footer-text" style={{ textAlign: 'center', maxWidth: '800px', margin: '20px auto', fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+        <p><strong>Backbenchers</strong> is the premier student-built study portal for <strong>JK Lakshmipat University (JKLU)</strong>. We provide comprehensive B.Tech study materials, including <strong>previous year question papers (PYQs)</strong>, handwritten notes, formulas, and exam preparation resources. Created by <strong>Rudrapal Singh Shekhawat</strong> (Dophera), this platform helps JKLU students access everything they need to excel in their semester exams.</p>
+      </div>
       <p className="footer-copyright">&copy; {new Date().getFullYear()} Backbenchers Portal. All rights reserved.</p>
     </footer>
   );

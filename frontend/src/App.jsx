@@ -13,7 +13,7 @@ import Profile from './components/Profile';
 import MockPdfViewer from './components/MockPdfViewer';
 import CreditsModal from './components/CreditsModal';
 import Footer from './components/Footer';
-import { getSemesterForSubject } from './data/subjects';
+import { getSemesterForSubject, getAllSubjects } from './data/subjects';
 import { API_URL } from './config';
 import { secureStorage } from './utils/secureStorage';
 import { ANALYTICS_EVENTS, identifyResearchUser, track, trackMaterial, trackPageView } from './analytics';
@@ -54,6 +54,16 @@ export default function App() {
   });
 
   const [blockedState, setBlockedState] = useState(null);
+
+  const navigate = (path, replace = false) => {
+    if (replace) {
+      window.history.replaceState(null, '', path);
+    } else {
+      window.history.pushState(null, '', path);
+    }
+    window.dispatchEvent(new Event('popstate'));
+  };
+
 
   const getAuthHeaders = () => {
     if (!user) return {};
@@ -149,39 +159,55 @@ export default function App() {
 
   // Handle browser back button via Native Hash Routing (100% reliable on mobile)
   useEffect(() => {
-    const handleHashChange = () => {
-      const rawHash = window.location.hash;
+        const handleRoute = () => {
+      // MSAL processes its own authentication hashes
+      if (window.location.hash.includes('code=') || window.location.hash.includes('state=')) return;
       
-      // Let MSAL process its own authentication hashes (code, state, error) in the popup/redirect
-      if (rawHash.includes('code=') || rawHash.includes('state=') || rawHash.includes('error=')) {
-        return; 
+      const path = window.location.pathname;
+      let view = path === '/' ? 'home' : path.slice(1);
+      
+      // Dynamic Title & Meta mapping
+      let title = "Backbenchers | JKLU B.Tech Notes & PYQs";
+      
+      if (view.startsWith('semester/')) {
+        view = view.replace('semester/', 'semester-');
+        title = `Semester ${view.split('-')[1]} Subjects | JKLU B.Tech PYQs`;
+      } else if (view.startsWith('year/')) {
+        view = view.replace('year/', 'year-').replace('/', '-');
+        title = `Year ${view.split('-')[1]} Subjects | JKLU B.Tech PYQs`;
+      } else if (view.startsWith('subject/')) {
+        const code = view.split('/')[1];
+        view = 'subject-detail';
+        const allSubs = getAllSubjects();
+        const sub = allSubs.find(s => s.code === code);
+        
+        if (sub && (!selectedSubject || selectedSubject.code !== code)) {
+           setSelectedSubject(sub);
+           secureStorage.setItem('backbenchers_selected_subject', JSON.stringify(sub));
+        }
+        
+        const subjName = sub ? sub.name : (selectedSubject ? selectedSubject.name : code);
+        title = `${code} ${subjName} PYQs | JKLU Backbenchers`;
+      } else if (view === 'downloads' || view === 'saved' || view === 'profile' || view === 'admin') {
+        title = `${view.charAt(0).toUpperCase() + view.slice(1)} | Backbenchers JKLU`;
       }
       
-      if (!rawHash || rawHash === '') {
-        // If they navigate back to the root without a hash, let the browser handle it.
-        // It will either exit the site naturally or just clear the hash.
-        return;
-      }
+      document.title = title;
 
-      const hash = rawHash.replace('#', '');
+      const hash = view;
       
       if (hash === 'subject-detail') {
-        // If they navigate to subject-detail but no subject is in state (e.g. refresh), go home
-        if (!selectedSubject) {
-          window.location.replace('#home');
+        if (!selectedSubject && !path.startsWith('/subject/')) {
+          navigate('/', true);
           setActiveView('home');
-          trackActivity('VIEW_PAGE', 'Home Page');
-          trackPageView('home');
         } else {
           setActiveView('subject-detail');
-          setActivePdfFile(null); // Ensure PDF is closed if they back out
-          trackActivity('VIEW_PAGE', `Subject: ${selectedSubject.code || selectedSubject.name}`);
-          trackPageView('subject_detail', { subject_code: selectedSubject.code || 'unknown' });
+          setActivePdfFile(null);
+          trackActivity('VIEW_PAGE', `Subject: ${path}`);
+          trackPageView('subject_detail', { subject_code: path });
         }
       } else if (hash === 'pdf-viewer') {
-        // Do nothing on hashchange to pdf-viewer.
-        // The PDF modal is opened by handleViewFile setting activePdfFile synchronously.
-        // If we check activePdfFile here, it fails due to stale closures.
+        // Keep modal
       } else if (hash.startsWith('semester-') || hash.startsWith('year-')) {
         setActiveView(hash);
         setActivePdfFile(null);
@@ -190,45 +216,27 @@ export default function App() {
       } else if (hash === 'credits') {
         setActiveView('credits');
         setActivePdfFile(null);
-        trackActivity('VIEW_PAGE', 'Credits Modal');
-        trackPageView('credits');
       } else if (hash === 'home' || hash === 'admin' || hash === 'downloads' || hash === 'saved' || hash === 'profile') {
         setActiveView(hash);
         setActivePdfFile(null);
-        
-        let pageName = hash.charAt(0).toUpperCase() + hash.slice(1);
-        if (hash === 'admin') pageName = 'Admin Panel';
-        trackActivity('VIEW_PAGE', `${pageName} Page`);
+        trackActivity('VIEW_PAGE', `${hash} Page`);
         trackPageView(hash);
-
         if (hash === 'home') {
           setSelectedSubject(null);
           secureStorage.removeItem('backbenchers_selected_subject');
         }
       } else {
-        // Default fallback
         setActiveView('home');
         setActivePdfFile(null);
-        window.location.replace('#home');
-        trackActivity('VIEW_PAGE', 'Home Page (Fallback)');
-        trackPageView('home', { navigation_result: 'fallback' });
+        navigate('/', true);
       }
-
-      // Automatically close sidebar on navigating for all devices (mobile + laptop)
       setSidebarCollapsed(true);
     };
 
-    window.addEventListener('hashchange', handleHashChange);
-    
-    // Initialize hash on load
-    if (!window.location.hash) {
-      window.history.pushState(null, '', '#buffer'); // Extra buffer layer
-      window.location.hash = 'home'; // Push instead of replace
-    } else {
-      handleHashChange();
-    }
+    window.addEventListener('popstate', handleRoute);
+    handleRoute();
 
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('popstate', handleRoute);
   }, [selectedSubject]);
 
   // Update theme html attribute
@@ -283,7 +291,7 @@ export default function App() {
     
     const nextView = userData.isAdmin ? 'admin' : 'home';
     setActiveView(nextView);
-    window.location.replace('#' + nextView);
+    navigate('/' + nextView, true);
   };
 
   const handleLogout = async () => {
@@ -292,7 +300,7 @@ export default function App() {
     setUser(null);
     secureStorage.removeItem('backbenchers_user');
     setActiveView('home');
-    window.location.hash = 'home';
+    navigate('/');
 
     // 2. Then redirect to Microsoft to kill the MSAL session
     try {
@@ -372,7 +380,7 @@ export default function App() {
     setSelectedSubject(subject);
     secureStorage.setItem('backbenchers_selected_subject', JSON.stringify(subject));
     setActiveView('subject-detail');
-    window.location.hash = 'subject-detail'; // Downward navigation pushes to history
+    navigate(`/subject/${subject.code || selectedSubject.code}`); // Downward navigation pushes to history
   };
 
   const handleViewFile = (file) => {
@@ -383,7 +391,7 @@ export default function App() {
     secureStorage.setItem('backbenchers_last_opened', JSON.stringify(fileWithTime));
     syncActivityToCloud({ lastOpenedFile: fileWithTime });
     trackActivity('VIEW_PDF', file.title);
-    window.location.hash = 'pdf-viewer';
+    // modal opens over current path;
   };
 
   // Physically download file and log transaction in backend
@@ -515,12 +523,12 @@ export default function App() {
               const semNum = selectedSubject?.semester || (selectedSubject ? getSemesterForSubject(selectedSubject.code) : null);
               if (semNum) {
                 if (String(semNum).startsWith('year-')) {
-                  window.location.replace(`#${semNum}`);
+                  navigate(`/${semNum.replace('-', '/')}`, true);
                 } else {
-                  window.location.replace(`#semester-${semNum}`);
+                  navigate(`/semester/${semNum}`, true);
                 }
               } else {
-                window.location.replace('#home');
+                navigate('/', true);
               }
             }}
             isAdmin={user?.isAdmin}
@@ -559,7 +567,7 @@ export default function App() {
             <SubjectGrid 
               activeSemester={semNum} 
               onSelectSubject={handleSelectSubject} 
-              onBack={() => { window.location.replace('#home'); }} 
+              onBack={() => { navigate('/', true); }} 
             />
           );
         } else if (activeView.startsWith('year-')) {
@@ -571,7 +579,7 @@ export default function App() {
               activeYear={yearNum} 
               activeBranch={branchName}
               onSelectSubject={handleSelectSubject} 
-              onBack={() => { window.location.replace('#home'); }} 
+              onBack={() => { navigate('/', true); }} 
             />
           );
         }
@@ -674,7 +682,7 @@ export default function App() {
               setSelectedSubject(null);
               secureStorage.removeItem('backbenchers_selected_subject');
             }
-            window.location.hash = view;
+            navigate(`/${view}`);
             setSidebarCollapsed(true);
           }}
           isCollapsed={sidebarCollapsed}
@@ -707,7 +715,7 @@ export default function App() {
       {activeView === 'credits' && (
         <CreditsModal onClose={() => {
           setActiveView('home');
-          window.location.replace('#home');
+          navigate('/', true);
         }} />
       )}
     </div>

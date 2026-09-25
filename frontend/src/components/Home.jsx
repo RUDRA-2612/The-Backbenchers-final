@@ -74,7 +74,7 @@ export default function Home({ onSelectSubject, lastOpenedFile, onViewFile }) {
                   <button 
                     key={branch.id}
                     className="semester-btn"
-                    onClick={() => { window.location.hash = `year-${idx + 1}-${branch.id}`; }}
+                    onClick={() => { window.history.pushState(null, '', `/year/${idx + 1}/${branch.id}`); window.dispatchEvent(new Event('popstate'));; }}
                   >
                     {branch.label}
                   </button>
@@ -85,7 +85,7 @@ export default function Home({ onSelectSubject, lastOpenedFile, onViewFile }) {
                 <button 
                   className="semester-btn"
                   style={{ width: '100%' }}
-                  onClick={() => { window.location.hash = year.action.hash; }}
+                  onClick={() => { window.history.pushState(null, '', `/${year.action.hash.replace('#', '')}`); window.dispatchEvent(new Event('popstate'));; }}
                 >
                   {year.action.label}
                 </button>
@@ -96,7 +96,7 @@ export default function Home({ onSelectSubject, lastOpenedFile, onViewFile }) {
                   <button 
                     key={sem.num} 
                     className="semester-btn"
-                    onClick={() => { window.location.hash = 'semester-' + sem.num; }}
+                    onClick={() => { window.history.pushState(null, '', `/semester/${sem.num}`); window.dispatchEvent(new Event('popstate'));; }}
                   >
                     {sem.label}
                   </button>
