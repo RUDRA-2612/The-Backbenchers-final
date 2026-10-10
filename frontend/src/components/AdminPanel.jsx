@@ -26,6 +26,9 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
   const [reports, setReports] = useState([]);
   const [userActivities, setUserActivities] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
+  const [stats, setStats] = useState({
+    materials: 0, logins: 0, downloads: 0, students: 0, blocked: 0, reports: 0, feedback: 0
+  });
   const [timelineUser, setTimelineUser] = useState(null); // stores { email, name } to show modal
   const [updatingId, setUpdatingId] = useState(null);
   const [userSearchQuery, setUserSearchQuery] = useState('');
@@ -91,43 +94,39 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
     try {
       const timestamp = Date.now();
       
-      const loginRes = await adminFetch(`${API_URL}/api/admin/logins?t=${timestamp}`, { cache: 'no-store' });
-      const loginData = await loginRes.json();
-      setLogins(Array.isArray(loginData) ? loginData : []);
+      // Always fetch stats to update the counts in the tabs quickly
+      adminFetch(`${API_URL}/api/admin/stats?t=${timestamp}`, { cache: 'no-store' })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => data && setStats(data))
+        .catch(console.error);
 
-      const downloadRes = await adminFetch(`${API_URL}/api/admin/downloads?t=${timestamp}`, { cache: 'no-store' });
-      const downloadData = await downloadRes.json();
-      setDownloads(Array.isArray(downloadData) ? downloadData : []);
-
-      const studentRes = await adminFetch(`${API_URL}/api/admin/users?t=${timestamp}`, { cache: 'no-store' });
-      const studentData = await studentRes.json();
-      setStudents(Array.isArray(studentData) ? studentData : []);
-
-      const blockedRes = await adminFetch(`${API_URL}/api/admin/blocked-emails?t=${timestamp}`, { cache: 'no-store' });
-      const blockedData = await blockedRes.json();
-      setBlockedEmails(Array.isArray(blockedData) ? blockedData : []);
-
-      const activitiesRes = await adminFetch(`${API_URL}/api/admin/user-activities?t=${timestamp}`, { cache: 'no-store' });
-      if (activitiesRes.ok) {
-        const activitiesData = await activitiesRes.json();
-        setUserActivities(activitiesData || []);
+      // Fetch ONLY what is needed for the active tab to drastically reduce loading time!
+      if (adminTab === 'logins') {
+        const res = await adminFetch(`${API_URL}/api/admin/logins?t=${timestamp}`, { cache: 'no-store' });
+        if (res.ok) setLogins(await res.json());
+      } else if (adminTab === 'downloads') {
+        const res = await adminFetch(`${API_URL}/api/admin/downloads?t=${timestamp}`, { cache: 'no-store' });
+        if (res.ok) setDownloads(await res.json());
+      } else if (adminTab === 'students') {
+        const [usersRes, actRes, logsRes] = await Promise.all([
+          adminFetch(`${API_URL}/api/admin/users?t=${timestamp}`, { cache: 'no-store' }),
+          adminFetch(`${API_URL}/api/admin/user-activities?t=${timestamp}`, { cache: 'no-store' }),
+          adminFetch(`${API_URL}/api/admin/activity-logs?t=${timestamp}`, { cache: 'no-store' })
+        ]);
+        if (usersRes.ok) setStudents(await usersRes.json());
+        if (actRes.ok) setUserActivities(await actRes.json());
+        if (logsRes.ok) setActivityLogs(await logsRes.json());
+      } else if (adminTab === 'blocked') {
+        const res = await adminFetch(`${API_URL}/api/admin/blocked-emails?t=${timestamp}`, { cache: 'no-store' });
+        if (res.ok) setBlockedEmails(await res.json());
+      } else if (adminTab === 'manage' || adminTab === 'upload') {
+        const res = await adminFetch(`${API_URL}/api/materials?t=${timestamp}`);
+        if (res.ok) setMaterials(await res.json());
+      } else if (adminTab === 'reports' || adminTab === 'feedback') {
+        const res = await adminFetch(`${API_URL}/api/admin/reports?t=${timestamp}`, { cache: 'no-store' });
+        if (res.ok) setReports(await res.json());
       }
-
-      const timelineRes = await adminFetch(`${API_URL}/api/admin/activity-logs?t=${timestamp}`, { cache: 'no-store' });
-      if (timelineRes.ok) {
-        const timelineData = await timelineRes.json();
-        setActivityLogs(timelineData || []);
-      }
-
-      const materialRes = await adminFetch(`${API_URL}/api/materials?t=${timestamp}`);
-      const materialData = await materialRes.json();
-      setMaterials(Array.isArray(materialData) ? materialData : []);
-
-      const reportRes = await adminFetch(`${API_URL}/api/admin/reports?t=${timestamp}`, { cache: 'no-store' });
-      if (reportRes.ok) {
-        const reportData = await reportRes.json();
-        setReports(Array.isArray(reportData) ? reportData : []);
-      }
+      
     } catch (err) {
       console.error('Error fetching admin details:', err);
     }
@@ -136,6 +135,32 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
   useEffect(() => {
     fetchLogs();
   }, [adminTab]);
+
+  // Lazily fetch data required for the global search bar if they use it
+  useEffect(() => {
+    const timestamp = Date.now();
+    if (showUserSearch && students.length === 0) {
+      adminFetch(`${API_URL}/api/admin/users?t=${timestamp}`, { cache: 'no-store' })
+        .then(res => res.ok ? res.json() : [])
+        .then(setStudents)
+        .catch(console.error);
+    }
+    
+    if (selectedUserEmail) {
+      if (logins.length === 0) {
+        adminFetch(`${API_URL}/api/admin/logins?t=${timestamp}`, { cache: 'no-store' })
+          .then(res => res.ok ? res.json() : [])
+          .then(setLogins)
+          .catch(console.error);
+      }
+      if (downloads.length === 0) {
+        adminFetch(`${API_URL}/api/admin/downloads?t=${timestamp}`, { cache: 'no-store' })
+          .then(res => res.ok ? res.json() : [])
+          .then(setDownloads)
+          .catch(console.error);
+      }
+    }
+  }, [showUserSearch, selectedUserEmail]);
 
   const handleBlockEmail = async (e) => {
     e.preventDefault();
@@ -599,7 +624,7 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
           <FileText size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Manage Materials
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'manage' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'manage' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {(materials || []).length}
+            {stats.materials || (materials || []).length}
           </span>
         </button>
         <button
@@ -609,7 +634,7 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
           <History size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Student Login Audit
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'logins' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'logins' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {(logins || []).length}
+            {stats.logins || (logins || []).length}
           </span>
         </button>
         <button
@@ -619,7 +644,7 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
           <Download size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Downloads Audit
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'downloads' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'downloads' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {(downloads || []).length}
+            {stats.downloads || (downloads || []).length}
           </span>
         </button>
         <button
@@ -629,7 +654,7 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
           <Users size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Registered Students
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'students' ? 'var(--accent)' : 'var(--accent-soft)', color: adminTab === 'students' ? '#fff' : 'var(--accent)', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {new Set((students || []).map(s => s.email)).size}
+            {stats.students || new Set((students || []).map(s => s.email)).size}
           </span>
         </button>
         <button
@@ -639,7 +664,7 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
           <Ban size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           Blocked Students
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'blocked' ? '#ff4d4f' : 'rgba(255, 77, 79, 0.1)', color: adminTab === 'blocked' ? '#fff' : '#ff4d4f', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {(blockedEmails || []).length}
+            {stats.blocked || (blockedEmails || []).length}
           </span>
         </button>
         <button
@@ -649,7 +674,7 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
           <Flag size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           User Reports
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'reports' ? '#ff4d4f' : 'rgba(255, 77, 79, 0.1)', color: adminTab === 'reports' ? '#fff' : '#ff4d4f', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {(reports || []).filter(r => r.title !== 'FEEDBACK').length}
+            {stats.reports || (reports || []).filter(r => r.title !== 'FEEDBACK').length}
           </span>
         </button>
         <button
@@ -659,7 +684,7 @@ export default function AdminPanel({ user, onMaterialUploaded }) {
           <MessageSquare size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
           User Feedback
           <span style={{ marginLeft: '6px', backgroundColor: adminTab === 'feedback' ? '#3b82f6' : 'rgba(59, 130, 246, 0.1)', color: adminTab === 'feedback' ? '#fff' : '#3b82f6', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {(reports || []).filter(r => r.title === 'FEEDBACK').length}
+            {stats.feedback || (reports || []).filter(r => r.title === 'FEEDBACK').length}
           </span>
         </button>
       </div>

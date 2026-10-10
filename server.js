@@ -371,6 +371,38 @@ app.post('/api/auth/change-password', async (req, res) => {
   }
 });
 
+app.get('/api/admin/stats', verifyAdmin, async (req, res) => {
+  try {
+    const [
+      { count: materialsCount },
+      { count: loginsCount },
+      { count: downloadsCount },
+      { count: studentsCount },
+      { count: blockedCount },
+      { data: reports }
+    ] = await Promise.all([
+      supabase.from('materials').select('*', { count: 'exact', head: true }),
+      supabase.from('login_logs').select('*', { count: 'exact', head: true }),
+      supabase.from('download_logs').select('*', { count: 'exact', head: true }),
+      supabase.from('users').select('*', { count: 'exact', head: true }),
+      supabase.from('blocked_emails').select('*', { count: 'exact', head: true }),
+      supabase.from('reports').select('title')
+    ]);
+
+    res.json({
+      materials: materialsCount || 0,
+      logins: loginsCount || 0,
+      downloads: downloadsCount || 0,
+      students: studentsCount || 0,
+      blocked: blockedCount || 0,
+      reports: reports ? reports.filter(r => r.title !== 'FEEDBACK').length : 0,
+      feedback: reports ? reports.filter(r => r.title === 'FEEDBACK').length : 0,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/admin/logins', verifyAdmin, async (req, res) => {
   try {
     const logs = await fetchAllRecords('login_logs', '*', 'timestamp', false);
