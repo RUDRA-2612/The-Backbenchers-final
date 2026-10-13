@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, Flag, Beaker, PauseCircle } from 'lucide-react';
+import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, Flag, Beaker } from 'lucide-react';
 import { secureStorage } from '../utils/secureStorage';
 
 // Semester 3 & 4 (Second Year) subject codes — View Online temporarily paused
@@ -161,27 +161,15 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], isA
               </div>
               <div className="resource-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  {SEM_3_4_CODES.has(subject.code) ? (
-                    <button
-                      className="btn btn-secondary"
-                      disabled
-                      title="View Online is temporarily unavailable for 2nd Year subjects"
-                      style={{ padding: '0.5rem', opacity: 0.45, cursor: 'not-allowed', filter: 'grayscale(0.4)' }}
-                    >
-                      <PauseCircle size={18} />
-                      <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Paused</span>
-                    </button>
-                  ) : (
-                    <button 
-                      className="btn btn-secondary btn-accent-light action-btn-hover" 
-                      onClick={() => onViewFile(file)}
-                      title="View Document Online"
-                      style={{ padding: '0.5rem' }}
-                    >
-                      <Eye size={18} />
-                      <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>View Online</span>
-                    </button>
-                  )}
+                  <button 
+                    className="btn btn-secondary btn-accent-light action-btn-hover" 
+                    onClick={SEM_3_4_CODES.has(subject.code) ? undefined : () => onViewFile(file)}
+                    title="View Document Online"
+                    style={{ padding: '0.5rem' }}
+                  >
+                    <Eye size={18} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>View Online</span>
+                  </button>
 
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
