@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Loader2, AlertCircle } from 'lucide-react';
 import { ANALYTICS_EVENTS, trackMaterial } from '../analytics';
+import { API_URL } from '../config';
+import { secureStorage } from '../utils/secureStorage';
 
-export default function MockPdfViewer({ file, onClose, onDownload }) {
+export default function MockPdfViewer({ file, authHeaders, onClose, onDownload }) {
   const [isMobile, setIsMobile] = useState(false);
-  const openedAt = React.useRef(0);
+  const [blobUrl, setBlobUrl] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const openedAt = useRef(0);
 
   useEffect(() => {
     openedAt.current = Date.now();
@@ -59,12 +64,86 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
     };
   }, []);
 
+  // Load PDF content securely via in-memory Blob URL
+  useEffect(() => {
+    let isMounted = true;
+    let activeBlobUrl = null;
+
+    const loadDocument = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Special case for static disclaimer/policy file
+        if (file.id === 'disclaimer' || file.filepath === '/Disclaimer_and_Content_Policy.pdf') {
+          if (isMounted) {
+            setBlobUrl('/Disclaimer_and_Content_Policy.pdf');
+            setIsLoading(false);
+          }
+          return;
+        }
+
+        // Resolve auth headers
+        let headers = authHeaders;
+        if (!headers || Object.keys(headers).length === 0) {
+          try {
+            const saved = secureStorage.getItem('backbenchers_user');
+            if (saved) {
+              const u = JSON.parse(saved);
+              headers = {
+                'x-user-email': u.email || '',
+                'x-session-id': u.sessionId || '',
+                'x-user-id': u.id || ''
+              };
+            }
+          } catch (e) {}
+        }
+
+        const response = await fetch(`${API_URL}/api/materials/${file.id}/view`, {
+          headers: headers || {}
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to load document (${response.status})`);
+        }
+
+        const blob = await response.blob();
+        if (!isMounted) return;
+
+        activeBlobUrl = URL.createObjectURL(blob);
+        setBlobUrl(activeBlobUrl);
+      } catch (err) {
+        console.error('Failed to securely load document:', err);
+        if (isMounted) {
+          setError('Unable to load document securely. Please verify your connection or try again.');
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadDocument();
+
+    return () => {
+      isMounted = false;
+      if (activeBlobUrl) {
+        URL.revokeObjectURL(activeBlobUrl);
+      }
+    };
+  }, [file.id, file.filepath]);
+
   return (
     <div className="pdf-viewer-overlay">
       <style>
         {`
           @media print {
             body { display: none !important; }
+          }
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
           }
         `}
       </style>
@@ -83,16 +162,34 @@ export default function MockPdfViewer({ file, onClose, onDownload }) {
         
         <div className="pdf-body">
           <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-            <iframe 
-              src={`/pdfjs/web/viewer.html?file=${encodeURIComponent(file.filepath)}#zoom=auto`} 
-              title={file.title} 
-              width="100%" 
-              height="100%" 
-              style={{ border: 'none', backgroundColor: '#fff', display: 'block' }}
-            />
+            {isLoading && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '1rem', color: 'var(--text-secondary)' }}>
+                <Loader2 size={36} style={{ animation: 'spin 1s linear infinite' }} />
+                <p style={{ fontWeight: 500, fontSize: '0.95rem' }}>Loading document securely...</p>
+              </div>
+            )}
+            
+            {!isLoading && error && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '1rem', color: '#ef4444', textAlign: 'center', padding: '2rem' }}>
+                <AlertCircle size={40} />
+                <p style={{ fontWeight: 600, maxWidth: '400px' }}>{error}</p>
+                <button className="btn btn-secondary" onClick={closeViewer} style={{ marginTop: '0.5rem' }}>Close</button>
+              </div>
+            )}
+
+            {!isLoading && !error && blobUrl && (
+              <iframe 
+                src={`/pdfjs/web/viewer.html?file=${encodeURIComponent(blobUrl)}#zoom=auto`} 
+                title={file.title} 
+                width="100%" 
+                height="100%" 
+                style={{ border: 'none', backgroundColor: '#fff', display: 'block' }}
+              />
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
+

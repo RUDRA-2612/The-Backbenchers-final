@@ -419,22 +419,20 @@ export default function App() {
         });
       }
 
-      // 2. Trigger browser file download (blob fetch or custom file download)
-      // Since these are PDF/text guides, we trigger a browser download from the server path
-      let fileUrl = file.filepath.startsWith('http') ? file.filepath : `${API_URL}${file.filepath}`;
-      
-      // Force Supabase to send as attachment for direct local download
-      if (fileUrl.includes('supabase.co/storage')) {
-        fileUrl += '?download=';
-      }
-      
+      // 2. Download via secure admin endpoint
+      const res = await fetch(`${API_URL}/api/admin/materials/${file.id}/download`, {
+        headers: getAuthHeaders()
+      });
+      if (!res.ok) throw new Error('Download failed from server');
+      const blob = await res.blob();
+      const downloadUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = fileUrl;
+      link.href = downloadUrl;
       link.setAttribute('download', file.filename || 'download.pdf');
-      link.setAttribute('target', '_blank'); // fallback
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
 
       // 3. Add to local downloads list if not already there
       const isExist = downloadedFiles.some(d => d.id === file.id);
@@ -707,6 +705,7 @@ export default function App() {
       {activePdfFile && (
         <MockPdfViewer 
           file={activePdfFile} 
+          authHeaders={getAuthHeaders()}
           onClose={() => window.history.back()}
           onDownload={handleDownloadFile}
         />

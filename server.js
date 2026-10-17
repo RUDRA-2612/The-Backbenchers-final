@@ -555,10 +555,98 @@ app.get('/api/materials', async (req, res) => {
   try {
     // Cache on Edge for 5 minutes (300s) to drastically reduce Vercel Edge requests
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
-    const materials = await fetchAllRecords('materials', '*', 'uploadedAt', false);
-    res.json(materials);
+    const materials = await fetchAllRecords('materials', 'id, title, subjectCode, category, subcategory, year, filename, isDefault, uploadedAt', 'uploadedAt', false);
+    // Strip filepath so direct storage and download URLs are NEVER leaked in network inspect
+    const safeMaterials = (materials || []).map(m => {
+      const { filepath, ...safe } = m;
+      return safe;
+    });
+    res.json(safeMaterials);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
+
+// Secure stream endpoint for authenticated viewing inside PDF viewer
+app.get('/api/materials/:id/view', verifyUser, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'Material ID is required' });
+
+    const { data: material, error } = await supabase
+      .from('materials')
+      .select('id, title, filepath, filename')
+      .eq('id', id)
+      .single();
+
+    if (error || !material || !material.filepath) {
+      return res.status(404).json({ error: 'Material document not found' });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename="preview.pdf"');
+    res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+
+    if (material.filepath.startsWith('http://') || material.filepath.startsWith('https://')) {
+      const upstreamRes = await fetch(material.filepath);
+      if (!upstreamRes.ok) {
+        return res.status(upstreamRes.status).json({ error: 'Failed to retrieve file from storage' });
+      }
+      const arrayBuffer = await upstreamRes.arrayBuffer();
+      return res.send(Buffer.from(arrayBuffer));
+    } else {
+      const localPath = path.join(__dirname, material.filepath);
+      if (fs.existsSync(localPath)) {
+        return fs.createReadStream(localPath).pipe(res);
+      }
+      return res.status(404).json({ error: 'Local file not found' });
+    }
+  } catch (err) {
+    console.error('Error serving material view:', err);
+    res.status(500).json({ error: 'Error streaming document' });
+  }
+});
+
+// Secure admin-only download endpoint
+app.get('/api/admin/materials/:id/download', verifyAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'Material ID is required' });
+
+    const { data: material, error } = await supabase
+      .from('materials')
+      .select('id, title, filepath, filename')
+      .eq('id', id)
+      .single();
+
+    if (error || !material || !material.filepath) {
+      return res.status(404).json({ error: 'Material document not found' });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(material.filename || 'download.pdf')}"`);
+
+    if (material.filepath.startsWith('http://') || material.filepath.startsWith('https://')) {
+      const upstreamRes = await fetch(material.filepath);
+      if (!upstreamRes.ok) {
+        return res.status(upstreamRes.status).json({ error: 'Failed to retrieve file from storage' });
+      }
+      const arrayBuffer = await upstreamRes.arrayBuffer();
+      return res.send(Buffer.from(arrayBuffer));
+    } else {
+      const localPath = path.join(__dirname, material.filepath);
+      if (fs.existsSync(localPath)) {
+        return fs.createReadStream(localPath).pipe(res);
+      }
+      return res.status(404).json({ error: 'Local file not found' });
+    }
+  } catch (err) {
+    console.error('Error downloading material:', err);
+    res.status(500).json({ error: 'Error downloading document' });
+  }
+});
+
 
 app.post('/api/materials/signed-url', verifyAdmin, async (req, res) => {
   try {

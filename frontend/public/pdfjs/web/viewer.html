@@ -35,6 +35,21 @@ See https://github.com/adobe-type-tools/cmap-resources
         body { display: none !important; }
       }
     </style>
+    <script>
+      // Disable right-click in viewer
+      document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+      });
+      // Disable Save and Print key shortcuts
+      window.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && ['s', 'S', 'p', 'P', 'u', 'U'].includes(e.key)) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      }, true);
+    </script>
 
     <link rel="stylesheet" href="viewer.css">
 
