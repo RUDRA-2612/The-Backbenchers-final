@@ -2,14 +2,6 @@ import React, { useState } from 'react';
 import { ArrowLeft, Eye, Download, FileText, Calendar, BookOpen, AlertCircle, Bookmark, Flag, Beaker } from 'lucide-react';
 import { secureStorage } from '../utils/secureStorage';
 
-// Semester 3 & 4 (Second Year) subject codes — View Online temporarily paused
-const SEM_3_4_CODES = new Set([
-  // Semester 3
-  'CS1131', 'CS1134', 'CS1133', 'CS1141', 'LS1108', 'CC1103',
-  // Semester 4
-  'CS1105', 'CS1138', 'CS1108', 'AS2170', 'LS1109', 'CC1104'
-]);
-
 export default function SubjectDetail({ subject, materials, savedFiles = [], isAdmin, onBack, onViewFile, onDownloadFile, onSaveFile, onReportFile }) {
   const [activeTab, setActiveTab] = useState(() => secureStorage.getItem('bb_activeTab') || 'papers');
   const [activeSubTab, setActiveSubTab] = useState(() => secureStorage.getItem('bb_activeSubTab') || 'mid-term');
@@ -163,7 +155,7 @@ export default function SubjectDetail({ subject, materials, savedFiles = [], isA
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button 
                     className="btn btn-secondary btn-accent-light action-btn-hover" 
-                    onClick={SEM_3_4_CODES.has(subject.code) ? undefined : () => onViewFile(file)}
+                    onClick={() => onViewFile(file)}
                     title="View Document Online"
                     style={{ padding: '0.5rem' }}
                   >
